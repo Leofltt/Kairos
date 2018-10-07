@@ -1,0 +1,45 @@
+name:                Kairos
+version:             0.1.0.0
+github:              "leofltt/Kairos"
+license:             BSD3
+author:              "Leo Foletto"
+maintainer:          "flttleonardo@gmail.com"
+copyright:           "2018, Leonardo Foletto"
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+# Metadata used when publishing your package
+synopsis:            Live coding library
+# category:            Sound
+
+description:         Please see the README on GitHub at <https://github.com/leofltt/Kairos#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+
+library:
+  source-dirs: src
+
+executables:
+  Kairos-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - Kairos
+
+tests:
+  Kairos-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - Kairos
