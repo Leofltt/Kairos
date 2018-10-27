@@ -1,6 +1,6 @@
 module Main where
 
-import Lib
+import Kairos
 
 main :: IO ()
-main = someFunc
+main = putStrLn "not yet implemented"

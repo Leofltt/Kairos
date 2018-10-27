@@ -21,6 +21,15 @@ dependencies:
 
 library:
   source-dirs: src
+  
+  exposed-modules: 
+  - Kairos 
+  - Kairos.Base
+  - Kairos.Time
+  - Kairos.Clock
+  - Kairos.IOI
+  - Kairos.Instrument
+  - Kairos.Network
 
 executables:
   Kairos-exe:
