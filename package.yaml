@@ -24,6 +24,7 @@ library:
   
   exposed-modules: 
   - Kairos 
+  other-modules:
   - Kairos.Base
   - Kairos.Time
   - Kairos.Clock
