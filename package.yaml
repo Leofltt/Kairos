@@ -9,6 +9,7 @@ copyright:           "2018, Leonardo Foletto"
 extra-source-files:
 - README.md
 - ChangeLog.md
+- Kairos.csd
 
 # Metadata used when publishing your package
 synopsis:            Live coding library
