@@ -7,12 +7,13 @@ data Clock = Clock { at :: Time, timeSigs :: [TimeSignature], active :: Bool } d
 
 data TimeSignature = TS { beat :: Double, bar :: Int, bpm :: Double} deriving (Show)
 
-data Instr = I { id :: Int, pf :: String, iOI :: [IOI] }
+-- Instruments have an id and pfields
+data Instr = I { id :: Int, pf :: String }
 
 -- an event is an action with a time of execution
 type Event a =  (Time, a)
 
--- a behavior is a function from event to actionx
+-- a behavior is a function from event to action
 type Behavior a = Clock -> Event a
 
 type Time = Double
