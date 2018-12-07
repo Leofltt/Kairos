@@ -21,7 +21,8 @@ dependencies:
 - base >= 4.7 && < 5
 - time
 - stm
-- random   
+- random
+- network  
 library:
   source-dirs: src
   

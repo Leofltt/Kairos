@@ -8,7 +8,7 @@ data Clock = Clock { at :: Double, timeSigs :: [TimeSignature], active :: Bool }
 data TimeSignature = TS { beat :: Double, bar :: Int, bpm :: Double} deriving (Show)
 
 -- Instruments have an id and pfields
-data Instr = I { id :: Int, pf :: Pfields }
+data Instr = I { id :: Int, pf :: String }
 
 -- implement pfields as Data.Map or TVars
 
