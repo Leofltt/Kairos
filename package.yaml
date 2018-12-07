@@ -22,7 +22,8 @@ dependencies:
 - time
 - stm
 - random
-- network  
+- network
+- bytestring  
 library:
   source-dirs: src
   
