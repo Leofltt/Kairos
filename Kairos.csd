@@ -40,11 +40,11 @@ ifreq2    =        800                     ; Tune
 
 aenv     expsega  .1, .0005, 1, pa - .0005, .01   ; Percussive envelope
 asqr1    oscil    1, ifreq1, 2, -1            
-asqr2    oscil    1, ifreq1*1.4471, 2, -1     
-asqr3    oscil    1, ifreq1*1.6170, 2, -1     
-asqr4    oscil    1, ifreq1*1.9265, 2, -1     
-asqr5    oscil    1, ifreq1*2.5028, 2, -1     
-asqr6    oscil    1, ifreq1*2.6637, 2, -1     
+asqr2    oscil    1, ifreq1*1.342, 2, -1     
+asqr3    oscil    1, ifreq1*1.2312, 2, -1     
+asqr4    oscil    1, ifreq1*1.6532, 2, -1     
+asqr5    oscil    1, ifreq1*1.9523, 2, -1     
+asqr6    oscil    1, ifreq1*2.1523, 2, -1     
 a808     sum      asqr1, asqr2, asqr3, asqr4, asqr5, asqr6  
 a808     butterhp a808, 5270                 
 a808     butterhp a808, 5270                 
