@@ -1,11 +1,9 @@
--- this module re-exports everything
-
-module Kairos where
+module Kairos  where
 
 import Kairos.Base
-import Kairos.IOI
-import Kairos.Instrument
+import Kairos.Network
 import Kairos.Time
 import Kairos.Clock
-import Kairos.Network
+import Kairos.IOI
+import Kairos.Instrument
 

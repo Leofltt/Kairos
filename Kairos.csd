@@ -26,8 +26,10 @@ garvL, garvbR init 0
 
 instr 1 ;Sampler
 
-aLeft, aRight diskin p4
-outs aLeft, aRight
+; HOW TO EVALUATE IF A SAMPLE IS STEREO OR MONO AND DECIDE ON THE NUMBER OF OUTS BASED ON THAT?
+
+aLeft diskin p4
+outs aLeft, aLeft
 
 endin
 

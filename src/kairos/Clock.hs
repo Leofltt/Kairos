@@ -5,7 +5,17 @@ import Control.Concurrent.STM
 import Data.Time.Clock.POSIX
 import Kairos.Base
 
-getCurrTime :: IO Double
-getCurrTime = do x <- getPOSIXTime; return $ realToFrac x
+getNow :: IO Double
+getNow = do x <- getPOSIXTime; return $ realToFrac x
 
+timeElapsed :: Clock -> IO Double
+timeElapsed clock = let
+  s = at clock     in
+  do 
+  x <- getNow
+  return (x - s)
 
+newClock :: IO Clock
+newClock  = do
+  s <- getNow
+  return $ Clock { at = s }
