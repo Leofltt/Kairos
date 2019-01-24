@@ -3,10 +3,9 @@
 module Kairos.Base where
 
 
-data Clock = Clock { at :: Double} deriving (Show)
---, timeSigs :: [TimeSignature], active :: Bool } deriving (Show)
+data Clock = Clock { startAt :: Double, timeSig :: [TimeSignature] } deriving (Show)
 
-data TimeSignature = TS { beat :: Double, bar :: Int, bpm :: Double} deriving (Show)
+data TimeSignature = TS { beat :: Double, bpm :: Double, startBar :: Double} deriving (Show)
 
 -- Instruments have an id and pfields
 data Instr = I { id :: Int, pf :: String }

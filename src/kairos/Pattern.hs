@@ -1,4 +1,4 @@
-module Kairos.Time where
+module Kairos.Pattern where
 
 import Kairos.Base
 

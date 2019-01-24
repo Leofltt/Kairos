@@ -31,7 +31,7 @@ library:
   - Kairos 
   other-modules:
   - Kairos.Base
-  - Kairos.Time
+  - Kairos.Pattern
   - Kairos.Clock
   - Kairos.IOI
   - Kairos.Instrument

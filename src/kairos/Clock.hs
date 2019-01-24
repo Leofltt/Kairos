@@ -10,12 +10,20 @@ getNow = do x <- getPOSIXTime; return $ realToFrac x
 
 timeElapsed :: Clock -> IO Double
 timeElapsed clock = let
-  s = at clock     in
+  s = startAt clock in
   do 
   x <- getNow
   return (x - s)
 
-newClock :: IO Clock
-newClock  = do
+defaultClock :: IO Clock
+defaultClock  = do
   s <- getNow
-  return $ Clock { at = s }
+  let timesig = TS { bpm = 120
+                   ,  beat = 4
+                   ,  startBar = 0 
+                   }
+  return $ Clock { startAt = s
+                 , timeSig = [timesig] 
+                 }
+
+

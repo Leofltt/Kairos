@@ -6,7 +6,7 @@ import Network.Socket.ByteString (recv, sendAll)
 import qualified Data.ByteString.Char8 as C 
 import Control.Concurrent
 
--- need UDP network to connect to Csound on port 10000
+-- UDP network to connect to Csound on port 10000
 
 sendMsg :: String -> IO ()
 sendMsg n = do
