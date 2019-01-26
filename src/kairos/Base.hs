@@ -2,11 +2,6 @@
 
 module Kairos.Base where
 
-
-data Clock = Clock { startAt :: Double, timeSig :: [TimeSignature] } deriving (Show)
-
-data TimeSignature = TS { beat :: Double, bpm :: Double, startBar :: Double} deriving (Show)
-
 -- Instruments have an id and pfields
 data Instr = I { id :: Int, pf :: String }
 
@@ -16,10 +11,10 @@ data Instr = I { id :: Int, pf :: String }
 type E a =  (Time, a)
 
 -- a pattern is a function that uses a clock to map events to action
-type P a = Clock -> [E a]
+--type P a = Clock -> [E a]
 
 -- time represents Bars.CurrPhase (Doubles)
 type Time = Double
 
 -- list of timestamps (based on where we are in the score)
-type IOI = [Time]
+type IOI = [Double]
