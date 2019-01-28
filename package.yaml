@@ -37,6 +37,7 @@ library:
   - Kairos.IOI
   - Kairos.Instrument
   - Kairos.Network
+  - Kairos.Player  
 
 executables:
   Kairos-exe:

@@ -4,6 +4,7 @@ import Kairos.Base
 import Control.Concurrent
 import Control.Concurrent.STM
 import qualified Data.Map.Strict as M
+import Data.List
 
 -- the play function plays an instrument given a clock
 -- play :: Clock -> IOI -> Instr  -> IO()
@@ -14,6 +15,8 @@ data Instr = I { insN :: Double, pf :: TVar (M.Map Int Pfield) }
 
 data Pfield = Pd Double | Ps String deriving (Show, Eq)
 
+pfToString :: [Pfield] -> String
+pfToString ps = filter (`notElem` "Ps") $ filter (`notElem` "Pd") $ concat $ map (show) ps   
 --make functor,applicative,monad instance 
 
 -- default instruments
