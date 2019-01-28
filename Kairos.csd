@@ -56,7 +56,10 @@ endin
 
 instr 666 ; ReverbSC
 
-aoutL, aoutR reverbsc garvL, garvbR, 0.5, 12000
+kfb = p4
+kcf = p5
+
+aoutL, aoutR reverbsc garvL, garvbR, kfb, kcf
 outs aoutL, aoutR
 
 clear garvL, garvbR

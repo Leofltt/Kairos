@@ -2,11 +2,6 @@
 
 module Kairos.Base where
 
--- Instruments have an id and pfields
-data Instr = I { id :: Int, pf :: String }
-
--- implement pfields as Data.Map of TVars
-
 -- an event is some data with a time of execution
 type E a =  (Time, a)
 

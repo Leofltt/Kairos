@@ -24,6 +24,7 @@ dependencies:
 - random
 - network
 - bytestring  
+- containers  
 library:
   source-dirs: src
   
