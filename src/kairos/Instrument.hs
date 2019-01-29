@@ -15,11 +15,12 @@ data Instr = I { insN :: Double, pf :: TVar (M.Map Int Pfield) }
 
 data Pfield = Pd Double | Ps String deriving (Show, Eq)
 
+-- maybe change this to monadic parsing, instead of strings
 pfToString :: [Pfield] -> String
-pfToString ps = filter (`notElem` "Ps") $ filter (`notElem` "Pd") $ concat $ map (show) ps   
---make functor,applicative,monad instance 
+pfToString ps = unwords $ filter (/= "Ps") $ filter (/= "Pd") $ words $ unwords $ map (show) ps   
 
--- default instruments
+
+-- default instruments 
 
 hihat :: IO Instr 
 hihat = do
@@ -30,8 +31,15 @@ hihat = do
 
 reverb :: IO Instr
 reverb = do
-  pfields <- newTVarIO $ M.fromList [(3, Pd (-1)),(4, Pd 0.7),(5, Pd 15000)] -- duration, feedback, cutoff freq
+  pfields <- newTVarIO $ M.fromList [(3, Pd 60000),(4, Pd 0.7),(5, Pd 15000)] -- duration, feedback, cutoff freq
   return $ I { insN = 666.1 -- the .1 is so that there is only one instance of reverb at any moment
              , pf = pfields
              }
+
+kick :: IO Instr
+kick = do
+   pfields <- newTVarIO $ M.fromList  [(3, Pd 1),(4, Ps "/Users/leofltt/Desktop/Kick-909.aif")]
+   return $ I { insN = 1 
+              , pf = pfields
+              }
 
