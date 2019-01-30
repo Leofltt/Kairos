@@ -22,9 +22,9 @@ pfToString ps = unwords $ filter (/= "Ps") $ filter (/= "Pd") $ words $ unwords 
 
 -- default instruments 
 
-hihat :: IO Instr 
-hihat = do
-  pfields <- newTVarIO $ M.singleton 3 (Pd 0.3) -- closed/open (0<=0.5<=1)
+hihat :: Double -> IO Instr 
+hihat oc = do
+  pfields <- newTVarIO $ M.singleton 3 (Pd oc) -- closed/open (0<=0.5<=1)
   return $ I { insN = 5
              , pf = pfields
              }

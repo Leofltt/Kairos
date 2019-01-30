@@ -24,12 +24,34 @@ gisquare ftgen 2, 0, 4096, 7, 1, 2048, 1, 0, 0, 2048, 0 ; Square wave
 ; GLOBAL VARIABLES
 garvL, garvbR init 0
 
+;opcode for declicking an audio signal. Should only be used in instruments that have positive p3 duration. 
+;taken from Steven Yi livecode.orc
+opcode declick, a, a
+  ain xin
+  aenv = linseg:a(0, 0.01, 1, p3 - 0.02, 1, 0.01, 0, 0.01, 0)
+  xout ain * aenv
+endop
+
 instr 1 ;Sampler
 
 ; HOW TO EVALUATE IF A SAMPLE IS STEREO OR MONO AND DECIDE ON THE NUMBER OF OUTS BASED ON THAT?
+;with an if fchnnls
+;implement it
 
 aLeft diskin p4
 outs aLeft, aLeft
+
+endin
+
+instr 3 ;Bass 303
+
+acut = 200 + expon(1, p3, 0.001) * 16000
+asig = vco2(1, p4)
+asig = diode_ladder(asig, acut, 10, 1, 4) 
+asig = tanh(asig * 4) * p5 * 0.5
+asig = declick(asig) 
+
+outc(asig, asig)
 
 endin
 
