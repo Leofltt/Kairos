@@ -28,36 +28,40 @@ garvL, garvbR init 0
 ;taken from Steven Yi livecode.orc
 opcode declick, a, a
   ain xin
-  aenv = linseg:a(0, 0.01, 1, p3 - 0.02, 1, 0.01, 0, 0.01, 0)
+  aenv = linseg(0, 0.01, 1, p3 - 0.02, 1, 0.01, 0, 0.01, 0)
   xout ain * aenv
 endop
 
 instr 1 ;Sampler
 
-; HOW TO EVALUATE IF A SAMPLE IS STEREO OR MONO AND DECIDE ON THE NUMBER OF OUTS BASED ON THAT?
-;with an if fchnnls
-;implement it
+inchs filenchnls p5
 
-aLeft diskin p4
-outs aLeft, aLeft
+if inchs = 1 then
+aLeft diskin p5
+outs aLeft*p4, aLeft*p4
+
+else
+aLeft, aRight diskin p5
+outs aLeft*p4, aRight*p4
+endif
 
 endin
 
 instr 3 ;Bass 303
 
 acut = 200 + expon(1, p3, 0.001) * 16000
-asig = vco2(1, p4)
+asig = vco2(1, p5)
 asig = diode_ladder(asig, acut, 10, 1, 4) 
-asig = tanh(asig * 4) * p5 * 0.5
-asig = declick(asig) 
+asig = (tanh (asig * 4)) * 0.5
+asig declick asig
 
-outc(asig, asig)
+outs asig*p4, asig*p4
 
 endin
 
 instr 5 ; HiHats 808
     
-pa       =        (p3 >= 0.5 ? 1 : .15)         ; Select open or closed
+pa       =        (p5 >= 0.5 ? 1 : .15)         ; Select open or closed
 ifreq1    =        540                     ; Tune
 ifreq2    =        800                     ; Tune
 
@@ -72,7 +76,7 @@ asqr6    oscil    1, ifreq1*2.1523, 2, -1
 a808     sum      asqr1, asqr2, asqr3, asqr4, asqr5, asqr6  
 a808     butterhp a808, 5270                 
 a808     butterhp a808, 5270                 
-outs a808*aenv, a808*aenv                  
+outs a808*aenv*p4, a808*aenv*p4                  
 
 endin
 

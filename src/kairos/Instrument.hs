@@ -1,45 +1,74 @@
 module Kairos.Instrument where
 
-import Kairos.Base
 import Control.Concurrent
 import Control.Concurrent.STM
 import qualified Data.Map.Strict as M
 import Data.List
-
--- the play function plays an instrument given a clock
--- play :: Clock -> IOI -> Instr  -> IO()
+import Data.Typeable
 
 type Orchestra = TVar (M.Map [Char] Instr)
 
 data Instr = I { insN :: Double, pf :: TVar (M.Map Int Pfield) } 
 
-data Pfield = Pd Double | Ps String deriving (Show, Eq)
+data Pfield  = Ps { pString :: String } | Pd { pDouble :: Double } deriving (Eq, Show, Ord, Typeable)
 
--- maybe change this to monadic parsing, instead of strings
-pfToString :: [Pfield] -> String
-pfToString ps = unwords $ filter (/= "Ps") $ filter (/= "Pd") $ words $ unwords $ map (show) ps   
+--instance Functor (Pfield e) where
+-- fmap f (Ps b) = Ps $ f b
+--  fmap f (Pd a) = Pd $ f a
 
+--instance Applicative (Pfield e) where
+--  pure (Ps b) = b
+--  pure (Pd a) = a
+
+pfToString :: [(Pfield)] -> String   
+pfToString ps = unwords $ map (show) ps
+
+getPfields :: Instr -> IO (M.Map Int Pfield)
+getPfields i = do
+  pf <- atomically $ readTVar $ pf i
+  return $ pf
+
+--updatePfield :: Instr -> Int -> a -> IO (M.Map Int Pfield) 
+--updatePfield i key newValue = let f _  = Just $ toPf newValue in do 
+--  pf <- getPfields i
+--  return $ M.update key pf
 
 -- default instruments 
 
 hihat :: Double -> IO Instr 
 hihat oc = do
-  pfields <- newTVarIO $ M.singleton 3 (Pd oc) -- closed/open (0<=0.5<=1)
+  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(5,Pd oc),(4,Pd 1)] -- p3 : closed/open (0<=0.5<=1)
   return $ I { insN = 5
              , pf = pfields
              }
 
 reverb :: IO Instr
 reverb = do
-  pfields <- newTVarIO $ M.fromList [(3, Pd 60000),(4, Pd 0.7),(5, Pd 15000)] -- duration, feedback, cutoff freq
+  pfields <- newTVarIO $ M.fromList [(3,Pd (-1)),(4,Pd 0.7),(5,Pd 15000)] -- duration, feedback, cutoff freq
   return $ I { insN = 666.1 -- the .1 is so that there is only one instance of reverb at any moment
              , pf = pfields
              }
 
 kick :: IO Instr
 kick = do
-   pfields <- newTVarIO $ M.fromList  [(3, Pd 1),(4, Ps "/Users/leofltt/Desktop/Kick-909.aif")]
-   return $ I { insN = 1 
-              , pf = pfields
-              }
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Ps "/Users/leofltt/Desktop/Kick-909.aif")]
+  return $ I { insN = 1 
+             , pf = pfields
+             }
 
+sampler :: String -> IO Instr
+sampler path = do
+  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Ps path)] -- p5 : Sample path
+  return $ I { insN = 1
+             , pf = pfields
+             }
+
+-- default Orchestra
+defaultOrc :: IO Orchestra
+defaultOrc = do
+  chh <- hihat 0.2
+  ohh <- hihat 0.8
+  k   <- kick
+  r   <- reverb
+  orc <-  atomically $ newTVar $ M.fromList [("K808",k),("ohh808",ohh),("chh808",chh),("Reverb",r)] 
+  return $ orc

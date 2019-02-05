@@ -1,6 +1,5 @@
 module Kairos.Network where
 
-import Kairos.Base
 import Network.Socket hiding (recv)
 import Network.Socket.ByteString (recv, sendAll)
 import qualified Data.ByteString.Char8 as C 
@@ -20,4 +19,4 @@ sendMsg n = do
 sendNote :: String -> IO ()
 sendNote n = let m = "$ " ++ n in
   sendMsg m
-  
+ 

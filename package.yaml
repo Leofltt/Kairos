@@ -24,14 +24,14 @@ dependencies:
 - random
 - network
 - bytestring  
-- containers  
+- containers 
+
 library:
   source-dirs: src
   
   exposed-modules: 
   - Kairos 
   other-modules:
-  - Kairos.Base
   - Kairos.Pattern
   - Kairos.Clock
   - Kairos.IOI
