@@ -42,3 +42,4 @@ playWhen f p = p { query = (filter (f . (st . wholE)) . query p)}
 playDelta :: Beats -> Beats -> Pattern a -> Pattern a
 playDelta s e = playWhen (\t -> and [ t >= s, t< e])
 
+

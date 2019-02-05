@@ -48,11 +48,3 @@ barsInIOI (IOI s e) | s > e = []
 
 barsIOIinIOI :: IOI -> [IOI]
 barsIOIinIOI = Prelude.map (timeToIOIBar . realToFrac) . barsInIOI
-
-data Eventf t a = Event { wholE :: t
-                        , partE :: t
-                        , action :: a
-                        } deriving (Functor, Ord, Eq, Show)  
- 
- 
-

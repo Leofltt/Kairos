@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveFunctor #-}
+
 module Kairos.Pattern where
 
 import Kairos.IOI
@@ -7,6 +9,11 @@ import qualified Data.Map.Strict as M
 import Control.Applicative
 import Data.Bifunctor
 import Data.Maybe
+
+data Eventf t a = Event { wholE :: t
+                        , partE :: t
+                        , action :: a
+                        } deriving (Functor, Ord, Eq, Show)
 
 type Event a = Eventf (IOIf Double) a
 
