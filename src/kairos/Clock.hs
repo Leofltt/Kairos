@@ -103,6 +103,8 @@ beatAt c time = do
 thisBar :: Beats -> Beats
 thisBar = fromIntegral . (floor :: Beats ->  Int) 
 
+nextBar :: Beats -> Beats
+nextBar = (+ 1) . thisBar
 -- given an amount of measure.currPhase, bpm and beatsPerMeasure, gives a Double back representing the length in s
 beatToTime :: Beats -> Double -> Double -> Double
 beatToTime x bpm beatPerMeasure = (x * beatPerMeasure) * (60.00 / bpm) 
@@ -120,4 +122,8 @@ deltaBar :: Clock -> IO Double
 deltaBar c = do
   cb <- currentBeat c
   ts <- currentTS c
-  return $ (cb - (thisBar cb)) * (beat ts) 
+  return $ (cb - (thisBar cb)) * (beat ts)
+
+-- return the current phase (current beat in the bar 0 - 1) in the bar where the beast happens
+deltaBeats :: Beats -> Beats
+deltaBeats b = b - (thisBar b)

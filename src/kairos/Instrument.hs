@@ -10,15 +10,11 @@ type Orchestra = TVar (M.Map [Char] Instr)
 
 data Instr = I { insN :: Double, pf :: TVar (M.Map Int Pfield) } 
 
-data Pfield  = Ps { pString :: String } | Pd { pDouble :: Double } deriving (Eq, Show, Ord, Typeable)
+data Pfield  = Ps { pString :: String } | Pd { pDouble :: Double } deriving (Eq, Ord, Typeable)
 
---instance Functor (Pfield e) where
--- fmap f (Ps b) = Ps $ f b
---  fmap f (Pd a) = Pd $ f a
-
---instance Applicative (Pfield e) where
---  pure (Ps b) = b
---  pure (Pd a) = a
+instance Show Pfield where
+  show (Ps s) = show s
+  show (Pd d) = show d
 
 pfToString :: [(Pfield)] -> String   
 pfToString ps = unwords $ map (show) ps

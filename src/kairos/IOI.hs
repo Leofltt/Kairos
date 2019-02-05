@@ -26,13 +26,33 @@ instance (Num a) => Num (IOIf a) where
   fromInteger = pure . fromInteger
   negate = fmap negate
 
-data Eventf t a = Event { startE :: t
-                        , endE :: t
+-- the IOI with max start and min end
+sect :: IOI -> IOI -> IOI
+sect (IOI so eo) (IOI st et) = IOI (max so st) (min eo et)
+
+-- the timespan given from the intersection of two IOIs
+timeSpanIOI :: IOI -> IOI -> Maybe IOI
+timeSpanIOI o@(IOI s e) t@(IOI i f) | and [s < e, b == q, b == e] = Nothing
+                                 | and [i < f, b == q, b == f] = Nothing
+                                 | b <= q = Just (IOI b q) 
+                                 | otherwise = Nothing
+                                 where (IOI b q) = sect o t
+
+timeToIOIBar :: Beats -> IOI
+timeToIOIBar b = (IOI (thisBar b) (nextBar b))
+
+barsInIOI :: Integral a => IOI -> [a]
+barsInIOI (IOI s e) | s > e = []
+                    | s == e = [floor s]
+                    | otherwise = [floor s .. ((ceiling e)-1)]  
+
+barsIOIinIOI :: IOI -> [IOI]
+barsIOIinIOI = Prelude.map (timeToIOIBar . realToFrac) . barsInIOI
+
+data Eventf t a = Event { wholE :: t
+                        , partE :: t
                         , action :: a
                         } deriving (Functor, Ord, Eq, Show)  
-
-type Event a = Eventf (IOIf Double) a
  
---toDur :: Clock -> IOI -> M.Map Int Pfields -> M.Map Int Pfields
  
 
