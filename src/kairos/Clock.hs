@@ -8,18 +8,13 @@ import Control.Monad.IO.Class
 
 data Clock = Clock { startAt :: Time, timeSig :: TVar [TimeSignature] } 
 
-data TimeSignature = TS { beat :: Double, bpm :: Double, startTime :: Time } deriving (Show,Eq)
+data TimeSignature = TS { beatInMsr :: Double, bpm :: Double, startTime :: Time } deriving (Show,Eq)
 
--- seconds 
+--  POSIX seconds 
 type Time = Double
 
 -- measureNumber.currPhase ( ex. 4.0 == measure 4 beat 1 ) 
 type Beats = Double
-
-data Transport = T { clock :: Clock
-                   ,  orc :: Orchestra
-                   ,  curBeat :: Clock -> Beats
-                   } 
 
 getNow :: IO Time
 getNow = liftIO $ fmap realToFrac getPOSIXTime
@@ -35,7 +30,7 @@ defaultClock :: IO Clock
 defaultClock  = do
   s <- getNow
   let timesig = TS { bpm = 120
-                   ,  beat = 4
+                   ,  beatInMsr = 4
                    ,  startTime = 0 -- this is actually the time delta from s to now, in Doubles 
                    }
   ts <-  newTVarIO $ [timesig]
@@ -47,7 +42,7 @@ defaultClock  = do
 newTS :: Double -> Double -> Beats -> TimeSignature
 newTS tmp msr strt = 
   TS { bpm = tmp
-     , beat = msr
+     , beatInMsr = msr
      , startTime = strt 
      } 
 
@@ -64,7 +59,7 @@ addTS c t = do
   curBeat <- currentBeat c
   curTS <- currentTS c
   beatCurTs <- beatAt c (startTime curTS)
-  atomically $ writeTVar (timeSig c) ((newTS (bpm t) (beat t) ((max ((beatToTime ((thisBar curBeat) - beatCurTs) (bpm curTS) (beat curTS)) + (startTime curTS)) (startTime $ head ts)) + (beatToTime (startTime t) (bpm t) (beat t)))):ts)
+  atomically $ writeTVar (timeSig c) ((newTS (bpm t) (beatInMsr t) ((max ((beatToTime ((thisBar curBeat) - beatCurTs) (bpm curTS) (beatInMsr curTS)) + (startTime curTS)) (startTime $ head ts)) + (beatToTime (startTime t) (bpm t) (beatInMsr t)))):ts)
   tim <- readTVarIO $ timeSig c
   return $ tim       
 
@@ -105,13 +100,14 @@ thisBar = fromIntegral . (floor :: Beats ->  Int)
 
 nextBar :: Beats -> Beats
 nextBar = (+ 1) . thisBar
--- given an amount of measure.currPhase, bpm and beatsPerMeasure, gives a Double back representing the length in s
+
+-- given an amount of currPhase, bpm and beatsPerMeasure, gives a Double back representing the length in s
 beatToTime :: Beats -> Double -> Double -> Double
 beatToTime x bpm beatPerMeasure = (x * beatPerMeasure) * (60.00 / bpm) 
 
 -- given a time delta and a TS, return the amount of beats in that timesignature
 timeToBeat :: Time -> TimeSignature -> Beats
-timeToBeat delta ts = delta * ((bpm ts)/ 60.00) / (beat ts)
+timeToBeat delta ts = delta * ((bpm ts)/ 60.00) / (beatInMsr ts)
 
 timeDelta :: [TimeSignature] -> [Double] -> Double
 timeDelta (x:xs) (now:sts) = (timeToBeat (now  - (head sts)) x) + (timeDelta xs sts) 
@@ -122,7 +118,12 @@ deltaBar :: Clock -> IO Double
 deltaBar c = do
   cb <- currentBeat c
   ts <- currentTS c
-  return $ (cb - (thisBar cb)) * (beat ts)
+  return $ (cb - (thisBar cb)) * (beatInMsr ts)
+
+--timeAtBeat :: Clock -> Beats -> IO Time
+--timeAtBeat c b = do
+--  ts <- currentTS c
+--  return $ (startTime ts) + (beatToTime b (bpm ts) (beatInMsr ts))
 
 -- return the current phase (current beat in the bar 0 - 1) in the bar where the beast happens
 deltaBeats :: Beats -> Beats

@@ -8,7 +8,9 @@ import Data.Typeable
 
 type Orchestra = TVar (M.Map [Char] Instr)
 
-data Instr = I { insN :: Double, pf :: TVar (M.Map Int Pfield) } 
+data Instr = I { insN :: Double, pf :: TVar PfMap } 
+
+type PfMap = M.Map Int Pfield
 
 data Pfield  = Ps { pString :: String } | Pd { pDouble :: Double } deriving (Eq, Ord, Typeable)
 
@@ -19,7 +21,7 @@ instance Show Pfield where
 pfToString :: [(Pfield)] -> String   
 pfToString ps = unwords $ map (show) ps
 
-getPfields :: Instr -> IO (M.Map Int Pfield)
+getPfields :: Instr -> IO (PfMap)
 getPfields i = do
   pf <- atomically $ readTVar $ pf i
   return $ pf
