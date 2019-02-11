@@ -19,4 +19,10 @@ sendMsg n = do
 sendNote :: String -> IO ()
 sendNote n = let m = "$ " ++ n in
   sendMsg m
- 
+
+sendEvent :: String -> IO ()
+sendEvent n = let m = "& " ++ n in
+  sendMsg m
+
+sendScore :: String -> IO ()
+sendScore s = sendMsg s 
