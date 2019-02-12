@@ -28,14 +28,13 @@ defaultEnvironment = do
              }
 
 
-playInstr :: Instr -> IO ()    -- ([Char])
+playInstr :: Instr -> IO () 
 playInstr instr = do
   pfields <- readTVarIO $ pf instr
   let pfs = M.elems pfields
   let pfieldList = pfToString pfs
   let pfds = "i" ++ (show (insN instr)) ++ " 0 " ++ pfieldList
   sendNote pfds
---  return $ show $ pfds
 
 -- given a TP, checks if it's in the future. If not, plays it
 -- playAt :: Clock -> Instr -> TimePoint -> IO ()
@@ -58,7 +57,7 @@ playOld c i tp = do
                      toWait <- tW
                      waitUntil c (toWait+0.002) >> playOld c i tp'; return ()
              else if ((toBePlayed <= cb) && (cb < toBeEnded))
-                     then do --print <- 
+                     then do  
                               playInstr i
                               let tp' = nextBeat tp
 --                            putStrLn $ "Just played " ++ print
@@ -96,7 +95,10 @@ playLoop e pn Playing = do
                  then do toWait <- timeAtBeat (clock e) toBePlayed
                          putStrLn $ "the beat " ++ (show toBePlayed) ++ " is in the future"
                          putStrLn $ "the current beat is " ++ (show cb)  
-                         waitUntil (clock e) toWait
+                         changeStatus e pn Pausing
+                         now <- timeD (clock e)
+                         let wt = toWait - now
+                         updateWaitTime e pn wt 
                          Just p' <- lookupMap (orc e) pn
                          playLoop e pn $ status p'
                  else if (toBeEnded > cb)
@@ -171,3 +173,5 @@ changeStatus e k newS = updateInstrument e k (\x -> x { status = newS })
 updateToPlay :: Environment -> String -> TimePoint -> IO ()
 updateToPlay e k newTP = updateInstrument e k (\x -> x { toPlay = Just newTP })
 
+updateWaitTime :: Environment -> String -> Time -> IO ()
+updateWaitTime e k newWT = updateInstrument e k (\x -> x { waitTime = newWT })
