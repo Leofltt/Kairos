@@ -28,14 +28,14 @@ defaultEnvironment = do
              }
 
 
-playInstr :: Instr -> IO ([Char])
+playInstr :: Instr -> IO ()    -- ([Char])
 playInstr instr = do
   pfields <- readTVarIO $ pf instr
   let pfs = M.elems pfields
   let pfieldList = pfToString pfs
   let pfds = "i" ++ (show (insN instr)) ++ " 0 " ++ pfieldList
-  sendEvent pfds
-  return $ show $ pfds
+  sendNote pfds
+--  return $ show $ pfds
 
 -- given a TP, checks if it's in the future. If not, plays it
 -- playAt :: Clock -> Instr -> TimePoint -> IO ()
@@ -48,30 +48,33 @@ playOld c i tp = do
   let toBeEnded = ((end (head tp))/(beatInMsr ts)) + (thisBar cb)
   if (toBePlayed > cb)
      then do toWait <- timeAtBeat c toBePlayed
-             putStrLn $ "to soon! it's " ++ (show cb)
-             putStrLn $ "pausing until: " ++ (show toBePlayed)
+--             putStrLn $ "to soon! it's " ++ (show cb)
+--             putStrLn $ "pausing until: " ++ (show toBePlayed)
              waitUntil c (toWait+0.002) >> playOld c i tp
      else if (cb > toBeEnded)
-        then do let tp' = nextBeat tp
-                let tW |(ioi(head tp')) > (ioi (head tp)) =  timeAtBeat c  ((((ioi (head tp'))/(beatInMsr ts)) + (thisBar cb))::Beats)
-                       |(ioi(head tp')) <= (ioi (head tp)) = timeAtBeat c ((((ioi (head tp'))/(beatInMsr ts)) + (nextBar cb))::Beats)
-                toWait <- tW
-                waitUntil c (toWait+0.002) >> playOld c i tp'; return ()
-        else if ((toBePlayed <= cb) && (cb < toBeEnded))
-           then do print <- playInstr i
-                   let tp' = nextBeat tp
-                   putStrLn $ "Just played " ++ print
-                   let nextB = ((((ioi (head tp'))/(beatInMsr ts)) + (thisBar cb))::Beats)
-                   toWait  <- timeAtBeat c toBeEnded
-                   putStrLn $ "Waiting for next beat after " ++ (show nextB)
-                   waitUntil c (toWait+0.002) >> playOld c i tp'; return ()
+             then do let tp' = nextBeat tp
+                     let tW |(ioi(head tp')) > (ioi (head tp)) =  timeAtBeat c  ((((ioi (head tp'))/(beatInMsr ts)) + (thisBar cb))::Beats)
+                            |(ioi(head tp')) <= (ioi (head tp)) = timeAtBeat c ((((ioi (head tp'))/(beatInMsr ts)) + (nextBar cb))::Beats)
+                     toWait <- tW
+                     waitUntil c (toWait+0.002) >> playOld c i tp'; return ()
+             else if ((toBePlayed <= cb) && (cb < toBeEnded))
+                     then do --print <- 
+                              playInstr i
+                              let tp' = nextBeat tp
+--                            putStrLn $ "Just played " ++ print
+                              let nextB = ((((ioi (head tp'))/(beatInMsr ts)) + (thisBar cb))::Beats)
+                              toWait  <- timeAtBeat c toBeEnded
+--                            putStrLn $ "Waiting for next beat after " ++ (show nextB)
+                              waitUntil c (toWait+0.002) >> playOld c i tp'; return ()
            else return ()
 
 play :: Environment -> String -> IO ()
 play e pn = let
-  checkStatus p Stopped = (forkIO $ playLoop e pn $ Stopped) >> return ()
-  checkStatus p Paused  = (forkIO $ playLoop e pn $ Paused) >> return ()
-  checkStatus p Playing = putStrLn $ "the player " ++ pn ++ " is already playing!"
+  checkStatus p Stopped  = (forkIO $ playLoop e pn $ Stopped)  >> return ()
+  checkStatus p Paused   = (forkIO $ playLoop e pn $ Paused)   >> return ()
+  checkStatus p Stopping = (forkIO $ playLoop e pn $ Stopping) >> return ()
+  checkStatus p Pausing  = (forkIO $ playLoop e pn $ Pausing)  >> return ()
+  checkStatus p Playing  = putStrLn $ "the player " ++ pn ++ " is already playing!"
   in do Just p <- lookupMap (orc e) pn
         checkStatus p $ status p
 
@@ -83,26 +86,30 @@ playLoop e pn Playing = do
   ts <- currentTS (clock e)
   let pb = toPlay p
   if (pb == Nothing)
-      then return ()
+      then do  changeStatus e pn Stopping
+               Just p' <- lookupMap (orc e) pn
+               playLoop e pn $ status p'
       else do let tp = fromJust pb
               let toBePlayed = ((ioi (tp))/(beatInMsr ts)) + (thisBar cb)
               let toBeEnded = ((end (tp))/(beatInMsr ts)) + (thisBar cb)
               if (toBePlayed > cb)
                  then do toWait <- timeAtBeat (clock e) toBePlayed
+                         putStrLn $ "the beat " ++ (show toBePlayed) ++ " is in the future"
+                         putStrLn $ "the current beat is " ++ (show cb)  
                          waitUntil (clock e) toWait
                          Just p' <- lookupMap (orc e) pn
                          playLoop e pn $ status p'
-                 else if ((toBePlayed <= cb) && (toBeEnded > cb))
-                      then do --return ()
+                 else if (toBeEnded > cb)
+                      then do --sequence_ [return ()]
                               Just timeString <- lookupMap (timePs e) (timeF p)
                               let nb = nextBeat timeString
-                              forkIO $ playInstr p >> return  ()
+                              forkIO $ playInstr p -- >> return  ()
                               updateToPlay e pn (head nb)
                               let nextToPlay = ((ioi (head nb))/(beatInMsr ts)) + (thisBar cb)
                               toWait <- timeAtBeat (clock e) nextToPlay
                               waitUntil (clock e) toWait
                               Just p' <- lookupMap (orc e) pn
-                              playLoop e pn $ status p'
+                              playLoop e pn $ status p
                       else do Just timeString <- lookupMap (timePs e) (timeF p)
                               let nb = nextBeat timeString
                               updateToPlay e pn (head nb)
@@ -121,15 +128,31 @@ playLoop e p Paused = do
   changeStatus e p Playing
   playLoop e p Playing
 
+playLoop e p Stopping = do
+  changeStatus e p Stopped
+  putStrLn $ "instrument " ++ p ++ " has been stopped."
+  return ()
+
+playLoop e p Pausing = do
+  Just ins <- lookupMap (orc e) p
+  let toWait = waitTime ins
+  waitT toWait
+  changeStatus e p Paused
+  Just p' <- lookupMap (orc e) p
+  playLoop e p $ status p'
+
 --playWhen :: (Beats -> Bool) -> Pattern a -> Pattern a
 --playWhen f p = p { query = (filter (f . (st . wholE)) . query p)}
 
 --playDelta :: Beats -> Beats -> Pattern a -> Pattern a
 --playDelta s e = playWhen (\t -> and [ t >= s, t< e])
 
-downB = [(TP 1 2),(TP 3 4)]
+--- default Patterns
 
-fourFloor = [(TP 0 1),(TP 1 2),(TP 2 3),(TP 3 4)]
+downB = [(TP 1 1.5),(TP 3 3.5)]
+
+fourFloor = [(TP 0 0.5),(TP 1 1.5),(TP 2 2.5),(TP 3 3.5)]
+
 
 defaultTPMap :: IO (TVar (M.Map [Char] [TimePoint]))
 defaultTPMap = do
