@@ -28,7 +28,7 @@ type Orchestra = TVar (M.Map [Char] Instr)
 data Instr = I { insN :: Int, pf :: TVar PfMap, status :: Status, toPlay :: Maybe TimePoint, timeF :: String, waitTime :: Time  }
 
 -- is the instrument Playing ?
-data Status = Playing | Stopped | Stopping | Paused | Pausing
+data Status = Playing | Stopped | Stopping | Paused | Pausing deriving (Show)
 
 -- Map of Pfields
 type PfMap = M.Map Int Pfield
