@@ -27,8 +27,9 @@ hihat oc = do
   pfields <- newTVarIO $ M.fromList [(3,Pd 1),(5,Pd oc),(4,Pd 1)] -- p3 : closed/open (0<=0.5<=1)
   return $ I { insN = 5
              , pf = pfields
-             , toPlay = Nothing
+             , toPlay = Just (TP 1 2)
              , status = Stopped
+             , timeF = "downB"
              }
 
 reverb :: IO Instr
@@ -38,6 +39,7 @@ reverb = do
              , pf = pfields
              , toPlay = Nothing
              , status = Stopped
+             , timeF = ""
              }
 
 kick :: IO Instr
@@ -45,8 +47,9 @@ kick = do
   pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Ps "/Users/leofltt/Desktop/Kick-909.aif")]
   return $ I { insN = 1
              , pf = pfields
-             , toPlay = Nothing
+             , toPlay = Just (TP 0 1)
              , status = Stopped
+             , timeF = "fourFloor"
              }
 
 sampler :: String -> IO Instr

@@ -1,5 +1,3 @@
-{-# LANGUAGE DeriveFunctor, FlexibleContexts #-}
-
 module Kairos.TimePoint where
 
 import Kairos.Base
@@ -8,11 +6,6 @@ import Kairos.Instrument
 import Data.Map.Strict as M
 import Control.Applicative (liftA2)
 
-data TimePointf a = TP { ioi :: a
-                  , end :: a
-                  } deriving (Eq, Ord, Functor, Show)
-
-type TimePoint = TimePointf Beats
 
 instance Applicative TimePointf where
   pure t = TP t t

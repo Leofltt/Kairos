@@ -1,4 +1,7 @@
+{-# LANGUAGE DeriveFunctor, FlexibleContexts #-}
+
 module Kairos.Base where
+
 
 import Control.Concurrent
 import Control.Concurrent.STM
@@ -22,7 +25,7 @@ type Beats = Double
 type Orchestra = TVar (M.Map [Char] Instr)
 
 -- Instrument
-data Instr = I { insN :: Int, pf :: TVar PfMap, status :: Status, toPlay :: Maybe Beats }
+data Instr = I { insN :: Int, pf :: TVar PfMap, status :: Status, toPlay :: Maybe TimePoint, timeF :: String  }
 
 -- is the instrument Playing ?
 data Status = Playing | Stopped | Paused
@@ -36,3 +39,9 @@ data Pfield  = Ps { pString :: String } | Pd { pDouble :: Double } deriving (Eq,
 instance Show Pfield where
   show (Ps s) = show s
   show (Pd d) = show d
+
+data TimePointf a = TP { ioi :: a
+                    , end :: a
+                    } deriving (Eq, Ord, Functor, Show)
+
+type TimePoint = TimePointf Beats

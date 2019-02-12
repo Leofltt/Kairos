@@ -39,7 +39,7 @@ library:
   - Kairos.Instrument
   - Kairos.Network
   - Kairos.Player
-  - Kairos.Transport  
+  - Kairos.MapUtilities    
 
 executables:
   Kairos-exe:

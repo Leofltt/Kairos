@@ -5,9 +5,10 @@ import Kairos.TimePoint
 import Kairos.Clock
 import Kairos.Instrument
 import Kairos.Network
-import Kairos.Transport
+import Kairos.MapUtilities
 import Control.Concurrent
 import Control.Concurrent.STM
+import Data.Maybe
 import qualified Data.Map.Strict as M
 
 -- the environment is the scope of the composition
@@ -33,7 +34,7 @@ playInstr instr = do
   let pfs = M.elems pfields
   let pfieldList = pfToString pfs
   let pfds = "i" ++ (show (insN instr)) ++ " 0 " ++ pfieldList
-  forkIO $ sendNote pfds
+  sendEvent pfds
   return $ show $ pfds
 
 -- given a TP, checks if it's in the future. If not, plays it
@@ -66,7 +67,60 @@ playOld c i tp = do
                    waitUntil c (toWait+0.002) >> playOld c i tp'; return ()
            else return ()
 
-playNew :: Environment -> String -> IO ()
+play :: Environment -> String -> IO ()
+play e pn = let
+  checkStatus p Stopped = (forkIO $ playLoop e pn $ Stopped) >> return ()
+  checkStatus p Paused  = (forkIO $ playLoop e pn $ Paused) >> return ()
+  checkStatus p Playing = putStrLn $ "the player " ++ pn ++ " is already playing!"
+  in do Just p <- lookupMap (orc e) pn
+        checkStatus p $ status p
+
+playLoop :: Environment -> String -> Status -> IO ()
+
+playLoop e pn Playing = do
+  Just p <- lookupMap (orc e) pn
+  cb <- currentBeat (clock e)
+  ts <- currentTS (clock e)
+  let pb = toPlay p
+  if (pb == Nothing)
+      then return ()
+      else do let tp = fromJust pb
+              let toBePlayed = ((ioi (tp))/(beatInMsr ts)) + (thisBar cb)
+              let toBeEnded = ((end (tp))/(beatInMsr ts)) + (thisBar cb)
+              if (toBePlayed > cb)
+                 then do toWait <- timeAtBeat (clock e) toBePlayed
+                         waitUntil (clock e) toWait
+                         Just p' <- lookupMap (orc e) pn
+                         playLoop e pn $ status p'
+                 else if ((toBePlayed <= cb) && (toBeEnded > cb))
+                      then do --return ()
+                              Just timeString <- lookupMap (timePs e) (timeF p)
+                              let nb = nextBeat timeString
+                              forkIO $ playInstr p >> return  ()
+                              updateToPlay e pn (head nb)
+                              let nextToPlay = ((ioi (head nb))/(beatInMsr ts)) + (thisBar cb)
+                              toWait <- timeAtBeat (clock e) nextToPlay
+                              waitUntil (clock e) toWait
+                              Just p' <- lookupMap (orc e) pn
+                              playLoop e pn $ status p'
+                      else do Just timeString <- lookupMap (timePs e) (timeF p)
+                              let nb = nextBeat timeString
+                              updateToPlay e pn (head nb)
+                              let tW | (ioi(head nb)) <= (ioi(tp)) = timeAtBeat (clock e) ((((ioi (head nb))/(beatInMsr ts)) + (nextBar cb))::Beats)
+                                     | (ioi(head nb)) > (ioi(tp)) = timeAtBeat (clock e) ((((ioi (head nb))/(beatInMsr ts)) + (thisBar cb))::Beats)
+                              toWait <- tW
+                              waitUntil (clock e) toWait
+                              Just p' <- lookupMap (orc e) pn
+                              playLoop e pn $ status p'
+
+playLoop e p Stopped = do
+  changeStatus e p Playing
+  playLoop e p Playing
+
+playLoop e p Paused = do
+  changeStatus e p Playing
+  playLoop e p Playing
+
 --playWhen :: (Beats -> Bool) -> Pattern a -> Pattern a
 --playWhen f p = p { query = (filter (f . (st . wholE)) . query p)}
 
@@ -81,3 +135,16 @@ defaultTPMap :: IO (TVar (M.Map [Char] [TimePoint]))
 defaultTPMap = do
   tpMap <- newTVarIO $ M.fromList [("fourFloor", fourFloor),("downB", downB)]
   return $ tpMap
+
+
+updateInstrument :: Environment -> String -> (Instr -> Instr) -> IO ()
+updateInstrument e k f = do
+  Just p <- lookupMap (orc e) k
+  addToMap (orc e) (k, f p)
+
+changeStatus :: Environment -> String -> Status -> IO ()
+changeStatus e k newS = updateInstrument e k (\x -> x { status = newS })
+
+updateToPlay :: Environment -> String -> TimePoint -> IO ()
+updateToPlay e k newTP = updateInstrument e k (\x -> x { toPlay = Just newTP })
+
