@@ -22,10 +22,9 @@ hihat oc = do
   pfields <- newTVarIO $ M.fromList [(3,Pd 1),(5,Pd oc),(4,Pd 1)] -- p3 : closed/open (0<=0.5<=1)
   return $ I { insN = 5
              , pf     = pfields
-             , toPlay = Just (TP 1 1.5)
+             , toPlay = Just (TP 0.5 1)
              , status = Stopped
-             , timeF  = "downB"
-             , waitTime = 0
+             , timeF  = "upFour"
              }
 
 reverb :: IO Instr
@@ -36,7 +35,6 @@ reverb = do
              , toPlay = Nothing
              , status = Stopped
              , timeF  = ""
-             , waitTime = 0
              }
 
 kick :: IO Instr
@@ -47,7 +45,6 @@ kick = do
              , toPlay = Just (TP 0 0.5)
              , status = Stopped
              , timeF  = "fourFloor"
-             , waitTime = 0
              }
 
 sampler :: String -> IO Instr
@@ -58,9 +55,17 @@ sampler path = do
              , toPlay = Nothing
              , status = Stopped
              , timeF  = ""
-             , waitTime = 0
              }
 
+clap909 :: IO Instr
+clap909 = do
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Ps "/Users/leofltt/Desktop/Clap-909.aif")]
+  return $ I { insN   = 1
+             , pf     = pfields
+             , toPlay = Just (TP 1 1.5)
+             , status = Stopped
+             , timeF  = "downB"
+             }
 -- default Orchestra
 
 defaultOrc :: IO Orchestra
@@ -69,5 +74,6 @@ defaultOrc = do
   ohh <- hihat 0.8
   k   <- kick
   r   <- reverb
-  orc <-  atomically $ newTVar $ M.fromList [("K808",k),("oh808",ohh),("ch808",chh),("rev",r)]
+  cp  <- clap909
+  orc <-  atomically $ newTVar $ M.fromList [("K909",k),("OH808",ohh),("CH808",chh),("rev",r),("CP909",cp)]
   return $ orc

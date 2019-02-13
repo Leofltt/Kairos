@@ -25,10 +25,10 @@ type Beats = Double
 type Orchestra = TVar (M.Map [Char] Instr)
 
 -- Instrument
-data Instr = I { insN :: Int, pf :: TVar PfMap, status :: Status, toPlay :: Maybe TimePoint, timeF :: String, waitTime :: Time  }
+data Instr = I { insN :: Int, pf :: TVar PfMap, status :: Status, toPlay :: Maybe TimePoint, timeF :: String  }
 
 -- is the instrument Playing ?
-data Status = Playing | Stopped | Stopping | Paused | Pausing deriving (Show)
+data Status = Playing | Stopped | Stopping deriving (Show)
 
 -- Map of Pfields
 type PfMap = M.Map Int Pfield

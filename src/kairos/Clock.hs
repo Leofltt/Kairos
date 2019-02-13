@@ -48,6 +48,12 @@ currentTempo c = do
   cts <- currentTS c
   return $ bpm $ cts
 
+changeTempo :: Clock -> Double -> IO Double
+changeTempo c t = do
+  cts <- currentTS c
+  tss <- addTS c $ newTS t (beatInMsr cts) 0
+  return $ bpm $ head tss  
+
 -- given a clock and a TS, prepends the TS to the list of current ts in the clock, correcting the start time appropriately
 addTS :: Clock -> TimeSignature -> IO [TimeSignature]
 addTS c t = do
