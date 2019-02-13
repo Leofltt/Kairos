@@ -24,7 +24,6 @@ hihat oc = do
              , pf     = pfields
              , toPlay = Just (TP 0.5 1)
              , status = Stopped
-             , timeF  = "upFour"
              }
 
 reverb :: IO Instr
@@ -34,17 +33,15 @@ reverb = do
              , pf     = pfields
              , toPlay = Nothing
              , status = Stopped
-             , timeF  = ""
              }
 
 kick :: IO Instr
 kick = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Ps "/Users/leofltt/Desktop/Kick-909.aif")]
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Ps "/Users/leofltt/Desktop/KairosSamples/Kick-909.aif")]
   return $ I { insN   = 1
              , pf     = pfields
              , toPlay = Just (TP 0 0.5)
              , status = Stopped
-             , timeF  = "fourFloor"
              }
 
 sampler :: String -> IO Instr
@@ -54,17 +51,15 @@ sampler path = do
              , pf     = pfields
              , toPlay = Nothing
              , status = Stopped
-             , timeF  = ""
              }
 
 clap909 :: IO Instr
 clap909 = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Ps "/Users/leofltt/Desktop/Clap-909.aif")]
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Ps "/Users/leofltt/Desktop/KairosSamples/Clap-909.aif")]
   return $ I { insN   = 1
              , pf     = pfields
              , toPlay = Just (TP 1 1.5)
              , status = Stopped
-             , timeF  = "downB"
              }
 -- default Orchestra
 

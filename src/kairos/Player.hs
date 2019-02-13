@@ -54,18 +54,18 @@ playOne e i tp = do
               return ()
 
 
-play :: Environment -> String -> IO ()
-play e pn = let
-  checkStatus p Stopped  = ( forkIO $ playLoop e pn $ Stopped)  >> return ()
-  checkStatus p Stopping = ( playLoop e pn $ Stopping) >> return ()
+play :: Environment -> String -> String -> IO ()
+play e pn times = let
+  checkStatus p Stopped  = ( forkIO $ playLoop e pn times $ Stopped)  >> return ()
+  checkStatus p Stopping = ( playLoop e pn times $ Stopping) >> return ()
   checkStatus p Playing  = putStrLn $ "the player " ++ pn ++ " is already playing!"
   in do Just p <- lookupMap (orc e) pn
         checkStatus p $ status p
 
 -- play loop callBack
-playLoop :: Environment -> String -> Status -> IO ()
+playLoop :: Environment -> String -> String -> Status -> IO ()
 
-playLoop e pn Playing = do
+playLoop e pn times Playing = do
   Just p <- lookupMap (orc e) pn
   now <- timeD (clock e)
   cb <- currentBeat (clock e)
@@ -74,9 +74,10 @@ playLoop e pn Playing = do
   if (pb == Nothing)
      then do  changeStatus e pn Stopping
               Just p' <- lookupMap (orc e) pn
-              playLoop e pn $ status p'
+              playLoop e pn times $ status p'
      else do  let tp = fromJust pb
-              Just timeString <- lookupMap (timePs e)  (timeF p)
+              Just timeString <- lookupMap (timePs e)  times
+              updateToPlay e pn $ checkSame tp (head timeString)
               let nb = nextBeat timeString tp
               let nextToPlay | (ioi (head nb)) > (ioi (tp)) = ((ioi (head nb))/(beatInMsr ts)) + (thisBar cb)
                              | (ioi (head nb)) <= (ioi (tp)) = ((ioi (head nb))/(beatInMsr ts)) + (nextBar cb)
@@ -88,14 +89,14 @@ playLoop e pn Playing = do
               let toWait = nextTime - now
               waitT toWait
               Just p' <- lookupMap (orc e) pn
-              playLoop e pn $ status p'
+              playLoop e pn times $ status p'
 
-playLoop e p Stopped = do
+playLoop e p times Stopped = do
   changeStatus e p Playing
-  playLoop e p Playing
+  playLoop e p times Playing
 
 
-playLoop e p Stopping = do
+playLoop e p times Stopping = do
   changeStatus e p Stopped
   putStrLn $ "instrument " ++ p ++ " has been stopped."
   return ()
@@ -107,13 +108,19 @@ playLoop e p Stopping = do
 --playDelta :: Beats -> Beats -> Pattern a -> Pattern a
 --playDelta s e = playWhen (\t -> and [ t >= s, t< e])
 
---- default Patterns
+stop :: Environment -> String -> IO ()
+stop e p = changeStatus e p Stopping
+
+--- default Patterns ----------------------------------------
 
 downB = [(TP 1 1.5),(TP 3 3.5)]
 
 upFour = [(TP 0.5 1),(TP 1.5 2),(TP 2.5 3),(TP 3.5 4)]
 
 fourFloor = [(TP 0 0.5),(TP 1 1.5),(TP 2 2.5),(TP 3 3.5)]
+
+-------------------------------------------------------------
+
 
 
 defaultTPMap :: IO (TVar (M.Map [Char] [TimePoint]))
@@ -130,12 +137,15 @@ updateInstrument e k f = do
 changeStatus :: Environment -> String -> Status -> IO ()
 changeStatus e k newS = updateInstrument e k (\x -> x { status = newS })
 
-changeTimeF :: Environment -> String -> String -> IO ()
-changeTimeF e k newF = updateInstrument e k (\x -> x { timeF = newF })
+-- changeTimeF :: Environment -> String -> String -> IO ()
+-- changeTimeF e k newF = updateInstrument e k (\x -> x { timeF = newF })
 
 
 updateToPlay :: Environment -> String -> TimePoint -> IO ()
 updateToPlay e k newTP = updateInstrument e k (\x -> x { toPlay = Just newTP })
 
+checkSame :: TimePoint -> TimePoint -> TimePoint
+checkSame m o | m  == o = m
+              | m  /= o = o
 -- updateWaitTime :: Environment -> String -> Time -> IO ()
 -- updateWaitTime e k newWT = updateInstrument e k (\x -> x { waitTime = newWT })
