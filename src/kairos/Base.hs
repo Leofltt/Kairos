@@ -25,7 +25,7 @@ type Beats = Double
 type Orchestra = TVar (M.Map [Char] Instr)
 
 -- Instrument
-data Instr = I { insN :: Int, pf :: TVar PfMap, status :: Status, toPlay :: Maybe TimePoint }
+data Instr = I { insN :: Int, pf :: TVar PfMap, status :: Status, toPlay :: Maybe TimePoint, timeF :: String }
 
 -- is the instrument Playing ?
 data Status = Playing | Stopped | Stopping deriving (Show)
@@ -40,8 +40,8 @@ instance Show Pfield where
   show (Ps s) = show s
   show (Pd d) = show d
 
-data TimePointf a = TP { ioi :: a
+data TimePointf a = TP { start :: a
                     , end :: a
-                    } deriving (Eq, Ord, Functor, Show)
+                    } deriving (Eq, Ord, Show, Functor)
 
 type TimePoint = TimePointf Beats

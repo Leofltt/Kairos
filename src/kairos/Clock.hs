@@ -52,7 +52,7 @@ changeTempo :: Clock -> Double -> IO Double
 changeTempo c t = do
   cts <- currentTS c
   tss <- addTS c $ newTS t (beatInMsr cts) 0
-  return $ bpm $ head tss  
+  return $ bpm $ head tss
 
 -- given a clock and a TS, prepends the TS to the list of current ts in the clock, correcting the start time appropriately
 addTS :: Clock -> TimeSignature -> IO [TimeSignature]
@@ -117,8 +117,8 @@ timeDelta [] _ = 0
 
 --elapsedSinceTSC
 -- return the current beat in a bar
-deltaBar :: Clock -> IO Double
-deltaBar c = do
+beatInBar :: Clock -> IO Double
+beatInBar c = do
   cb <- currentBeat c
   ts <- currentTS c
   return $ (cb - (thisBar cb)) * (beatInMsr ts)

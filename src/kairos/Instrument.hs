@@ -22,8 +22,9 @@ hihat oc = do
   pfields <- newTVarIO $ M.fromList [(3,Pd 1),(5,Pd oc),(4,Pd 1)] -- p3 : closed/open (0<=0.5<=1)
   return $ I { insN = 5
              , pf     = pfields
-             , toPlay = Just (TP 0.5 1)
+             , toPlay = Just (TP 0 1)
              , status = Stopped
+             , timeF = ""
              }
 
 reverb :: IO Instr
@@ -33,6 +34,7 @@ reverb = do
              , pf     = pfields
              , toPlay = Nothing
              , status = Stopped
+             , timeF = ""
              }
 
 kick :: IO Instr
@@ -40,8 +42,9 @@ kick = do
   pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Ps "/Users/leofltt/Desktop/KairosSamples/Kick-909.aif")]
   return $ I { insN   = 1
              , pf     = pfields
-             , toPlay = Just (TP 0 0.5)
+             , toPlay = Just (TP 0 1)
              , status = Stopped
+             , timeF = ""
              }
 
 sampler :: String -> IO Instr
@@ -51,6 +54,7 @@ sampler path = do
              , pf     = pfields
              , toPlay = Nothing
              , status = Stopped
+             , timeF = ""
              }
 
 clap909 :: IO Instr
@@ -58,9 +62,11 @@ clap909 = do
   pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Ps "/Users/leofltt/Desktop/KairosSamples/Clap-909.aif")]
   return $ I { insN   = 1
              , pf     = pfields
-             , toPlay = Just (TP 1 1.5)
+             , toPlay = Just (TP 0 1)
              , status = Stopped
+             , timeF = ""
              }
+
 -- default Orchestra
 
 defaultOrc :: IO Orchestra

@@ -9,7 +9,7 @@ import Control.Applicative (liftA2)
 
 instance Applicative TimePointf where
   pure t = TP t t
-  (<*>)(TP ioif endf)(TP iois ends) = TP (ioif iois) (endf ends)
+  (<*>)(TP startf endf)(TP starts ends) = TP (startf starts) (endf ends)
 
 instance (Num a) => Num (TimePointf a) where
   (+) = liftA2 (+)

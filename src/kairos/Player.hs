@@ -45,58 +45,58 @@ playOne e i tp = do
    --Just p <- lookupMap (orc e) i
    ts <- currentTS (clock e)
    cb <- currentBeat (clock e)
-   let toBePlayed = ((ioi (tp))/(beatInMsr ts)) + (thisBar cb)
+   let toBePlayed = ((start (tp))/(beatInMsr ts)) + (thisBar cb)
    if (toBePlayed > cb)
       then do toWait <- timeAtBeat (clock e) toBePlayed
-              waitUntil (clock e) (toWait+0.002)
+              waitUntil (clock e) toWait
               playOne e i tp
       else do playInstr i
               return ()
 
 
-play :: Environment -> String -> String -> IO ()
-play e pn times = let
-  checkStatus p Stopped  = ( forkIO $ playLoop e pn times $ Stopped)  >> return ()
-  checkStatus p Stopping = ( playLoop e pn times $ Stopping) >> return ()
+play :: Environment -> String -> IO ()
+play e pn = let
+  checkStatus p Stopped  = ( forkIO $ playLoop e pn $ Stopped)  >> return ()
+  checkStatus p Stopping = ( playLoop e pn $ Stopping) >> return ()
   checkStatus p Playing  = putStrLn $ "the player " ++ pn ++ " is already playing!"
   in do Just p <- lookupMap (orc e) pn
         checkStatus p $ status p
 
 -- play loop callBack
-playLoop :: Environment -> String -> String -> Status -> IO ()
+playLoop :: Environment -> String -> Status -> IO ()
 
-playLoop e pn times Playing = do
+playLoop e pn Playing = do
   Just p <- lookupMap (orc e) pn
   now <- timeD (clock e)
   cb <- currentBeat (clock e)
   ts <- currentTS (clock e)
   let pb = toPlay p
-  if (pb == Nothing)
+  if ((pb == Nothing) || ((timeF p )== ""))
      then do  changeStatus e pn Stopping
               Just p' <- lookupMap (orc e) pn
-              playLoop e pn times $ status p'
+              playLoop e pn $ status p'
      else do  let tp = fromJust pb
-              Just timeString <- lookupMap (timePs e)  times
-              updateToPlay e pn $ checkSame tp (head timeString)
+              Just timeString <- lookupMap (timePs e) (timeF p)
               let nb = nextBeat timeString tp
-              let nextToPlay | (ioi (head nb)) > (ioi (tp)) = ((ioi (head nb))/(beatInMsr ts)) + (thisBar cb)
-                             | (ioi (head nb)) <= (ioi (tp)) = ((ioi (head nb))/(beatInMsr ts)) + (nextBar cb)
-              --                               | (ioi (head nb)) == (ioi (tp)) = ((ioi (head nb))/(beatInMsr ts)) + (nextBa
-              let thisToPlay = ((ioi (tp))/(beatInMsr ts)) + (thisBar cb)
+              let nextToPlay | (start (head nb)) > (start (head timeString)) = ((start (head nb))/(beatInMsr ts)) + (thisBar cb)
+                             | (start (head nb)) <= (start (head timeString)) = ((start (head nb))/(beatInMsr ts)) + (nextBar cb)
+              let thisToPlay = ((start (head timeString))/(beatInMsr ts)) + (thisBar cb)
               nextTime <- timeAtBeat (clock e) nextToPlay
-              forkIO $ playOne e p tp
+              forkIO $ playOne e p  $ head timeString
               updateToPlay e pn (head nb)
+              Just ins <- lookupMap (orc e) pn
+              putStrLn $ show $ fromJust $ toPlay ins
               let toWait = nextTime - now
               waitT toWait
               Just p' <- lookupMap (orc e) pn
-              playLoop e pn times $ status p'
+              playLoop e pn $ status p'
 
-playLoop e p times Stopped = do
+playLoop e p Stopped = do
   changeStatus e p Playing
-  playLoop e p times Playing
+  playLoop e p Playing
 
 
-playLoop e p times Stopping = do
+playLoop e p Stopping = do
   changeStatus e p Stopped
   putStrLn $ "instrument " ++ p ++ " has been stopped."
   return ()
@@ -119,13 +119,23 @@ upFour = [(TP 0.5 1),(TP 1.5 2),(TP 2.5 3),(TP 3.5 4)]
 
 fourFloor = [(TP 0 0.5),(TP 1 1.5),(TP 2 2.5),(TP 3 3.5)]
 
+eightN = [(TP 0 0.4),(TP 0.5 0.9),(TP 1 1.4),(TP 1.5 1.9),(TP 2 2.4),(TP 2.5 2.9),(TP 3 3.4),(TP 3.5 4)]
+
+sixteenN = [(TP 0 0.2),(TP 0.25 0.45),(TP 0.5 0.7),(TP 0.75 0.95),(TP 1 1.2),(TP 1.25 1.45),(TP 1.5 1.7),(TP 1.75 1.95),
+            (TP 2 2.2),(TP 2.25 2.45),(TP 2.5 2.7),(TP 2.75 2.95),(TP 3 3.2),(TP 3.25 3.45),(TP 3.5 3.7),(TP 3.75 4)]
+
 -------------------------------------------------------------
 
-
+quarterN :: Environment -> String -> IO (TimePoint)
+quarterN e s = do
+  Just i <- lookupMap (orc e) s
+  let toP = toPlay i
+  let newTP =  fromJust toP + 1
+  return $ newTP
 
 defaultTPMap :: IO (TVar (M.Map [Char] [TimePoint]))
 defaultTPMap = do
-  tpMap <- newTVarIO $ M.fromList [("fourFloor", fourFloor),("downB", downB),("upFour", upFour) ]
+  tpMap <- newTVarIO $ M.fromList [("fourFloor", fourFloor),("downB", downB),("upFour", upFour),("eightN",eightN),("sixteenN",sixteenN)]
   return $ tpMap
 
 
@@ -137,15 +147,16 @@ updateInstrument e k f = do
 changeStatus :: Environment -> String -> Status -> IO ()
 changeStatus e k newS = updateInstrument e k (\x -> x { status = newS })
 
--- changeTimeF :: Environment -> String -> String -> IO ()
--- changeTimeF e k newF = updateInstrument e k (\x -> x { timeF = newF })
+changeTimeF :: Environment -> String -> String -> IO ()
+changeTimeF e k newF = do
+  Just pl <- lookupMap (orc e) k
+  let Just toP = toPlay pl
+  updateToPlay e k (TP {start = 0, end = (end toP)})
+  updateInstrument e k (\x -> x { timeF = newF })
 
 
 updateToPlay :: Environment -> String -> TimePoint -> IO ()
 updateToPlay e k newTP = updateInstrument e k (\x -> x { toPlay = Just newTP })
 
-checkSame :: TimePoint -> TimePoint -> TimePoint
-checkSame m o | m  == o = m
-              | m  /= o = o
 -- updateWaitTime :: Environment -> String -> Time -> IO ()
 -- updateWaitTime e k newWT = updateInstrument e k (\x -> x { waitTime = newWT })

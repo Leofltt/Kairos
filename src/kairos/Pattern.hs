@@ -3,10 +3,10 @@
 module Kairos.Pattern where
 
 import Kairos.Base
-import Kairos.TimePoint
-import Kairos.Clock
+--import Kairos.TimePoint
+--import Kairos.Clock
 import Kairos.Instrument
-import qualified Data.Map.Strict as M
+--import qualified Data.Map.Strict as M
 import Control.Applicative
 import Data.Bifunctor
 import Data.Maybe
@@ -23,11 +23,8 @@ type Event a = Eventf (TimePointf Beats) a
 instance Bifunctor Eventf where
   bimap f g (Event t e) = Event (f t) (g e)
 {--
-data Pattern a = Pattern {query :: (Status -> [Event a])}
+data Pattern a = Pattern {query :: (Environment -> [Event a])}
 
-data Status = Status { ioi :: TimePoint
-                     , act :: PfMap --make data type for this
-                     }
 
 instance Functor Pattern where
  fmap f p = p {query = (fmap(fmap f)) . query p}
