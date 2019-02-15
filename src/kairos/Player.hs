@@ -77,8 +77,7 @@ playLoop e pn Playing = do
               playLoop e pn $ status p'
      else do  let tp = fromJust pb
               Just timeString <- lookupMap (timePs e) (timeF p)
-              currBeat <-  beatInBar (clock e)
-              let nb = nextBeat currBeat timeString
+              let nb = nextBeat cb ts timeString
               let nextToPlay | (start nb) > (start tp) = ((start  nb)/(beatInMsr ts)) + (thisBar cb)
                              | (start nb) <= (start tp) = ((start nb)/(beatInMsr ts)) + (nextBar cb)
               nextTime <- timeAtBeat (clock e) nextToPlay
@@ -123,26 +122,6 @@ eightN = [(TP 0 0.5),(TP 0.5 1),(TP 1 1.5),(TP 1.5 2),(TP 2 2.5),(TP 2.5 3),(TP 
 sixteenN = [(TP 0 0.2),(TP 0.25 0.45),(TP 0.5 0.7),(TP 0.75 0.95),(TP 1 1.2),(TP 1.25 1.45),(TP 1.5 1.7),(TP 1.75 1.95),
             (TP 2 2.2),(TP 2.25 2.45),(TP 2.5 2.7),(TP 2.75 2.95),(TP 3 3.2),(TP 3.25 3.45),(TP 3.5 3.7),(TP 3.75 4)]
 
--------------------------------------------------------------
---
--- quarterN :: Environment -> String -> IO (TimePoint)
--- quarterN e s = do
---   Just i <- lookupMap (orc e) s
---   ts <- currentTS (clock e)
---   let toP = toPlay i
---   let tP = fromJust (toP + 1)
---   return $ tP
---
--- eightN :: Environment -> String -> IO (TimePoint)
--- eightN e s = do
---     Just i <- lookupMap (orc e) s
---     ts <- currentTS (clock e)
---     let toP = toPlay i
---     let tP = fromJust (toP + 0.5)
---     return $ tP
--------------------------------------------------------------
-
-
 defaultTPMap :: IO (TVar (M.Map [Char] [TimePoint]))
 defaultTPMap = do
   tpMap <- newTVarIO $ M.fromList [("upFour", upFour),("downB", downB),("eightN",eightN),("sixteenN",sixteenN),("fourFloor",fourFloor)]
@@ -167,10 +146,9 @@ updateToPlay :: Environment -> String -> Maybe TimePoint -> IO ()
 updateToPlay e k newTP = updateInstrument e k (\x -> x { toPlay = newTP })
 
 --nextbeat based on cb and list of timepoints
-nextBeat :: Beats -> [TimePoint] -> TimePoint
-nextBeat cb xs | filter ((cb <) . start) xs == [] = head xs
-               | otherwise = head $ filter ((cb <) . start) xs
-
+nextBeat :: Beats -> TimeSignature -> [TimePoint] -> TimePoint
+nextBeat cb ts xs | filter ((cb <) .(thisBar ((thisBar cb) + ((start (head xs))/beatInMsr ts)) +).((1/(beatInMsr ts))*). start) xs == [] = head xs
+                  | otherwise = head $ filter ((cb <) .(thisBar ((thisBar cb) + ((start (head xs))/beatInMsr ts)) +).((1/(beatInMsr ts))*). start) xs
 
 -- updateWaitTime :: Environment -> String -> Time -> IO ()
 -- updateWaitTime e k newWT = updateInstrument e k (\x -> x { waitTime = newWT })
