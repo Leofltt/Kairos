@@ -1,7 +1,7 @@
 module Kairos.Clock where
 
 import Kairos.Base
-import Kairos.Instrument
+--import Kairos.Instrument
 import Control.Monad
 import Control.Concurrent
 import Control.Concurrent.STM
@@ -81,8 +81,7 @@ possible (t:ts) now
 possible [] now = []
 
 starts :: [TimeSignature] -> [Time]
-starts (t:ts) = (startTime t):starts ts
-starts [] = []
+starts ts = map startTime ts
 
 -- display the time in Measure.CurrPhase
 currentBeat :: Clock -> IO Beats

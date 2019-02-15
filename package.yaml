@@ -23,23 +23,23 @@ dependencies:
 - stm
 - random
 - network
-- bytestring  
-- containers 
+- bytestring
+- containers
 - transformers
 library:
   source-dirs: src
-  
-  exposed-modules: 
-  - Kairos 
+
+  exposed-modules:
+  - Kairos
   other-modules:
-  - Kairos.Base       
+  - Kairos.Base
   - Kairos.Pattern
   - Kairos.Clock
   - Kairos.TimePoint
   - Kairos.Instrument
   - Kairos.Network
   - Kairos.Player
-  - Kairos.MapUtilities    
+  - Kairos.MapUtilities   
 
 executables:
   Kairos-exe:

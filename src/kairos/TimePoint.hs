@@ -2,7 +2,7 @@ module Kairos.TimePoint where
 
 import Kairos.Base
 import Kairos.Clock
-import Kairos.Instrument
+--import Kairos.Instrument
 import Data.Map.Strict as M
 import Control.Applicative (liftA2)
 
@@ -18,6 +18,12 @@ instance (Num a) => Num (TimePointf a) where
   signum = fmap signum
   fromInteger = pure . fromInteger
   negate = fmap negate
+
+wrapBar :: TimeSignature -> TimePoint -> TimePoint
+wrapBar ts tp = fmap (doubleMod (beatInMsr ts)) tp
+
+
+doubleMod bar beat = beat - (bar * (fromIntegral $ floor (beat/bar)))
 
 -- the time point with max start and min end
 sect :: TimePoint -> TimePoint -> TimePoint
@@ -41,10 +47,3 @@ barsInTP (TP s e) | s > e = []
 
 barsTPinTP :: TimePoint -> [TimePoint]
 barsTPinTP = Prelude.map (beatToTPBar . realToFrac) . barsInTP
-
--- given a list of times, return a list of times with the next beat on the head of the list
--- and the beat just played at the bottom
-
-nextBeat :: [TimePoint] -> TimePoint -> [TimePoint]
-nextBeat (t:ts) x | x == t = ts ++ [t]
-                  | otherwise = nextBeat (ts++[t]) x

@@ -77,15 +77,14 @@ playLoop e pn Playing = do
               playLoop e pn $ status p'
      else do  let tp = fromJust pb
               Just timeString <- lookupMap (timePs e) (timeF p)
-              let nb = nextBeat timeString tp
-              let nextToPlay | (start (head nb)) > (start (head timeString)) = ((start (head nb))/(beatInMsr ts)) + (thisBar cb)
-                             | (start (head nb)) <= (start (head timeString)) = ((start (head nb))/(beatInMsr ts)) + (nextBar cb)
-              let thisToPlay = ((start (head timeString))/(beatInMsr ts)) + (thisBar cb)
+              currBeat <-  beatInBar (clock e)
+              let nb = nextBeat currBeat timeString
+              let nextToPlay | (start nb) > (start tp) = ((start  nb)/(beatInMsr ts)) + (thisBar cb)
+                             | (start nb) <= (start tp) = ((start nb)/(beatInMsr ts)) + (nextBar cb)
               nextTime <- timeAtBeat (clock e) nextToPlay
-              forkIO $ playOne e p  $ head timeString
-              updateToPlay e pn (head nb)
+              forkIO $ playOne e p tp
+              updateToPlay e pn (Just nb)
               Just ins <- lookupMap (orc e) pn
-              putStrLn $ show $ fromJust $ toPlay ins
               let toWait = nextTime - now
               waitT toWait
               Just p' <- lookupMap (orc e) pn
@@ -113,31 +112,41 @@ stop e p = changeStatus e p Stopping
 
 --- default Patterns ----------------------------------------
 
-downB = [(TP 1 1.5),(TP 3 3.5)]
+downB = [(TP 1 2),(TP 3 4)]
 
-upFour = [(TP 0.5 1),(TP 1.5 2),(TP 2.5 3),(TP 3.5 4)]
+upFour = [(TP 0.5 1.5),(TP 1.5 2.5),(TP 2.5 3.5),(TP 3.5 4.5)]
 
-fourFloor = [(TP 0 0.5),(TP 1 1.5),(TP 2 2.5),(TP 3 3.5)]
+fourFloor = [(TP 0 1),(TP 1 2),(TP 2 3),(TP 3 4)]
 
-eightN = [(TP 0 0.4),(TP 0.5 0.9),(TP 1 1.4),(TP 1.5 1.9),(TP 2 2.4),(TP 2.5 2.9),(TP 3 3.4),(TP 3.5 4)]
+eightN = [(TP 0 0.5),(TP 0.5 1),(TP 1 1.5),(TP 1.5 2),(TP 2 2.5),(TP 2.5 3),(TP 3 3.5),(TP 3.5 4)]
 
 sixteenN = [(TP 0 0.2),(TP 0.25 0.45),(TP 0.5 0.7),(TP 0.75 0.95),(TP 1 1.2),(TP 1.25 1.45),(TP 1.5 1.7),(TP 1.75 1.95),
             (TP 2 2.2),(TP 2.25 2.45),(TP 2.5 2.7),(TP 2.75 2.95),(TP 3 3.2),(TP 3.25 3.45),(TP 3.5 3.7),(TP 3.75 4)]
 
 -------------------------------------------------------------
+--
+-- quarterN :: Environment -> String -> IO (TimePoint)
+-- quarterN e s = do
+--   Just i <- lookupMap (orc e) s
+--   ts <- currentTS (clock e)
+--   let toP = toPlay i
+--   let tP = fromJust (toP + 1)
+--   return $ tP
+--
+-- eightN :: Environment -> String -> IO (TimePoint)
+-- eightN e s = do
+--     Just i <- lookupMap (orc e) s
+--     ts <- currentTS (clock e)
+--     let toP = toPlay i
+--     let tP = fromJust (toP + 0.5)
+--     return $ tP
+-------------------------------------------------------------
 
-quarterN :: Environment -> String -> IO (TimePoint)
-quarterN e s = do
-  Just i <- lookupMap (orc e) s
-  let toP = toPlay i
-  let newTP =  fromJust toP + 1
-  return $ newTP
 
 defaultTPMap :: IO (TVar (M.Map [Char] [TimePoint]))
 defaultTPMap = do
-  tpMap <- newTVarIO $ M.fromList [("fourFloor", fourFloor),("downB", downB),("upFour", upFour),("eightN",eightN),("sixteenN",sixteenN)]
+  tpMap <- newTVarIO $ M.fromList [("upFour", upFour),("downB", downB),("eightN",eightN),("sixteenN",sixteenN),("fourFloor",fourFloor)]
   return $ tpMap
-
 
 updateInstrument :: Environment -> String -> (Instr -> Instr) -> IO ()
 updateInstrument e k f = do
@@ -151,12 +160,17 @@ changeTimeF :: Environment -> String -> String -> IO ()
 changeTimeF e k newF = do
   Just pl <- lookupMap (orc e) k
   let Just toP = toPlay pl
-  updateToPlay e k (TP {start = 0, end = (end toP)})
+--  updateToPlay e k (Just (TP {start = 0, end = (end toP)}))
   updateInstrument e k (\x -> x { timeF = newF })
 
+updateToPlay :: Environment -> String -> Maybe TimePoint -> IO ()
+updateToPlay e k newTP = updateInstrument e k (\x -> x { toPlay = newTP })
 
-updateToPlay :: Environment -> String -> TimePoint -> IO ()
-updateToPlay e k newTP = updateInstrument e k (\x -> x { toPlay = Just newTP })
+--nextbeat based on cb and list of timepoints
+nextBeat :: Beats -> [TimePoint] -> TimePoint
+nextBeat cb xs | filter ((cb <) . start) xs == [] = head xs
+               | otherwise = head $ filter ((cb <) . start) xs
+
 
 -- updateWaitTime :: Environment -> String -> Time -> IO ()
 -- updateWaitTime e k newWT = updateInstrument e k (\x -> x { waitTime = newWT })

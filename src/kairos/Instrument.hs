@@ -24,7 +24,7 @@ hihat oc = do
              , pf     = pfields
              , toPlay = Just (TP 0 1)
              , status = Stopped
-             , timeF = ""
+             , timeF = "upFour"
              }
 
 reverb :: IO Instr
@@ -44,7 +44,7 @@ kick = do
              , pf     = pfields
              , toPlay = Just (TP 0 1)
              , status = Stopped
-             , timeF = ""
+             , timeF = "fourFloor"
              }
 
 sampler :: String -> IO Instr
@@ -64,7 +64,7 @@ clap909 = do
              , pf     = pfields
              , toPlay = Just (TP 0 1)
              , status = Stopped
-             , timeF = ""
+             , timeF = "downB"
              }
 
 -- default Orchestra
