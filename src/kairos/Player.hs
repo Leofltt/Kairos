@@ -56,11 +56,11 @@ playOne e i tp = do
 
 play :: Environment -> String -> IO ()
 play e pn = let
-  checkStatus p Stopped  = ( forkIO $ playLoop e pn $ Stopped)  >> return ()
-  checkStatus p Stopping = ( playLoop e pn $ Stopping) >> return ()
-  checkStatus p Playing  = putStrLn $ "the player " ++ pn ++ " is already playing!"
-  in do Just p <- lookupMap (orc e) pn
-        checkStatus p $ status p
+  checkStatus i Stopped  = ( forkIO $ playLoop e pn $ Stopped)  >> return ()
+  checkStatus i Stopping = ( playLoop e pn $ Stopping) >> return ()
+  checkStatus i Playing  = putStrLn $ "the instrument " ++ pn ++ " is already playing!"
+  in do Just i <- lookupMap (orc e) pn
+        checkStatus i $ status i
 
 -- play loop callBack
 playLoop :: Environment -> String -> Status -> IO ()
@@ -77,11 +77,11 @@ playLoop e pn Playing = do
               playLoop e pn $ status p'
      else do  let tp = fromJust pb
               Just timeString <- lookupMap (timePs e) (timeF p)
-              let nb = nextBeat cb ts timeString
-              let nextToPlay | (start nb) > (start tp) = ((start  nb)/(beatInMsr ts)) + (thisBar cb)
+              let nb = nextBeat tp timeString
+              let nextToPlay | (start nb) > (start tp) = ( (start  (wrapBar ts nb))/(beatInMsr ts)) + (thisBar cb) + ((fromIntegral $ floor $ (start  nb)/(beatInMsr ts)) - (fromIntegral $ floor $ (start  tp)/(beatInMsr ts)))
                              | (start nb) <= (start tp) = ((start nb)/(beatInMsr ts)) + (nextBar cb)
               nextTime <- timeAtBeat (clock e) nextToPlay
-              forkIO $ playOne e p tp
+              forkIO $ playOne e p (wrapBar ts tp)
               updateToPlay e pn (Just nb)
               Just ins <- lookupMap (orc e) pn
               let toWait = nextTime - now
@@ -146,9 +146,16 @@ updateToPlay :: Environment -> String -> Maybe TimePoint -> IO ()
 updateToPlay e k newTP = updateInstrument e k (\x -> x { toPlay = newTP })
 
 --nextbeat based on cb and list of timepoints
-nextBeat :: Beats -> TimeSignature -> [TimePoint] -> TimePoint
-nextBeat cb ts xs | filter ((cb <) .(thisBar ((thisBar cb) + ((start (head xs))/beatInMsr ts)) +).((1/(beatInMsr ts))*). start) xs == [] = head xs
-                  | otherwise = head $ filter ((cb <) .(thisBar ((thisBar cb) + ((start (head xs))/beatInMsr ts)) +).((1/(beatInMsr ts))*). start) xs
+-- DOESN't WORK ! NEED TO KNOW THE TIME AT BEAT 1 AND USE THAT FOR THE COMPARISON ALWAYS OR JUST CHECK TIMES, NOT TPs
+-- nextBeat :: Beats -> TimeSignature -> [TimePoint] -> TimePoint
+-- nextBeat cb ts xs | filter ((cb <) .(thisBar ((thisBar cb) + ((start (head xs))/beatInMsr ts)) +).((1/(beatInMsr ts))*). start) xs == [] = head xs
+--                   | otherwise = head $ filter ((cb <) .(thisBar ((thisBar cb) + ((start (head xs))/beatInMsr ts)) +).((1/(beatInMsr ts))*). start) xs
 
+nextBeat :: TimePoint -> [TimePoint] -> TimePoint
+nextBeat b xs | filter (b <) xs == [] = head xs
+              | otherwise = head $ filter (b <) xs
+
+addTPS :: Environment -> [TimePoint] -> String -> IO ()
+addTPS e ts n = addToMap (timePs e) (n,ts)
 -- updateWaitTime :: Environment -> String -> Time -> IO ()
 -- updateWaitTime e k newWT = updateInstrument e k (\x -> x { waitTime = newWT })

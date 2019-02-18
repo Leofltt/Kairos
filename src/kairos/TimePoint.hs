@@ -22,8 +22,8 @@ instance (Num a) => Num (TimePointf a) where
 wrapBar :: TimeSignature -> TimePoint -> TimePoint
 wrapBar ts tp = fmap (doubleMod (beatInMsr ts)) tp
 
-
 doubleMod bar beat = beat - (bar * (fromIntegral $ floor (beat/bar)))
+
 
 -- the time point with max start and min end
 sect :: TimePoint -> TimePoint -> TimePoint
