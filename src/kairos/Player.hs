@@ -11,18 +11,14 @@ import Control.Concurrent.STM
 import Data.Maybe
 import qualified Data.Map.Strict as M
 
--- the environment is the scope of the composition
-data Environment = E { orc :: Orchestra
-                     , clock :: Clock
-                     , timePs :: TVar (M.Map [Char] [TimePoint])
-                     }
-
-defaultEnvironment :: IO Environment
-defaultEnvironment = do
+defaultPerformance :: IO Performance
+defaultPerformance = do
   o <- defaultOrc
+  f <- defaultFx
   c <- defaultClock
   t <- defaultTPMap
-  return $ E { orc = o
+  return $ P { orc = o
+             , fx = f
              , clock = c
              , timePs = t
              }
@@ -34,13 +30,13 @@ playInstr instr = do
   let pfs = M.elems pfields
   let pfieldList = pfToString pfs
   let pfds = "i" ++ (show (insN instr)) ++ " 0 " ++ pfieldList
-  sendNote pfds
+  sendEvent pfds
 
 -- given a TP, checks if it's in the future. If not, plays it
 -- playAt :: Clock -> Instr -> TimePoint -> IO ()
 
 
-playOne :: Environment -> Instr -> TimePoint -> IO ()
+playOne :: Performance -> Instr -> TimePoint -> IO ()
 playOne e i tp = do
    --Just p <- lookupMap (orc e) i
    ts <- currentTS (clock e)
@@ -48,13 +44,18 @@ playOne e i tp = do
    let toBePlayed = ((start (tp))/(beatInMsr ts)) + (thisBar cb)
    if (toBePlayed > cb)
       then do toWait <- timeAtBeat (clock e) toBePlayed
-              waitUntil (clock e) toWait
+              waitUntil (clock e) (toWait-0.01)
               playOne e i tp
       else do playInstr i
               return ()
 
+playNow :: Performance -> String -> IO ()
+playNow e i = do
+  tp <- beatInBar (clock e)
+  Just p <- lookupMap (orc e) i
+  playOne e p (pure tp)
 
-play :: Environment -> String -> IO ()
+play :: Performance -> String -> IO ()
 play e pn = let
   checkStatus i Stopped  = ( forkIO $ playLoop e pn $ Stopped)  >> return ()
   checkStatus i Stopping = ( playLoop e pn $ Stopping) >> return ()
@@ -63,7 +64,7 @@ play e pn = let
         checkStatus i $ status i
 
 -- play loop callBack
-playLoop :: Environment -> String -> Status -> IO ()
+playLoop :: Performance -> String -> Status -> IO ()
 
 playLoop e pn Playing = do
   Just p <- lookupMap (orc e) pn
@@ -85,7 +86,7 @@ playLoop e pn Playing = do
               updateToPlay e pn (Just nb)
               Just ins <- lookupMap (orc e) pn
               let toWait = nextTime - now
-              waitT toWait
+              waitT (toWait+0.02)
               Just p' <- lookupMap (orc e) pn
               playLoop e pn $ status p'
 
@@ -106,56 +107,48 @@ playLoop e p Stopping = do
 --playDelta :: Beats -> Beats -> Pattern a -> Pattern a
 --playDelta s e = playWhen (\t -> and [ t >= s, t< e])
 
-stop :: Environment -> String -> IO ()
+stop :: Performance -> String -> IO ()
 stop e p = changeStatus e p Stopping
 
 --- default Patterns ----------------------------------------
 
-downB = [(TP 1 2),(TP 3 4)]
+downB = [(TP 1),(TP 3)]
 
-upFour = [(TP 0.5 1.5),(TP 1.5 2.5),(TP 2.5 3.5),(TP 3.5 4.5)]
+upFour = [(TP 0.5),(TP 1.5),(TP 2.5),(TP 3.5)]
 
-fourFloor = [(TP 0 1),(TP 1 2),(TP 2 3),(TP 3 4)]
+fourFloor = [(TP 0),(TP 1),(TP 2),(TP 3)]
 
-eightN = [(TP 0 0.5),(TP 0.5 1),(TP 1 1.5),(TP 1.5 2),(TP 2 2.5),(TP 2.5 3),(TP 3 3.5),(TP 3.5 4)]
+eightN = [(TP 0),(TP 0.5),(TP 1),(TP 1.5),(TP 2),(TP 2.5),(TP 3),(TP 3.5)]
 
-sixteenN = [(TP 0 0.2),(TP 0.25 0.45),(TP 0.5 0.7),(TP 0.75 0.95),(TP 1 1.2),(TP 1.25 1.45),(TP 1.5 1.7),(TP 1.75 1.95),
-            (TP 2 2.2),(TP 2.25 2.45),(TP 2.5 2.7),(TP 2.75 2.95),(TP 3 3.2),(TP 3.25 3.45),(TP 3.5 3.7),(TP 3.75 4)]
+sixteenN = [(TP 0),(TP 0.25),(TP 0.5),(TP 0.75),(TP 1),(TP 1.25),(TP 1.5),(TP 1.75),
+            (TP 2),(TP 2.25),(TP 2.5),(TP 2.75),(TP 3),(TP 3.25),(TP 3.5),(TP 3.75)]
 
 defaultTPMap :: IO (TVar (M.Map [Char] [TimePoint]))
 defaultTPMap = do
   tpMap <- newTVarIO $ M.fromList [("upFour", upFour),("downB", downB),("eightN",eightN),("sixteenN",sixteenN),("fourFloor",fourFloor)]
   return $ tpMap
 
-updateInstrument :: Environment -> String -> (Instr -> Instr) -> IO ()
+updateInstrument :: Performance -> String -> (Instr -> Instr) -> IO ()
 updateInstrument e k f = do
   Just p <- lookupMap (orc e) k
   addToMap (orc e) (k, f p)
 
-changeStatus :: Environment -> String -> Status -> IO ()
+changeStatus :: Performance -> String -> Status -> IO ()
 changeStatus e k newS = updateInstrument e k (\x -> x { status = newS })
 
-changeTimeF :: Environment -> String -> String -> IO ()
+changeTimeF :: Performance -> String -> String -> IO ()
 changeTimeF e k newF = do
   Just pl <- lookupMap (orc e) k
-  let Just toP = toPlay pl
---  updateToPlay e k (Just (TP {start = 0, end = (end toP)}))
+  Just ts <- lookupMap (timePs e) newF
+  updateToPlay e k (Just $ head ts)
   updateInstrument e k (\x -> x { timeF = newF })
 
-updateToPlay :: Environment -> String -> Maybe TimePoint -> IO ()
+updateToPlay :: Performance -> String -> Maybe TimePoint -> IO ()
 updateToPlay e k newTP = updateInstrument e k (\x -> x { toPlay = newTP })
-
---nextbeat based on cb and list of timepoints
--- DOESN't WORK ! NEED TO KNOW THE TIME AT BEAT 1 AND USE THAT FOR THE COMPARISON ALWAYS OR JUST CHECK TIMES, NOT TPs
--- nextBeat :: Beats -> TimeSignature -> [TimePoint] -> TimePoint
--- nextBeat cb ts xs | filter ((cb <) .(thisBar ((thisBar cb) + ((start (head xs))/beatInMsr ts)) +).((1/(beatInMsr ts))*). start) xs == [] = head xs
---                   | otherwise = head $ filter ((cb <) .(thisBar ((thisBar cb) + ((start (head xs))/beatInMsr ts)) +).((1/(beatInMsr ts))*). start) xs
 
 nextBeat :: TimePoint -> [TimePoint] -> TimePoint
 nextBeat b xs | filter (b <) xs == [] = head xs
               | otherwise = head $ filter (b <) xs
 
-addTPS :: Environment -> [TimePoint] -> String -> IO ()
-addTPS e ts n = addToMap (timePs e) (n,ts)
--- updateWaitTime :: Environment -> String -> Time -> IO ()
--- updateWaitTime e k newWT = updateInstrument e k (\x -> x { waitTime = newWT })
+addTPf :: Performance -> String -> [TimePoint] -> IO ()
+addTPf e n ts = addToMap (timePs e) (n,ts)

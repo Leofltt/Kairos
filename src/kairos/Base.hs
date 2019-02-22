@@ -2,12 +2,17 @@
 
 module Kairos.Base where
 
-
 import Control.Concurrent
 import Control.Concurrent.STM
 import qualified Data.Map.Strict as M
 import Data.Typeable
 
+-- the Performance is the scope of the composition
+data Performance = P { orc :: Orchestra
+                     , fx  :: Orchestra
+                     , clock :: Clock
+                     , timePs :: TVar (M.Map [Char] [TimePoint])
+                     }
 
 -- clock
 data Clock = Clock { startAt :: Time, timeSig :: TVar [TimeSignature] }
@@ -18,7 +23,7 @@ data TimeSignature = TS { beatInMsr :: Double, bpm :: Double, startTime :: Time 
 --  Performance seconds
 type Time = Double
 
--- measureNumber.currPhase ( ex. 4.0 == measure 4 beat 1 )
+-- measureNumber.currPhase ( ex. 4.1 == measure 4 beat 2 )
 type Beats = Double
 
 -- Orchestra
@@ -40,8 +45,8 @@ instance Show Pfield where
   show (Ps s) = show s
   show (Pd d) = show d
 
+-- a point in the Bar
 data TimePointf a = TP { start :: a
-                    , end :: a
                     } deriving (Eq, Ord, Show, Functor)
 
 type TimePoint = TimePointf Beats

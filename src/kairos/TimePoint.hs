@@ -1,15 +1,14 @@
 module Kairos.TimePoint where
 
 import Kairos.Base
-import Kairos.Clock
---import Kairos.Instrument
+--import Kairos.Clock
 import Data.Map.Strict as M
 import Control.Applicative (liftA2)
 
 
 instance Applicative TimePointf where
-  pure t = TP t t
-  (<*>)(TP startf endf)(TP starts ends) = TP (startf starts) (endf ends)
+  pure t = TP t
+  (<*>)(TP startf)(TP starts) = TP (startf starts)
 
 instance (Num a) => Num (TimePointf a) where
   (+) = liftA2 (+)
@@ -20,30 +19,30 @@ instance (Num a) => Num (TimePointf a) where
   negate = fmap negate
 
 wrapBar :: TimeSignature -> TimePoint -> TimePoint
-wrapBar ts tp = fmap (doubleMod (beatInMsr ts)) tp
+wrapBar ts tp = fmap (doubleRem (beatInMsr ts)) tp
 
-doubleMod bar beat = beat - (bar * (fromIntegral $ floor (beat/bar)))
+doubleRem bar beat = beat - (bar * (fromIntegral $ floor (beat/bar)))
 
 
--- the time point with max start and min end
-sect :: TimePoint -> TimePoint -> TimePoint
-sect (TP ioif endf) (TP iois ends) = TP (max ioif iois) (min endf ends)
-
--- the timespan given from the intersection of two IOIs
-timeSpanInters :: TimePoint -> TimePoint -> Maybe TimePoint
-timeSpanInters o@(TP s e) t@(TP s' e') | and [s < e, b == q, b == e] = Nothing
-                                 | and [s' < e', b == q, b == e'] = Nothing
-                                 | b <= q = Just (TP b q)
-                                 | otherwise = Nothing
-                                 where (TP b q) = sect o t
-
-beatToTPBar :: Beats -> TimePoint
-beatToTPBar b = (TP (thisBar b) (nextBar b))
-
-barsInTP :: Integral a => TimePoint -> [a]
-barsInTP (TP s e) | s > e = []
-                    | s == e = [floor s]
-                    | otherwise = [floor s .. ((ceiling e)-1)]
-
-barsTPinTP :: TimePoint -> [TimePoint]
-barsTPinTP = Prelude.map (beatToTPBar . realToFrac) . barsInTP
+-- -- the time point with max start and min end
+-- sect :: TimePoint -> TimePoint -> TimePoint
+-- sect (TP ioif endf) (TP iois ends) = TP (max ioif iois) (min endf ends)
+--
+-- -- the timespan given from the intersection of two IOIs
+-- timeSpanInters :: TimePoint -> TimePoint -> Maybe TimePoint
+-- timeSpanInters o@(TP s e) t@(TP s' e') | and [s < e, b == q, b == e] = Nothing
+--                                  | and [s' < e', b == q, b == e'] = Nothing
+--                                  | b <= q = Just (TP b q)
+--                                  | otherwise = Nothing
+--                                  where (TP b q) = sect o t
+--
+-- beatToTPBar :: Beats -> TimePoint
+-- beatToTPBar b = (TP (thisBar b) (nextBar b))
+--
+-- barsInTP :: Integral a => TimePoint -> [a]
+-- barsInTP (TP s e) | s > e = []
+--                     | s == e = [floor s]
+--                     | otherwise = [floor s .. ((ceiling e)-1)]
+--
+-- barsTPinTP :: TimePoint -> [TimePoint]
+-- barsTPinTP = Prelude.map (beatToTPBar . realToFrac) . barsInTP

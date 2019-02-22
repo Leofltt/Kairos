@@ -5,7 +5,7 @@ module Kairos.Pattern where
 import Kairos.Base
 --import Kairos.TimePoint
 --import Kairos.Clock
-import Kairos.Instrument
+--import Kairos.Instrument
 --import qualified Data.Map.Strict as M
 import Control.Applicative
 import Data.Bifunctor
