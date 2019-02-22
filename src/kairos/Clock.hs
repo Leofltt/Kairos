@@ -1,7 +1,6 @@
 module Kairos.Clock where
 
 import Kairos.Base
---import Kairos.Instrument
 import Control.Monad
 import Control.Concurrent
 import Control.Concurrent.STM
