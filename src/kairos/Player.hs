@@ -44,9 +44,10 @@ playOne e i tp = do
    let toBePlayed = ((start (tp))/(beatInMsr ts)) + (thisBar cb)
    if (toBePlayed > cb)
       then do toWait <- timeAtBeat (clock e) toBePlayed
-              waitUntil (clock e) (toWait-0.01)
+              waitUntil (clock e) (toWait)
               playOne e i tp
       else do playInstr i
+              updatePfields i
               return ()
 
 playNow :: Performance -> String -> IO ()
@@ -86,7 +87,7 @@ playLoop e pn Playing = do
               updateToPlay e pn (Just nb)
               Just ins <- lookupMap (orc e) pn
               let toWait = nextTime - now
-              waitT (toWait+0.02)
+              waitT (toWait)
               Just p' <- lookupMap (orc e) pn
               playLoop e pn $ status p'
 
@@ -130,8 +131,23 @@ defaultTPMap = do
 
 updateInstrument :: Performance -> String -> (Instr -> Instr) -> IO ()
 updateInstrument e k f = do
-  Just p <- lookupMap (orc e) k
-  addToMap (orc e) (k, f p)
+  Just i <- lookupMap (orc e) k
+  addToMap (orc e) (k, f i)
+--
+updatePfields :: Instr -> IO ()
+updatePfields i = do
+   pfields <- readTVarIO (pf i)
+   pfpats <- readTVarIO (pats i)
+   mapM_ (updateonepfield (pf i)) (M.elems pfpats)
+
+
+updateonepfield :: TVar PfMap -> PfPat -> IO ()
+updateonepfield pfmap pats = do
+  Just pf <- lookupMap pfmap (pfNum pats)
+  newVal <- (updater pats) pats
+  addToMap  pfmap ((pfNum pats),newVal)
+
+
 
 changeStatus :: Performance -> String -> Status -> IO ()
 changeStatus e k newS = updateInstrument e k (\x -> x { status = newS })
@@ -152,3 +168,5 @@ nextBeat b xs | filter (b <) xs == [] = head xs
 
 addTPf :: Performance -> String -> [TimePoint] -> IO ()
 addTPf e n ts = addToMap (timePs e) (n,ts)
+
+stopAll e = (mapM_ (stop e)) . M.keys =<< readTVarIO (orc e)

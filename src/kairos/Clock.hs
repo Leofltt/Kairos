@@ -7,6 +7,14 @@ import Control.Concurrent.STM
 import Data.Time.Clock.POSIX
 import Control.Monad.IO.Class
 
+
+displayClock c = do
+  ts   <- currentTS c
+  cb   <- currentBeat c
+  beat <- beatInBar c
+  return $ "clock's bar: " ++ (show $ thisBar cb) ++ ", beat: " ++ (take 4 $ show $ beat) ++ ", at tempo: " ++ (show $ bpm ts) ++" bpm."
+
+-- (show $ ((fromIntegral $ truncate beat*100)/ 100))
 getNow :: MonadIO m => m Time
 getNow = liftIO $ fmap realToFrac getPOSIXTime
 
@@ -47,11 +55,11 @@ currentTempo c = do
   cts <- currentTS c
   return $ bpm $ cts
 
-changeTempo :: Clock -> Double -> IO Double
+changeTempo :: Clock -> Double -> IO ()
 changeTempo c t = do
   cts <- currentTS c
   tss <- addTS c $ newTS t (beatInMsr cts) 0
-  return $ bpm $ head tss
+  putStrLn $ "Current bpm: " ++ show (bpm $ head tss)
 
 -- given a clock and a TS, prepends the TS to the list of current ts in the clock, correcting the start time appropriately
 addTS :: Clock -> TimeSignature -> IO [TimeSignature]
@@ -67,7 +75,7 @@ addTS c t = do
 currentTS :: Clock -> IO TimeSignature
 currentTS c = do
   now <- timeD c
-  tms <- atomically $ readTVar $ timeSig c
+  tms <- readTVarIO $ timeSig c
   return $ checkTimeSig now tms
 
 checkTimeSig :: Time -> [TimeSignature] ->  TimeSignature
@@ -91,7 +99,7 @@ currentBeat c = do
 
 beatAt :: Clock -> Time -> IO Beats
 beatAt c time = do
-  tms <- atomically $ readTVar $ timeSig c
+  tms <- readTVarIO $ timeSig c
   return $ timeDelta (possible tms time) (time:(starts (possible tms time)))
 
 -- return the bar number from Beats

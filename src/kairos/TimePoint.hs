@@ -23,6 +23,8 @@ wrapBar ts tp = fmap (doubleRem (beatInMsr ts)) tp
 
 doubleRem bar beat = beat - (bar * (fromIntegral $ floor (beat/bar)))
 
+toTP :: [Double] -> [TimePoint]
+toTP times = Prelude.map pure times
 
 -- -- the time point with max start and min end
 -- sect :: TimePoint -> TimePoint -> TimePoint

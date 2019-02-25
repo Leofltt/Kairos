@@ -15,10 +15,13 @@ data Performance = P { orc :: Orchestra
                      }
 
 -- clock
-data Clock = Clock { startAt :: Time, timeSig :: TVar [TimeSignature] }
+data Clock = Clock { startAt :: Time
+                   , timeSig :: TVar [TimeSignature] }
 
 -- time signature
-data TimeSignature = TS { beatInMsr :: Double, bpm :: Double, startTime :: Time } deriving (Show,Eq)
+data TimeSignature = TS { beatInMsr :: Double
+                        , bpm :: Double
+                        , startTime :: Time } deriving (Show,Eq)
 
 --  Performance seconds
 type Time = Double
@@ -30,7 +33,12 @@ type Beats = Double
 type Orchestra = TVar (M.Map [Char] Instr)
 
 -- Instrument
-data Instr = I { insN :: Int, pf :: TVar PfMap, status :: Status, toPlay :: Maybe TimePoint, timeF :: String }
+data Instr = I { insN :: Int
+               , pf :: TVar PfMap
+               , status :: Status
+               , toPlay :: Maybe TimePoint
+               , pats :: TVar (M.Map [Char] PfPat)
+               , timeF :: String }
 
 -- is the instrument Playing ?
 data Status = Playing | Stopped | Stopping deriving (Show)
@@ -38,8 +46,15 @@ data Status = Playing | Stopped | Stopping deriving (Show)
 -- Map of Pfields
 type PfMap = M.Map Int Pfield
 
+-- pattern of pfields and related update function
+data PfPat = PfPat { pfNum :: Int                           -- id of the pfield
+                   , pat  :: TVar [Pfield]                  -- the string of possible values (or only value, depends on what the replacer needs)
+                   , updater :: PfPat -> IO Pfield          -- the function that decides which value to take
+                   }
+
 -- a single Pfield
-data Pfield  = Ps { pString :: String } | Pd { pDouble :: Double } deriving (Eq, Ord, Typeable)
+data Pfield  = Ps { pString :: String }
+             | Pd { pDouble :: Double } deriving (Eq, Ord, Typeable)
 
 instance Show Pfield where
   show (Ps s) = show s
@@ -47,6 +62,6 @@ instance Show Pfield where
 
 -- a point in the Bar
 data TimePointf a = TP { start :: a
-                    } deriving (Eq, Ord, Show, Functor)
+                       } deriving (Eq, Ord, Show, Functor)
 
 type TimePoint = TimePointf Beats
