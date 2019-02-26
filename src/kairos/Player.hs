@@ -23,7 +23,6 @@ defaultPerformance = do
              , timePs = t
              }
 
-
 playInstr :: Instr -> IO ()
 playInstr instr = do
   pfields <- readTVarIO $ pf instr
@@ -31,10 +30,6 @@ playInstr instr = do
   let pfieldList = pfToString pfs
   let pfds = "i" ++ (show (insN instr)) ++ " 0 " ++ pfieldList
   sendEvent pfds
-
--- given a TP, checks if it's in the future. If not, plays it
--- playAt :: Clock -> Instr -> TimePoint -> IO ()
-
 
 playOne :: Performance -> Instr -> TimePoint -> IO ()
 playOne e i tp = do
@@ -95,21 +90,17 @@ playLoop e p Stopped = do
   changeStatus e p Playing
   playLoop e p Playing
 
-
 playLoop e p Stopping = do
   changeStatus e p Stopped
   putStrLn $ "instrument " ++ p ++ " has been stopped."
   return ()
 
-
---playWhen :: (Beats -> Bool) -> Pattern a -> Pattern a
---playWhen f p = p { query = (filter (f . (st . wholE)) . query p)}
-
---playDelta :: Beats -> Beats -> Pattern a -> Pattern a
---playDelta s e = playWhen (\t -> and [ t >= s, t< e])
-
 stop :: Performance -> String -> IO ()
 stop e p = changeStatus e p Stopping
+
+stopAll e = (mapM_ (stop e)) . M.keys =<< readTVarIO (orc e)
+
+playAll e = (mapM_ (play e)) . M.keys =<< readTVarIO (orc e)
 
 --- default Patterns ----------------------------------------
 
@@ -168,5 +159,3 @@ nextBeat b xs | filter (b <) xs == [] = head xs
 
 addTPf :: Performance -> String -> [TimePoint] -> IO ()
 addTPf e n ts = addToMap (timePs e) (n,ts)
-
-stopAll e = (mapM_ (stop e)) . M.keys =<< readTVarIO (orc e)

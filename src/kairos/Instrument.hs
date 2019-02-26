@@ -7,13 +7,21 @@ import Control.Concurrent.STM
 import qualified Data.Map.Strict as M
 
 
-pfToString :: [(Pfield)] -> String
-pfToString ps = unwords $ map (show) ps
+pfToString :: [Pfield] -> String
+pfToString ps = unwords $ map show ps
 
 getPfields :: Instr -> IO (PfMap)
 getPfields i = do
   pf <- readTVarIO $ pf i
   return $ pf
+
+toPfD :: [Double] -> [Pfield]
+toPfD (x:xs) = (Pd x) : toPfD xs
+toPfD []     = []
+
+toPfS :: [String] -> [Pfield]
+toPfS (x:xs) = (Ps x) : toPfS xs
+toPfS []     = []
 
 -- default instruments
 
@@ -144,8 +152,8 @@ addPfPath' e insname name pfPat = do
 
 keep ::  PfPat -> IO Pfield
 keep n = do
-  pat <- readTVarIO (pat n)
-  return $ head pat
+  pats <- readTVarIO (pat n)
+  return $ head pats
 
 nextVal :: PfPat -> IO Pfield
 nextVal n = do
