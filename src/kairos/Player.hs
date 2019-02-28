@@ -32,98 +32,102 @@ playInstr instr = do
   sendEvent pfds
 
 playOne :: Performance -> Instr -> TimePoint -> IO ()
-playOne e i tp = do
-   --Just p <- lookupMap (orc e) i
-   ts <- currentTS (clock e)
-   cb <- currentBeat (clock e)
+playOne perf i tp = do
+   ts <- currentTS (clock perf)
+   cb <- currentBeat (clock perf)
    let toBePlayed = ((start (tp))/(beatInMsr ts)) + (thisBar cb)
    if (toBePlayed > cb)
-      then do toWait <- timeAtBeat (clock e) toBePlayed
-              waitUntil (clock e) (toWait)
-              playOne e i tp
+      then do toWait <- timeAtBeat (clock perf) toBePlayed
+              waitUntil (clock perf) (toWait)
+              playOne perf i tp
       else do playInstr i
               updatePfields i
               return ()
 
 playNow :: Performance -> String -> IO ()
-playNow e i = do
-  tp <- beatInBar (clock e)
-  Just p <- lookupMap (orc e) i
-  playOne e p (pure tp)
+playNow perf i = do
+  tp <- beatInBar (clock perf)
+  Just p <- lookupMap (orc perf) i
+  playOne perf p (pure tp)
 
 play :: Performance -> String -> IO ()
-play e pn = let
-  checkStatus i Stopped  = ( forkIO $ playLoop e pn $ Stopped)  >> return ()
-  checkStatus i Stopping = ( playLoop e pn $ Stopping) >> return ()
+play perf pn = let
+  checkStatus i Stopped  = ( forkIO $ playLoop perf pn $ Stopped)  >> return ()
+  checkStatus i Stopping = ( playLoop perf pn $ Stopping) >> return ()
   checkStatus i Playing  = putStrLn $ "the instrument " ++ pn ++ " is already playing!"
-  in do Just i <- lookupMap (orc e) pn
+  in do Just i <- lookupMap (orc perf) pn
         checkStatus i $ status i
 
 -- play loop callBack
 playLoop :: Performance -> String -> Status -> IO ()
 
-playLoop e pn Playing = do
-  Just p <- lookupMap (orc e) pn
-  now <- timeD (clock e)
-  cb <- currentBeat (clock e)
-  ts <- currentTS (clock e)
+playLoop perf pn Playing = do
+  Just p <- lookupMap (orc perf) pn
+  now <- timeD (clock perf)
+  cb <- currentBeat (clock perf)
+  ts <- currentTS (clock perf)
   let pb = toPlay p
   if ((pb == Nothing) || ((timeF p )== ""))
-     then do  changeStatus e pn Stopping
-              Just p' <- lookupMap (orc e) pn
-              playLoop e pn $ status p'
+     then do  changeStatus perf pn Stopping
+              Just p' <- lookupMap (orc perf) pn
+              playLoop perf pn $ status p'
      else do  let tp = fromJust pb
-              Just timeString <- lookupMap (timePs e) (timeF p)
+              Just timeString <- lookupMap (timePs perf) (timeF p)
               let nb = nextBeat tp timeString
               let nextToPlay | (start nb) > (start tp) = ( (start  (wrapBar ts nb))/(beatInMsr ts)) + (thisBar cb) + ((fromIntegral $ floor $ (start  nb)/(beatInMsr ts)) - (fromIntegral $ floor $ (start  tp)/(beatInMsr ts)))
                              | (start nb) <= (start tp) = ((start nb)/(beatInMsr ts)) + (nextBar cb)
-              nextTime <- timeAtBeat (clock e) nextToPlay
-              forkIO $ playOne e p (wrapBar ts tp)
-              updateToPlay e pn (Just nb)
-              Just ins <- lookupMap (orc e) pn
+              nextTime <- timeAtBeat (clock perf) nextToPlay
+              forkIO $ playOne perf p (wrapBar ts tp)
+              updateToPlay perf pn (Just nb)
+              Just ins <- lookupMap (orc perf) pn
               let toWait = nextTime - now
               waitT (toWait)
-              Just p' <- lookupMap (orc e) pn
-              playLoop e pn $ status p'
+              Just p' <- lookupMap (orc perf) pn
+              playLoop perf pn $ status p'
 
-playLoop e p Stopped = do
-  changeStatus e p Playing
-  playLoop e p Playing
+playLoop perf p Stopped = do
+  changeStatus perf p Playing
+  playLoop perf p Playing
 
-playLoop e p Stopping = do
-  changeStatus e p Stopped
+playLoop perf p Stopping = do
+  changeStatus perf p Stopped
   putStrLn $ "instrument " ++ p ++ " has been stopped."
   return ()
 
 stop :: Performance -> String -> IO ()
-stop e p = changeStatus e p Stopping
+stop perf i = changeStatus perf i Stopping
 
-stopAll e = (mapM_ (stop e)) . M.keys =<< readTVarIO (orc e)
+stopAll perf = (mapM_ (stop perf)) . M.keys =<< readTVarIO (orc perf)
 
-playAll e = (mapM_ (play e)) . M.keys =<< readTVarIO (orc e)
+playAll perf = (mapM_ (play perf)) . M.keys =<< readTVarIO (orc perf)
+
+soloIns perf i = (mapM_ (stop perf)) . filter (/=i) . M.keys =<< readTVarIO (orc perf)
 
 --- default Patterns ----------------------------------------
 
+emptyTP = toTP []
+
 downB = [(TP 1),(TP 3)]
 
-upFour = [(TP 0.5),(TP 1.5),(TP 2.5),(TP 3.5)]
+dbk1 = toTP $ [0,2.5]
 
-fourFloor = [(TP 0),(TP 1),(TP 2),(TP 3)]
+upFour = toTP $ takeWhile (< 4) [0.5,1.5..]
 
-eightN = [(TP 0),(TP 0.5),(TP 1),(TP 1.5),(TP 2),(TP 2.5),(TP 3),(TP 3.5)]
+fourFloor = toTP $ takeWhile (< 4) [0,1..]
 
-sixteenN = [(TP 0),(TP 0.25),(TP 0.5),(TP 0.75),(TP 1),(TP 1.25),(TP 1.5),(TP 1.75),
-            (TP 2),(TP 2.25),(TP 2.5),(TP 2.75),(TP 3),(TP 3.25),(TP 3.5),(TP 3.75)]
+eightN = toTP $ takeWhile (< 4) [0,0.5..]
+
+sixteenN = toTP $ takeWhile (< 4) [0,0.25..]
 
 defaultTPMap :: IO (TVar (M.Map [Char] [TimePoint]))
 defaultTPMap = do
-  tpMap <- newTVarIO $ M.fromList [("upFour", upFour),("downB", downB),("eightN",eightN),("sixteenN",sixteenN),("fourFloor",fourFloor)]
+  tpMap <- newTVarIO $ M.fromList [("upFour", upFour),("downB", downB),("eightN",eightN),("sixteenN",sixteenN),("fourFloor",fourFloor),("dbk1",dbk1),("empty",emptyTP)]
   return $ tpMap
 
 updateInstrument :: Performance -> String -> (Instr -> Instr) -> IO ()
-updateInstrument e k f = do
-  Just i <- lookupMap (orc e) k
-  addToMap (orc e) (k, f i)
+updateInstrument perf k f = do
+  Just i <- lookupMap (orc perf) k
+  addToMap (orc perf) (k, f i)
 --
 updatePfields :: Instr -> IO ()
 updatePfields i = do
@@ -137,8 +141,6 @@ updateonepfield pfmap pats = do
   Just pf <- lookupMap pfmap (pfNum pats)
   newVal <- (updater pats) pats
   addToMap  pfmap ((pfNum pats),newVal)
-
-
 
 changeStatus :: Performance -> String -> Status -> IO ()
 changeStatus e k newS = updateInstrument e k (\x -> x { status = newS })

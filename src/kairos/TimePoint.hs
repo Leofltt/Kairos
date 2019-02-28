@@ -1,14 +1,13 @@
 module Kairos.TimePoint where
 
 import Kairos.Base
---import Kairos.Clock
 import Data.Map.Strict as M
 import Control.Applicative (liftA2)
 
 
 instance Applicative TimePointf where
   pure t = TP t
-  (<*>)(TP startf)(TP starts) = TP (startf starts)
+  (<*>)(TP first)(TP second) = TP (first second)
 
 instance (Num a) => Num (TimePointf a) where
   (+) = liftA2 (+)

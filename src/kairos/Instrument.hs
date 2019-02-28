@@ -6,7 +6,6 @@ import Control.Concurrent
 import Control.Concurrent.STM
 import qualified Data.Map.Strict as M
 
-
 pfToString :: [Pfield] -> String
 pfToString ps = unwords $ map show ps
 
@@ -87,7 +86,7 @@ clap909 = do
 
 jsn1 :: IO Instr
 jsn1 = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Ps "/Users/leofltt/Desktop/KairosSamples/Snares/Snare4Jungle1.wav")]
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Ps "/Users/leofltt/Desktop/KairosSamples/Snares/Snare4JungleMidHigh.wav")]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 1
              , pf     = pfields
@@ -106,9 +105,10 @@ defaultOrc = do
   ohh  <- hihat 0.8
   k    <- kick909
   jsn1 <- jsn1
+  sj2 <- sampler "/Users/leofltt/Desktop/KairosSamples/Kicks/Snare4JungleMidLow.wav"
   cp   <- clap909
   kcJ  <- sampler "/Users/leofltt/Desktop/KairosSamples/Kicks/KickCymbJungle.wav"
-  orc  <- atomically $ newTVar $ M.fromList [("K909",k),("OH808",ohh),("CH808",chh),("snJ1",jsn1),("CP909",cp),("kcJ",kcJ)]
+  orc  <- atomically $ newTVar $ M.fromList [("K909",k),("OH808",ohh),("CH808",chh),("sj1",jsn1),("CP909",cp),("kcJ",kcJ),("sj2",sj2)]
   return $ orc
 
 -- default Fx Orchestra
@@ -118,6 +118,11 @@ defaultFx = do
   rev <- reverb
   orc <-  atomically $ newTVar $ M.fromList [("rev",rev)]
   return $ orc
+
+-- to add instruments
+addInstrument :: Performance -> String -> Instr -> IO ()
+addInstrument perf name instr = addToMap (orc perf) (name,instr)
+
 
 -- function to create a PfPat
 createPfPat :: Int -> [Pfield] -> (PfPat -> IO Pfield) -> IO PfPat
