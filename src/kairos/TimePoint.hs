@@ -24,26 +24,3 @@ doubleRem bar beat = beat - (bar * (fromIntegral $ floor (beat/bar)))
 
 toTP :: [Double] -> [TimePoint]
 toTP times = Prelude.map pure times
-
--- -- the time point with max start and min end
--- sect :: TimePoint -> TimePoint -> TimePoint
--- sect (TP ioif endf) (TP iois ends) = TP (max ioif iois) (min endf ends)
---
--- -- the timespan given from the intersection of two IOIs
--- timeSpanInters :: TimePoint -> TimePoint -> Maybe TimePoint
--- timeSpanInters o@(TP s e) t@(TP s' e') | and [s < e, b == q, b == e] = Nothing
---                                  | and [s' < e', b == q, b == e'] = Nothing
---                                  | b <= q = Just (TP b q)
---                                  | otherwise = Nothing
---                                  where (TP b q) = sect o t
---
--- beatToTPBar :: Beats -> TimePoint
--- beatToTPBar b = (TP (thisBar b) (nextBar b))
---
--- barsInTP :: Integral a => TimePoint -> [a]
--- barsInTP (TP s e) | s > e = []
---                     | s == e = [floor s]
---                     | otherwise = [floor s .. ((ceiling e)-1)]
---
--- barsTPinTP :: TimePoint -> [TimePoint]
--- barsTPinTP = Prelude.map (beatToTPBar . realToFrac) . barsInTP
