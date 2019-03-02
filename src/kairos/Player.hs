@@ -50,6 +50,8 @@ playNow perf i = do
   Just p <- lookupMap (orc perf) i
   playOne perf p (pure tp)
 
+playEffect = playNow
+
 play :: Performance -> String -> IO ()
 play perf pn = let
   checkStatus i Stopped  = ( forkIO $ playLoop perf pn $ Stopped)  >> return ()

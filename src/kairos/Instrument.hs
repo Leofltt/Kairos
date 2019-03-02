@@ -26,7 +26,7 @@ toPfS []     = []
 
 hihat :: Double -> IO Instr
 hihat oc = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(5,Pd oc),(4,Pd 1)] -- p3 : closed/open (0<=0.5<=1)
+  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6,Pd oc)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN = 5
              , pf     = pfields
@@ -38,19 +38,19 @@ hihat oc = do
 
 reverb :: IO Instr
 reverb = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd (-1)),(4,Pd 0.7),(5,Pd 15000)] -- duration, feedback, cutoff freq
+  pfields <- newTVarIO $ M.fromList [(3,Pd (-1)),(4,Pd 1),(5,Pd 0.7),(6,Pd 15000)] -- duration, volume, feedback, cutoff freq
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 666 -- the .1 is so that there is only one instance of reverb at any moment
              , pf     = pfields
              , toPlay = Nothing
              , status = Stopped
-             , timeF = ""
+             , timeF = "empty"
              , pats = emptyPat
              }
 
 kick909 :: IO Instr
 kick909 = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Ps "/Users/leofltt/Desktop/KairosSamples/909/Kick-909.aif")]
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6,Ps "/Users/leofltt/Desktop/KairosSamples/909/Kick-909.aif"),(7,Pd 1)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 1
              , pf     = pfields
@@ -62,19 +62,30 @@ kick909 = do
 
 sampler :: String -> IO Instr
 sampler path = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Ps path)] -- p5 : Sample path
+  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6,Ps path),(7,Pd 1)] -- p5 : Sample path
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 1
              , pf     = pfields
              , toPlay = Nothing
              , status = Stopped
-             , timeF = ""
+             , timeF = "empty"
              , pats = emptyPat
              }
 
+acidBass :: IO Instr
+acidBass = do
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6,Pd 303),(7,Pd 16000)]
+  emptyPat <- newTVarIO M.empty
+  return $ I { insN   = 3
+             , pf     = pfields
+             , toPlay = Just (TP 1.75)
+             , status = Stopped
+             , timeF = "empty"
+             , pats = emptyPat
+             }
 clap909 :: IO Instr
 clap909 = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Ps "/Users/leofltt/Desktop/KairosSamples/909/Clap-909.aif")]
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6,Ps "/Users/leofltt/Desktop/KairosSamples/909/Clap-909.aif"),(7,Pd 1)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 1
              , pf     = pfields
@@ -86,7 +97,7 @@ clap909 = do
 
 jsn1 :: IO Instr
 jsn1 = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Ps "/Users/leofltt/Desktop/KairosSamples/Snares/Snare4JungleMidHigh.wav")]
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6,Ps "/Users/leofltt/Desktop/KairosSamples/Snares/Snare4JungleMidHigh.wav"),(7,Pd 1)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 1
              , pf     = pfields
@@ -104,11 +115,12 @@ defaultOrc = do
   chh  <- hihat 0.2
   ohh  <- hihat 0.8
   k    <- kick909
+  a303 <- acidBass
   jsn1 <- jsn1
   sj2 <- sampler "/Users/leofltt/Desktop/KairosSamples/Kicks/Snare4JungleMidLow.wav"
   cp   <- clap909
   kcJ  <- sampler "/Users/leofltt/Desktop/KairosSamples/Kicks/KickCymbJungle.wav"
-  orc  <- atomically $ newTVar $ M.fromList [("K909",k),("OH808",ohh),("CH808",chh),("sj1",jsn1),("CP909",cp),("kcJ",kcJ),("sj2",sj2)]
+  orc  <- atomically $ newTVar $ M.fromList [("K909",k),("OH808",ohh),("CH808",chh),("sj1",jsn1),("CP909",cp),("kcJ",kcJ),("sj2",sj2),("303",a303)]
   return $ orc
 
 -- default Fx Orchestra
@@ -136,7 +148,8 @@ createPfPat num pfields updtr = do
 -- alias for common pfields
 duration = createPfPat 3
 volume = createPfPat 4
-samplePath = createPfPat 5
+revSend = createPfPat 5
+samplePath = createPfPat 6
 
 -- function to default a pattern to the value of the pfield
 defaultPfpat :: Instr -> PfPat -> IO ()

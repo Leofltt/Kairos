@@ -1,4 +1,4 @@
-inits && useful
+--inits && useful
 ------------------
 
 :set prompt "\n"
@@ -15,16 +15,17 @@ addPf = addPfPath' e
 addPf' i pf pfnum list fun = addPf i pf =<< createPfPat pfnum list fun
 silence = stopAll e
 playA = playAll e
+platFx = playEffect e
 solo = soloIns e
 fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
 defPath s = "/Users/leofltt/Desktop/KairosSamples" ++ s
 
-TEST PERFORMANCE
+--TEST PERFORMANCE
 ----------------------
 
 cPat "jGhost1" "sJ"
 
-solo "CP909" 
+solo "CP909"
 
 playA
 
@@ -48,13 +49,13 @@ addP "roll" $ toTP $ takeWhile (<4) [0,0.2..]
 addC "sJ" "jGhost1" $ toTP [1.75,2.25,5.75,6.25,7.75]
 p "sJ"
 
-mapM_ (cPat "dbk1") ["K909","OH808"] 
+mapM_ (cPat "dbk1") ["K909","OH808"]
 
 addI "sJ" $ sampler $ defPath "/Snares/Snare4JungleMidLow.wav"
 
 fs 888 "finding beauty in dissonance"
 
-cT 156 
+cT 156
 
 sj1 <- samplePath [(Ps "/Users/leofltt/Desktop/KairosSamples/Kicks/KickCymbJungle.wav"),(Ps "/Users/leofltt/Desktop/KairosSamples/909/Kick-909.aif")] nextVal
 
@@ -75,4 +76,3 @@ addC "sJ" "hi" $ toTP [5,13]
 addPf "K909" "vol" =<< volume  (toPfD [0]) keep
 
 addPf "sJ" "samples" snares1
-

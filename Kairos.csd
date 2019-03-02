@@ -17,6 +17,10 @@ ksmps = 10
 nchnls = 2
 0dbfs = 1.0
 
+; common p-fields :
+; p4 : amplitude (0 - 1)
+; p5 : reverb send (0 - 1)
+
 ; TABLES
 gisine   ftgen 1, 0, 4096, 10, 1; Sine wave
 gisquare ftgen 2, 0, 4096, 7, 1, 2048, 1, 0, 0, 2048, 0 ; Square wave
@@ -34,29 +38,33 @@ endop
 
 instr 1 ;Sampler
 
-inchs filenchnls p5
+inchs filenchnls p6
 
 if inchs = 1 then
-aLeft diskin2 p5, 1
+aLeft diskin2 p6, p7
 outs aLeft*p4, aLeft*p4
-
+garvL = garvL + p5 * aLeft * p4
+garvR = garvR + p5 * aLeft * p4
 else
-aLeft, aRight diskin2 p5, 1
+aLeft, aRight diskin2 p6, p7
 outs aLeft*p4, aRight*p4
+garvL = garvL + p5 * aLeft * p4
+garvR = garvR + p5 * aRight * p4
 endif
 
 endin
 
 instr 3 ;Bass 303
 
-acut = 200 + expon(1, p3, 0.001) * 16000
-asig = vco2(1, p5)
+acut = 200 + expon(1, p3, 0.001) * p7
+asig = vco2(1, p6)
 asig = diode_ladder(asig, acut, 10, 1, 4)
 asig = (tanh (asig * 4)) * 0.5
 asig declick asig
 
 outs asig*p4, asig*p4
-
+garvbR = garvbR + p5 * asig * p4
+garvbL = garvbL + p5 * asig * p4
 endin
 
 instr 5 ; HiHats 808
@@ -77,16 +85,17 @@ a808     sum      asqr1, asqr2, asqr3, asqr4, asqr5, asqr6
 a808     butterhp a808, 5270
 a808     butterhp a808, 5270
 outs a808*aenv*p4, a808*aenv*p4
-
+garvbR = garvbR + p5 * a808 * p4 * aenv
+garvbL = garvbL + p5 * a808 * p4 * aenv
 endin
 
 instr 666 ; ReverbSC
 
-kfb = p4
-kcf = p5
+kfb = p5
+kcf = p6
 
 aoutL, aoutR reverbsc garvL, garvbR, kfb, kcf
-outs aoutL, aoutR
+outs aoutL * p4,  aoutR * p4
 
 clear garvL, garvbR
 
