@@ -26,7 +26,7 @@ gisine   ftgen 1, 0, 4096, 10, 1; Sine wave
 gisquare ftgen 2, 0, 4096, 7, 1, 2048, 1, 0, 0, 2048, 0 ; Square wave
 
 ; GLOBAL VARIABLES
-garvL, garvbR init 0
+garvbL, garvbR init 0
 
 ;opcode for declicking an audio signal. Should only be used in instruments that have positive p3 duration.
 ;taken from Steven Yi livecode.orc
@@ -43,13 +43,13 @@ inchs filenchnls p6
 if inchs = 1 then
 aLeft diskin2 p6, p7
 outs aLeft*p4, aLeft*p4
-garvL = garvL + p5 * aLeft * p4
-garvR = garvR + p5 * aLeft * p4
+garvbL = garvbL + p5 * aLeft * p4
+garvbR = garvbR + p5 * aLeft * p4
 else
 aLeft, aRight diskin2 p6, p7
 outs aLeft*p4, aRight*p4
-garvL = garvL + p5 * aLeft * p4
-garvR = garvR + p5 * aRight * p4
+garbL = garvbL + p5 * aLeft * p4
+garvbR = garvbR + p5 * aRight * p4
 endif
 
 endin
@@ -69,7 +69,7 @@ endin
 
 instr 5 ; HiHats 808
 
-pa       =        (p5 >= 0.5 ? 1 : .15)         ; Select open or closed
+pa       =        (p6 >= 0.5 ? 1 : .15)         ; Select open or closed
 ifreq1    =        540                     ; Tune
 ifreq2    =        800                     ; Tune
 
@@ -94,10 +94,10 @@ instr 666 ; ReverbSC
 kfb = p5
 kcf = p6
 
-aoutL, aoutR reverbsc garvL, garvbR, kfb, kcf
+aoutL, aoutR reverbsc garvbL, garvbR, kfb, kcf
 outs aoutL * p4,  aoutR * p4
 
-clear garvL, garvbR
+clear garvbL, garvbR
 
 endin
 

@@ -50,7 +50,11 @@ playNow perf i = do
   Just p <- lookupMap (orc perf) i
   playOne perf p (pure tp)
 
-playEffect = playNow
+playEffect :: Performance -> String -> IO ()
+playEffect perf i = do
+  tp <- beatInBar (clock perf)
+  Just p <- lookupMap (fx perf) i
+  playOne perf p (pure tp)
 
 play :: Performance -> String -> IO ()
 play perf pn = let

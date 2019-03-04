@@ -40,7 +40,7 @@ reverb :: IO Instr
 reverb = do
   pfields <- newTVarIO $ M.fromList [(3,Pd (-1)),(4,Pd 1),(5,Pd 0.7),(6,Pd 15000)] -- duration, volume, feedback, cutoff freq
   emptyPat <- newTVarIO M.empty
-  return $ I { insN   = 666 -- the .1 is so that there is only one instance of reverb at any moment
+  return $ I { insN   = 666
              , pf     = pfields
              , toPlay = Nothing
              , status = Stopped
@@ -74,7 +74,7 @@ sampler path = do
 
 acidBass :: IO Instr
 acidBass = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6,Pd 303),(7,Pd 16000)]
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 0.2),(4,Pd 0.7),(5,Pd 0),(6,Pd 303),(7,Pd 16000)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 3
              , pf     = pfields
