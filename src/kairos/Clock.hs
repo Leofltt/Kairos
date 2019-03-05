@@ -14,7 +14,6 @@ displayClock c = do
   beat <- beatInBar c
   return $ "clock's bar: " ++ (show $ thisBar cb) ++ ", beat: " ++ (take 4 $ show $ beat) ++ ", at tempo: " ++ (show $ bpm ts) ++" bpm."
 
--- (show $ ((fromIntegral $ truncate beat*100)/ 100))
 getNow :: MonadIO m => m Time
 getNow = liftIO $ fmap realToFrac getPOSIXTime
 
