@@ -44,7 +44,7 @@ reverb = do
              , pf     = pfields
              , toPlay = Nothing
              , status = Stopped
-             , timeF = "empty"
+             , timeF = ""
              , pats = emptyPat
              }
 
@@ -62,13 +62,13 @@ kick909 = do
 
 sampler :: String -> IO Instr
 sampler path = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6,Ps path),(7,Pd 1)] -- p5 : Sample path
+  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6,Ps path),(7,Pd 1)] -- p6 : Sample path, p7 : pitch
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 1
              , pf     = pfields
              , toPlay = Nothing
              , status = Stopped
-             , timeF = "empty"
+             , timeF = ""
              , pats = emptyPat
              }
 
@@ -80,33 +80,9 @@ acidBass = do
              , pf     = pfields
              , toPlay = Just (TP 1.75)
              , status = Stopped
-             , timeF = "empty"
+             , timeF = ""
              , pats = emptyPat
              }
-clap909 :: IO Instr
-clap909 = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6,Ps "/Users/leofltt/Desktop/KairosSamples/909/Clap-909.aif"),(7,Pd 1)]
-  emptyPat <- newTVarIO M.empty
-  return $ I { insN   = 1
-             , pf     = pfields
-             , toPlay = Just (TP 0)
-             , status = Stopped
-             , timeF = "downB"
-             , pats = emptyPat
-             }
-
-jsn1 :: IO Instr
-jsn1 = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6,Ps "/Users/leofltt/Desktop/KairosSamples/Snares/Snare4JungleMidHigh.wav"),(7,Pd 1)]
-  emptyPat <- newTVarIO M.empty
-  return $ I { insN   = 1
-             , pf     = pfields
-             , toPlay = Just (TP 0)
-             , status = Stopped
-             , timeF = "downB"
-             , pats = emptyPat
-             }
-
 
 -- default Orchestra
 
@@ -116,11 +92,14 @@ defaultOrc = do
   ohh  <- hihat 0.8
   k    <- kick909
   a303 <- acidBass
-  jsn1 <- jsn1
+  jsn1 <- sampler "/Users/leofltt/Desktop/KairosSamples/Snares/Snare4JungleMidHigh.wav"
   sj2 <- sampler "/Users/leofltt/Desktop/KairosSamples/Kicks/Snare4JungleMidLow.wav"
-  cp   <- clap909
+  cp   <- sampler "/Users/leofltt/Desktop/KairosSamples/909/Clap-909.aif"
   kcJ  <- sampler "/Users/leofltt/Desktop/KairosSamples/Kicks/KickCymbJungle.wav"
-  orc  <- atomically $ newTVar $ M.fromList [("K909",k),("OH808",ohh),("CH808",chh),("sj1",jsn1),("CP909",cp),("kcJ",kcJ),("sj2",sj2),("303",a303)]
+  orc  <- atomically $ newTVar $ M.fromList [("K909",k),("OH808",ohh),("CH808",chh)
+                                            ,("sj1",jsn1),("CP909",cp),("kcJ",kcJ)
+                                            ,("sj2",sj2),("303",a303)
+                                            ]
   return $ orc
 
 -- default Fx Orchestra
@@ -145,7 +124,7 @@ createPfPat num pfields updtr = do
                  , updater = updtr
                  }
 
--- alias for common pfields
+-- aliases for common pfields
 duration = createPfPat 3
 volume = createPfPat 4
 revSend = createPfPat 5

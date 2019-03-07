@@ -111,8 +111,6 @@ soloIns perf i = (mapM_ (stop perf)) . filter (/=i) . M.keys =<< readTVarIO (orc
 
 --- default Patterns ----------------------------------------
 
-emptyTP = toTP []
-
 downB = [(TP 1),(TP 3)]
 
 dbk1 = toTP $ [0,2.5]
@@ -125,9 +123,17 @@ eightN = toTP $ takeWhile (< 4) [0,0.5..]
 
 sixteenN = toTP $ takeWhile (< 4) [0,0.25..]
 
+jGhost = toTP [1.75,2.25,5.75]
+
+jGhost1 = toTP [1.75,2.25,5.75,6.25,7.75]
+
+
 defaultTPMap :: IO (TVar (M.Map [Char] [TimePoint]))
 defaultTPMap = do
-  tpMap <- newTVarIO $ M.fromList [("upFour", upFour),("downB", downB),("eightN",eightN),("sixteenN",sixteenN),("fourFloor",fourFloor),("dbk1",dbk1),("empty",emptyTP)]
+  tpMap <- newTVarIO $ M.fromList [("upFour", upFour),("downB", downB),("eightN",eightN)
+                                  ,("sixteenN",sixteenN),("fourFloor",fourFloor),("dbk1",dbk1)
+                                  ,("jGhost1",jGhost1),("jGhost",jGhost)
+                                  ]
   return $ tpMap
 
 updateInstrument :: Performance -> String -> (Instr -> Instr) -> IO ()
@@ -157,6 +163,7 @@ changeTimeF e k newF = do
   Just ts <- lookupMap (timePs e) newF
   updateToPlay e k (Just $ head ts)
   updateInstrument e k (\x -> x { timeF = newF })
+
 
 updateToPlay :: Performance -> String -> Maybe TimePoint -> IO ()
 updateToPlay e k newTP = updateInstrument e k (\x -> x { toPlay = newTP })
