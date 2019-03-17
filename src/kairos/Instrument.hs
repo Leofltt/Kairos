@@ -5,6 +5,7 @@ import Kairos.MapUtilities
 import Control.Concurrent
 import Control.Concurrent.STM
 import qualified Data.Map.Strict as M
+import System.Random (getStdRandom,randomR)
 
 pfToString :: [Pfield] -> String
 pfToString ps = unwords $ map show ps
@@ -26,13 +27,61 @@ toPfS []     = []
 
 hihat :: Double -> IO Instr
 hihat oc = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6,Pd oc)]
+  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6, Pd 0),(7,Pd oc)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN = 5
              , pf     = pfields
              , toPlay = Just (TP 0)
              , status = Stopped
              , timeF = "upFour"
+             , pats = emptyPat
+             }
+
+kick909 :: IO Instr
+kick909 = do
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6, Pd 0),(7,Ps "/Users/leofltt/Desktop/KairosSamples/909/Kick-909.aif"),(8,Pd 1)]
+  emptyPat <- newTVarIO M.empty
+  return $ I { insN   = 1
+             , pf     = pfields
+             , toPlay = Just (TP 0)
+             , status = Stopped
+             , timeF = "fourFloor"
+             , pats = emptyPat
+             }
+
+sampler :: String -> IO Instr
+sampler path = do
+  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6, Pd 0),(7,Ps path),(8,Pd 1)] -- p6 : Sample path, p7 : pitch
+  emptyPat <- newTVarIO M.empty
+  return $ I { insN   = 1
+             , pf     = pfields
+             , toPlay = Nothing
+             , status = Stopped
+             , timeF = ""
+             , pats = emptyPat
+             }
+
+acidBass :: IO Instr
+acidBass = do
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 0.2),(4,Pd 0.7),(5,Pd 0),(6, Pd 0),(7,Pd 48),(8,Pd 16000)]
+  emptyPat <- newTVarIO M.empty
+  return $ I { insN   = 3
+             , pf     = pfields
+             , toPlay = Just (TP 0)
+             , status = Stopped
+             , timeF = ""
+             , pats = emptyPat
+             }
+
+hoover :: IO Instr
+hoover = do
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 0.7),(5,Pd 0),(6, Pd 0),(7,Pd 48),(8,Pd 888),(9,Pd 5)]
+  emptyPat <- newTVarIO M.empty
+  return $ I { insN   = 4
+             , pf     = pfields
+             , toPlay = Just (TP 0)
+             , status = Stopped
+             , timeF = ""
              , pats = emptyPat
              }
 
@@ -48,37 +97,13 @@ reverb = do
              , pats = emptyPat
              }
 
-kick909 :: IO Instr
-kick909 = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6,Ps "/Users/leofltt/Desktop/KairosSamples/909/Kick-909.aif"),(7,Pd 1)]
+delay :: IO Instr
+delay = do
+  pfields <- newTVarIO $ M.fromList [(3,Pd (-1)),(4,Pd 1),(5,Pd 0.3),(6,Pd 700)] -- duration, volume, feedback, delay time
   emptyPat <- newTVarIO M.empty
-  return $ I { insN   = 1
-             , pf     = pfields
-             , toPlay = Just (TP 0)
-             , status = Stopped
-             , timeF = "fourFloor"
-             , pats = emptyPat
-             }
-
-sampler :: String -> IO Instr
-sampler path = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6,Ps path),(7,Pd 1)] -- p6 : Sample path, p7 : pitch
-  emptyPat <- newTVarIO M.empty
-  return $ I { insN   = 1
+  return $ I { insN   = 555
              , pf     = pfields
              , toPlay = Nothing
-             , status = Stopped
-             , timeF = ""
-             , pats = emptyPat
-             }
-
-acidBass :: IO Instr
-acidBass = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 0.2),(4,Pd 0.7),(5,Pd 0),(6,Pd 303),(7,Pd 16000)]
-  emptyPat <- newTVarIO M.empty
-  return $ I { insN   = 3
-             , pf     = pfields
-             , toPlay = Just (TP 1.75)
              , status = Stopped
              , timeF = ""
              , pats = emptyPat
@@ -92,23 +117,20 @@ defaultOrc = do
   ohh  <- hihat 0.8
   k    <- kick909
   a303 <- acidBass
-  jsn1 <- sampler "/Users/leofltt/Desktop/KairosSamples/Snares/Snare4JungleMidHigh.wav"
-  sj2 <- sampler "/Users/leofltt/Desktop/KairosSamples/Kicks/Snare4JungleMidLow.wav"
+  hov  <- hoover
+  sj1  <- sampler "/Users/leofltt/Desktop/KairosSamples/Snares/Snare4JungleMidHigh.wav"
+  sj2  <- sampler "/Users/leofltt/Desktop/KairosSamples/Kicks/Snare4JungleMidLow.wav"
   cp   <- sampler "/Users/leofltt/Desktop/KairosSamples/909/Clap-909.aif"
+  rev  <- reverb
+  del  <- delay
   kcJ  <- sampler "/Users/leofltt/Desktop/KairosSamples/Kicks/KickCymbJungle.wav"
   orc  <- atomically $ newTVar $ M.fromList [("K909",k),("OH808",ohh),("CH808",chh)
-                                            ,("sj1",jsn1),("CP909",cp),("kcJ",kcJ)
-                                            ,("sj2",sj2),("303",a303)
+                                            ,("sj1",sj1),("CP909",cp),("kcj",kcJ)
+                                            ,("sj2",sj2),("303",a303),("hov",hov)
+                                            ,("rev",rev),("del",del)
                                             ]
   return $ orc
 
--- default Fx Orchestra
-
-defaultFx :: IO Orchestra
-defaultFx = do
-  rev <- reverb
-  orc <-  atomically $ newTVar $ M.fromList [("rev",rev)]
-  return $ orc
 
 -- to add instruments
 addInstrument :: Performance -> String -> Instr -> IO ()
@@ -158,3 +180,13 @@ nextVal n = do
   let pat' = (tail patrn)++[head patrn]
   atomically $ writeTVar (pat n) pat'
   return $ (head pat')
+
+randomize :: PfPat -> IO Pfield
+randomize n = do
+  p <- readTVarIO (pat n)
+  let l = (length p) - 1
+  ran <- randI l
+  return $ (!!) p ran
+
+randI :: Int -> IO Int
+randI i = getStdRandom (randomR (0, i))

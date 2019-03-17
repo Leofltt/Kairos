@@ -9,7 +9,6 @@ import Data.Typeable
 
 -- the Performance is the scope of the composition
 data Performance = P { orc :: Orchestra
-                     , fx  :: Orchestra
                      , clock :: Clock
                      , timePs :: TVar (M.Map [Char] [TimePoint])
                      }

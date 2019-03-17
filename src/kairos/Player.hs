@@ -14,11 +14,9 @@ import qualified Data.Map.Strict as M
 defaultPerformance :: IO Performance
 defaultPerformance = do
   o <- defaultOrc
-  f <- defaultFx
   c <- defaultClock
   t <- defaultTPMap
   return $ P { orc = o
-             , fx = f
              , clock = c
              , timePs = t
              }
@@ -50,11 +48,7 @@ playNow perf i = do
   Just p <- lookupMap (orc perf) i
   playOne perf p (pure tp)
 
-playEffect :: Performance -> String -> IO ()
-playEffect perf i = do
-  tp <- beatInBar (clock perf)
-  Just p <- lookupMap (fx perf) i
-  playOne perf p (pure tp)
+playEffect = playNow
 
 play :: Performance -> String -> IO ()
 play perf pn = let
@@ -140,6 +134,7 @@ updateInstrument :: Performance -> String -> (Instr -> Instr) -> IO ()
 updateInstrument perf k f = do
   Just i <- lookupMap (orc perf) k
   addToMap (orc perf) (k, f i)
+
 --
 updatePfields :: Instr -> IO ()
 updatePfields i = do
