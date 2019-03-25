@@ -97,11 +97,13 @@ playLoop perf p Stopping = do
 stop :: Performance -> String -> IO ()
 stop perf i = changeStatus perf i Stopping
 
-stopAll perf = (mapM_ (stop perf)) . M.keys =<< readTVarIO (orc perf)
+stopAll perf = (mapM_ (stop perf)) .  notEffect . M.keys =<< readTVarIO (orc perf)
 
-playAll perf = (mapM_ (play perf)) . M.keys =<< readTVarIO (orc perf)
+playAll perf = (mapM_ (play perf)) .  notEffect . M.keys =<< readTVarIO (orc perf)
 
-soloIns perf i = (mapM_ (stop perf)) . filter (/=i) . M.keys =<< readTVarIO (orc perf)
+soloIns perf i = (mapM_ (stop perf)) . filter (/=i) . notEffect . M.keys =<< readTVarIO (orc perf)
+
+notEffect = filter (/= "rev") . filter (/= "del")
 
 --- default Patterns ----------------------------------------
 
@@ -135,7 +137,6 @@ updateInstrument perf k f = do
   Just i <- lookupMap (orc perf) k
   addToMap (orc perf) (k, f i)
 
---
 updatePfields :: Instr -> IO ()
 updatePfields i = do
    pfields <- readTVarIO (pf i)
@@ -156,9 +157,17 @@ changeTimeF :: Performance -> String -> String -> IO ()
 changeTimeF e k newF = do
   Just pl <- lookupMap (orc e) k
   Just ts <- lookupMap (timePs e) newF
-  updateToPlay e k (Just $ head ts)
+  val <- closertoNow e ts
+  updateToPlay e k (Just val)
   updateInstrument e k (\x -> x { timeF = newF })
 
+closertoNow :: Performance -> [TimePoint] -> IO TimePoint
+closertoNow e ts = do
+  now <- currentBeat (clock e)
+  let val = deltaBeats now
+  let tp | (takeWhile (<= (TP val)) ts) /= [] = last $ takeWhile (<= (TP val)) ts
+         | otherwise = head ts
+  return $ tp
 
 updateToPlay :: Performance -> String -> Maybe TimePoint -> IO ()
 updateToPlay e k newTP = updateInstrument e k (\x -> x { toPlay = newTP })

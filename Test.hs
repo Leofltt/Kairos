@@ -12,13 +12,27 @@ addIns = addInstrument e
 addI name ins = addIns name =<< ins
 addC i n s = addP n s >> cPat n i
 addPf = addPfPath' e
-addPf' i pf pfnum list fun = addPf i pf =<< createPfPat pfnum list fun
+addPf' i pfnum list fun = addPf i pfnum =<< createPfPat pfnum list fun
+vol i list fun = addPf' i 4 list fun -- global
+rev i list fun = addPf' i 5 list fun
+del i list fun = addPf' i 6 list fun
+dur i list fun = addPf' i 3 list fun
+freq i list fun = addPf' i 7 list fun -- 303, hoover
+cf i list fun = addPf' i 8 list fun -- 303, hoover
+res i list fun = addPf' i 9 list fun -- 303, hoover
+cps i list fun = addPf' i 8 list fun -- sampler
+sample i list fun = addPf' i 7 list fun -- sampler
 silence = stopAll e
 playA = playAll e
 playFx = playEffect e
 solo = soloIns e
 fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
 defPath s = "/Users/leofltt/Desktop/KairosSamples" ++ s
+addI "sh" $ sampler $ defPath "/ch/shortHat.wav"
+addI "r1" $ sampler $ defPath "/rim/HollowRim.wav"
+addI "rS" $ sampler $ defPath "/rim/SmallRim.wav"
+addI "sS" $ sampler $ defPath "/snares/SNSandy.wav"
+mapM playFx ["rev","del"]
 
 :! clear
 
@@ -28,48 +42,101 @@ defPath s = "/Users/leofltt/Desktop/KairosSamples" ++ s
 
 silence
 
-addPf' "303" "rev" 5 (toPfD $ [0.5, 0.7]) nextVal
 
-mapM_ p ["kcJ","CH808"]
 
-cPat "jGhost1" "CH808"
-cPat "dbk1" "kcJ"
+-- example 1 : Techno
 
-addC "CP909" "yolo" $ toTP $ [0.4, 0.8, 1.6, 3.2]
+--setup
 
-addPf' "CP909" "vol" 4 (toPfD $ [0.75, 0.5, 0]) randomize
+cPat "fourFloor" "K909"
+cPat "upFour" "CH808"
+cPat "downB" "CP909"
+
+-- demo walkthrough
+
+cT 127
+
+mapM_ p ["K909","CH808"]
+
 p "CP909"
-   
-playFx "rev"
 
-playFx "del"
 
-addPf' "CH808" "vol" 4 (toPfD $ [0.75]) nextVal
+addC "OH808" "OH1" $ toTP $ [1.5,3.5] 
+p "OH808"
 
-addPf' "303" "delS" 6 (toPfD $ [0.3,0.7,0.9]) randomize
+vol "OH808" [Pd 0.8)] keep
 
-addPf' "303" "dur" 3 (toPfD $ [ 0.7, 0.8 ,0.5]) randomize
-addPf' "303" "pitch" 7 (toPfD $ [42, 48, 52, 36]) randomize
-addPf' "303" "cf" 8 (toPfD $ [6000, 888, 2222]) randomize
-cPat "eightN" "303"
+vol "CP909" [Pd 1.4] keep
+rev "CP909" (toPfD [0.4]) keep
+rev "303" [Pd 0.5] keep
+
+solo "CP909"
+
 p "303"
 
-addPf' "303" "reverb" 5 (toPfD $ [0.6]) keep
+s "OH808"
 
-addC "303" "test" $ toTP $ takeWhile (<4) [0,0.33..]
+rev "OH808" [(Pd 0.3)] keep
 
-cPat "sixteenN"  "sJ"
+cPat "sixteenN"  "303"
+freq "303" (toPfD $ [36, 43]) randomize
+cf "303" (toPfD $ [6000, 800]) randomize
 
-addP "roll" $ toTP $ takeWhile (<4) [0,0.2..]
+p "303"
 
-mapM_ (cPat "dbk1") ["K909","OH808"]
+vol "OH808" [Pd 0.4] keep 
 
-addI "sJ" $ sampler $ defPath "/Snares/Snare4JungleMidLow.wav"
+-----------------------------
 
-fs 888 "finding beauty in dissonance"
+-- example 2 : Jungle / Drum & Bass
 
+-- setup
 
-sj1 <- samplePath (toPfS $ map defPath ["/Kicks/KickCymbJungle.wav","/909/Kick-909.aif"]) nextVal
+cPat "eightN" "sh"
+cPat "jGhost1" "rS"
+cPat "jGhost" "r1"
+cPat "dbk1" "kcj"
+cPat "upFour" "OH808"
 
-addPf "303" "vol" =<< volume (toPfD [1.5]) keep
+vol "OH808" [Pd 0.4] keep
 
+mapM_ (cPat "downB") ["sS", "sj1", "sj2"]
+
+-- play 
+
+cT 148
+
+mapM_ p ["kcj", "sS"]
+
+p "sh"
+
+p "OH808"
+p "rS"
+
+dur "hov" (toPfD [0.7, 1, 0.5]) randomize
+addC "hov" "lSys1" $ toTP $ lSys 2 (interp1 4) [0, 2.5]
+freq "hov" (toPfD [48, 51, 55]) nextVal
+vol "hov" [Pd 0.8] keep
+cf "hov" [Pd 6000] keep
+
+p "hov" 
+
+p "rS"
+
+solo "K909"
+
+mapM_ p ["K909","rS","sh","OH808"]
+
+cPat "dbk1" "K909"
+ 
+-----------------------------
+--freestyle 
+
+addC "K909" "lS1" $ toTP $ lSys 2 (interp1 4) [0,2.5]
+
+addC "rS" "lS2" $ toTP $ lSys 2 (interp1 8) [1.75,2.25,5.75, 6.25, 7.75]
+
+cPat "downB" "sj1"
+p "sj1"
+
+silence

@@ -69,7 +69,7 @@ instr 3 ;Bass 303
 
 acut = 200 + expon(1, p3, 0.001) * p8
 asig = vco2(1, cpsmidinn(p7))
-asig = diode_ladder(asig, acut, 10, 1, 4)
+asig = diode_ladder(asig, acut, p9, 1, 4)
 asig = (tanh (asig * 4)) * 0.5
 asig declick asig
 

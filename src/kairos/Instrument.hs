@@ -63,7 +63,7 @@ sampler path = do
 
 acidBass :: IO Instr
 acidBass = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 0.2),(4,Pd 0.7),(5,Pd 0),(6, Pd 0),(7,Pd 48),(8,Pd 16000)]
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 0.2),(4,Pd 0.7),(5,Pd 0),(6, Pd 0),(7,Pd 48),(8,Pd 16000),(9,Pd 10)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 3
              , pf     = pfields
@@ -118,14 +118,14 @@ defaultOrc = do
   k    <- kick909
   a303 <- acidBass
   hov  <- hoover
-  sj1  <- sampler "/Users/leofltt/Desktop/KairosSamples/Snares/Snare4JungleMidHigh.wav"
-  sj2  <- sampler "/Users/leofltt/Desktop/KairosSamples/Kicks/Snare4JungleMidLow.wav"
+  sj1  <- sampler "/Users/leofltt/Desktop/KairosSamples/snares/Snare4JungleMidHigh.wav"
+  sj2  <- sampler "/Users/leofltt/Desktop/KairosSamples/snares/Snare4JungleMidLow.wav"
   cp   <- sampler "/Users/leofltt/Desktop/KairosSamples/909/Clap-909.aif"
   rev  <- reverb
   del  <- delay
-  kcJ  <- sampler "/Users/leofltt/Desktop/KairosSamples/Kicks/KickCymbJungle.wav"
+  kcj  <- sampler "/Users/leofltt/Desktop/KairosSamples/Kicks/KickCymbJungle.wav"
   orc  <- atomically $ newTVar $ M.fromList [("K909",k),("OH808",ohh),("CH808",chh)
-                                            ,("sj1",sj1),("CP909",cp),("kcj",kcJ)
+                                            ,("sj1",sj1),("CP909",cp),("kcj",kcj)
                                             ,("sj2",sj2),("303",a303),("hov",hov)
                                             ,("rev",rev),("del",del)
                                             ]
@@ -159,13 +159,13 @@ defaultPfpat i pfp = do
   atomically $ writeTVar (pat pfp) [pf]
   return ()
 
-addPfPath :: Instr -> [Char] -> PfPat -> IO ()
-addPfPath i name pfPat = addToMap (pats i) (name,pfPat)
+addPfPath :: Instr -> Int -> PfPat -> IO ()
+addPfPath i num pfPat = addToMap (pats i) (num,pfPat)
 
-addPfPath' :: Performance -> [Char] -> [Char] -> PfPat -> IO ()
-addPfPath' e insname name pfPat = do
+addPfPath' :: Performance -> [Char] -> Int -> PfPat -> IO ()
+addPfPath' e insname num pfPat = do
   Just i <- lookupMap (orc e) insname
-  addPfPath i name pfPat
+  addPfPath i num pfPat
 
 -- updaters
 

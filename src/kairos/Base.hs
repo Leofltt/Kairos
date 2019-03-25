@@ -36,7 +36,7 @@ data Instr = I { insN :: Int
                , pf :: TVar PfMap
                , status :: Status
                , toPlay :: Maybe TimePoint
-               , pats :: TVar (M.Map [Char] PfPat)
+               , pats :: TVar (M.Map Int PfPat)
                , timeF :: String }
 
 -- is the instrument Playing ?
