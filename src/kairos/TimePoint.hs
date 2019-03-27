@@ -25,10 +25,19 @@ doubleRem bar beat = beat - (bar * (fromIntegral $ floor (beat/bar)))
 toTP :: [Double] -> [TimePoint]
 toTP times = Prelude.map pure times
 
+fromTP :: [TimePoint] -> [Double]
+fromTP (x:xs) = (start x):(fromTP xs)
+fromTP [] = []
+
 lSys ::  Int -> ([Double] -> [Double]) -> [Double] -> [Double]
 lSys n rule xs  | n <= 0 = xs | otherwise = lSys (n-1) rule (rule xs)
 
 --rules :: [Double] -> [Double]
 interp1 :: Double -> [Double] -> [Double]
-interp1 total (x:y:xs) = x:((x+y)/2):(interp1 total (y:xs))
 interp1 total (x:[]) = (x:[((x + total)/2)])
+interp1 total (x:y:xs) = x:((x+y)/2):(interp1 total (y:xs))
+
+interp2 :: Double -> [Double] -> [Double]
+interp2 tot (x:y:[]) = [((x+y)/2)]
+interp2 tot (x:[]) = [(x + tot)/2]
+interp2 tot (x:y:xs) = ((x+y)/2):(interp2 tot xs)

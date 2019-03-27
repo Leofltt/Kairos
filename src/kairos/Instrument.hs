@@ -99,7 +99,7 @@ reverb = do
 
 delay :: IO Instr
 delay = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd (-1)),(4,Pd 1),(5,Pd 0.3),(6,Pd 700)] -- duration, volume, feedback, delay time
+  pfields <- newTVarIO $ M.fromList [(3,Pd (-1)),(4,Pd 1),(5,Pd 0.14),(6,Pd 700)] -- duration, volume, feedback, delay time
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 555
              , pf     = pfields
@@ -118,15 +118,13 @@ defaultOrc = do
   k    <- kick909
   a303 <- acidBass
   hov  <- hoover
-  sj1  <- sampler "/Users/leofltt/Desktop/KairosSamples/snares/Snare4JungleMidHigh.wav"
-  sj2  <- sampler "/Users/leofltt/Desktop/KairosSamples/snares/Snare4JungleMidLow.wav"
   cp   <- sampler "/Users/leofltt/Desktop/KairosSamples/909/Clap-909.aif"
   rev  <- reverb
   del  <- delay
   kcj  <- sampler "/Users/leofltt/Desktop/KairosSamples/Kicks/KickCymbJungle.wav"
   orc  <- atomically $ newTVar $ M.fromList [("K909",k),("OH808",ohh),("CH808",chh)
-                                            ,("sj1",sj1),("CP909",cp),("kcj",kcj)
-                                            ,("sj2",sj2),("303",a303),("hov",hov)
+                                            ,("CP909",cp),("kcj",kcj)
+                                            ,("303",a303),("hov",hov)
                                             ,("rev",rev),("del",del)
                                             ]
   return $ orc

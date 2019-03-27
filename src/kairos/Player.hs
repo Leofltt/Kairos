@@ -91,11 +91,14 @@ playLoop perf p Stopped = do
 
 playLoop perf p Stopping = do
   changeStatus perf p Stopped
+  playLoop perf p Stopping
   putStrLn $ "instrument " ++ p ++ " has been stopped."
   return ()
 
 stop :: Performance -> String -> IO ()
-stop perf i = changeStatus perf i Stopping
+stop perf i = do
+  changeStatus perf i Stopping
+
 
 stopAll perf = (mapM_ (stop perf)) .  notEffect . M.keys =<< readTVarIO (orc perf)
 
@@ -119,6 +122,8 @@ eightN = toTP $ takeWhile (< 4) [0,0.5..]
 
 sixteenN = toTP $ takeWhile (< 4) [0,0.25..]
 
+dubb = toTP $ [2.25,2.75]
+
 jGhost = toTP [1.75,2.25,5.75]
 
 jGhost1 = toTP [1.75,2.25,5.75,6.25,7.75]
@@ -128,7 +133,7 @@ defaultTPMap :: IO (TVar (M.Map [Char] [TimePoint]))
 defaultTPMap = do
   tpMap <- newTVarIO $ M.fromList [("upFour", upFour),("downB", downB),("eightN",eightN)
                                   ,("sixteenN",sixteenN),("fourFloor",fourFloor),("dbk1",dbk1)
-                                  ,("jGhost1",jGhost1),("jGhost",jGhost)
+                                  ,("jGhost1",jGhost1),("jGhost",jGhost),("dubb",dubb)
                                   ]
   return $ tpMap
 
@@ -157,24 +162,31 @@ changeTimeF :: Performance -> String -> String -> IO ()
 changeTimeF e k newF = do
   Just pl <- lookupMap (orc e) k
   Just ts <- lookupMap (timePs e) newF
-  val <- closertoNow e ts
+  val <- closertoNow e k ts
   updateToPlay e k (Just val)
   updateInstrument e k (\x -> x { timeF = newF })
 
-closertoNow :: Performance -> [TimePoint] -> IO TimePoint
-closertoNow e ts = do
-  now <- currentBeat (clock e)
-  let val = deltaBeats now
-  let tp | (takeWhile (<= (TP val)) ts) /= [] = last $ takeWhile (<= (TP val)) ts
-         | otherwise = head ts
-  return $ tp
+closertoNow :: Performance -> String -> [TimePoint] -> IO TimePoint
+closertoNow e k ts = do
+  Just pl <- lookupMap (orc e) k
+  if ((toPlay pl) /= Nothing)
+    then do let toP = fromJust (toPlay pl)
+            let tp | (takeWhile (<= (toP)) ts) /= [] = last $ takeWhile (<= (toP)) ts
+                   | otherwise = head ts
+            return $ tp
+    else do now <- beatInBar (clock e)
+            let tp | (takeWhile (<= (TP now)) ts) /= [] = last $ takeWhile (<= (TP now)) ts
+                   | otherwise = head ts
+            return $ tp
 
 updateToPlay :: Performance -> String -> Maybe TimePoint -> IO ()
 updateToPlay e k newTP = updateInstrument e k (\x -> x { toPlay = newTP })
 
+
 nextBeat :: TimePoint -> [TimePoint] -> TimePoint
 nextBeat b xs | filter (b <) xs == [] = head xs
               | otherwise = head $ filter (b <) xs
+
 
 addTPf :: Performance -> String -> [TimePoint] -> IO ()
 addTPf e n ts = addToMap (timePs e) (n,ts)
