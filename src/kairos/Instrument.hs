@@ -63,7 +63,7 @@ sampler path = do
 
 acidBass :: IO Instr
 acidBass = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 0.2),(4,Pd 0.7),(5,Pd 0),(6, Pd 0),(7,Pd 48),(8,Pd 16000),(9,Pd 10)]
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 0.7),(4,Pd 0.7),(5,Pd 0),(6, Pd 0),(7,Pd 48),(8,Pd 16000),(9,Pd 10)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 3
              , pf     = pfields
@@ -99,7 +99,7 @@ reverb = do
 
 delay :: IO Instr
 delay = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd (-1)),(4,Pd 1),(5,Pd 0.14),(6,Pd 700)] -- duration, volume, feedback, delay time
+  pfields <- newTVarIO $ M.fromList [(3,Pd (-1)),(4,Pd 1),(5,Pd 0.14),(6,Pd 450)] -- duration, volume, feedback, delay time
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 555
              , pf     = pfields

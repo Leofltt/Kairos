@@ -91,7 +91,6 @@ playLoop perf p Stopped = do
 
 playLoop perf p Stopping = do
   changeStatus perf p Stopped
-  playLoop perf p Stopping
   putStrLn $ "instrument " ++ p ++ " has been stopped."
   return ()
 

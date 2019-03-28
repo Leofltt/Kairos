@@ -36,39 +36,41 @@ addI "sj1" $ sampler $ defPath "/snares/Snare4JungleMidHigh.wav"
 addI "sj2" $ sampler $ defPath "/snares/Snare4JungleMidLow.wav"
 addI "glass" $ sampler $ defPath "/fracture/Glass1Dry.wav"
 mapM playFx ["rev","del"]
+
 :! clear
 
 
 --TEST PERFORMANCE
 ----------------------
 
-addC "303" "lS3" $ toTP $ lSys 4 (interp2 4) $ lSys 6 (interp1 4) (fromTP dbk1)
-
-silence 
-
-freq "303" (toPfD $ [57, 60, 65]) randomize
-
-p "303"
-
-cf "303" (toPfD $ [5000, 8000]) randomize
-
-cPat "eightN" "CH808" 
-vol "CH808" [Pd 0.7] keep
-p "CH808"
-
-rev "CH808" [Pd 0.15] keep
-del "CP909" [Pd 0.3, Pd 0] randomize
-
+cT 133
 
 cPat "downB" "CP909"
 p "CP909"
 
+
+del "CP909" (toPfD [0.3, 0]) randomize
+rev "CP909" [Pd 0.3] keep
+
 cPat "dbk1" "K909" 
-cPat "upFour" "sh"
 p "K909"
+
+silence
+
+addC "sh" "hat2" $ toTP $ lSys 1 (interp1 4) [0, 0.5,2.25,2.75]
 p "sh"
 
-cT 127
+freq "303" (toPfD [55, 58, 62 ]) nextVal
+addC "303" "bass1" $ toTP $ lSys 1 (interp1 4) $ fromTP dbk1 
+rev "303" [Pd 0.3] keep
+vol "303" [Pd 0.4] keep
+cf "303" [Pd 1111] keep
+
+s "303"
+
+silence
+
+
 
 
 
