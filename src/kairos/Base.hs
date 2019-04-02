@@ -40,7 +40,7 @@ data Instr = I { insN :: Int
                , timeF :: String }
 
 -- is the instrument Playing ?
-data Status = Playing | Stopped | Stopping deriving (Show)
+data Status = Playing | Stopped | Stopping | Init deriving (Show)
 
 -- Map of Pfields
 type PfMap = M.Map Int Pfield

@@ -42,3 +42,7 @@ mapM playFx ["rev","del"]
 
 --TEST PERFORMANCE
 ----------------------
+
+s "CH808"
+
+cPat "eightN" "CH808"

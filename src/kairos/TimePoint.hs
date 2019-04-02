@@ -30,7 +30,7 @@ fromTP (x:xs) = (start x):(fromTP xs)
 fromTP [] = []
 
 evolve ::  Int -> ([Double] -> [Double]) -> [Double] -> [Double]
-evolve n rule xs  | n <= 0 = xs | otherwise = lSys (n-1) rule (rule xs)
+evolve n rule xs  | n <= 0 = xs | otherwise = evolve (n-1) rule (rule xs)
 
 --rules :: [Double] -> [Double]
 interp1 :: Double -> [Double] -> [Double]

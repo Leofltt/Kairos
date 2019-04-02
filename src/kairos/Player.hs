@@ -54,6 +54,7 @@ play :: Performance -> String -> IO ()
 play perf pn = let
   checkStatus i Stopped  = ( forkIO $ playLoop perf pn $ Stopped)  >> return ()
   checkStatus i Stopping = ( playLoop perf pn $ Stopping) >> return ()
+  checkStatus i Init = ( playLoop perf pn $ Init) >> return ()
   checkStatus i Playing  = putStrLn $ "the instrument " ++ pn ++ " is already playing!"
   in do Just i <- lookupMap (orc perf) pn
         checkStatus i $ status i
@@ -79,15 +80,31 @@ playLoop perf pn Playing = do
               nextTime <- timeAtBeat (clock perf) nextToPlay
               forkIO $ playOne perf p (wrapBar ts tp)
               updateToPlay perf pn (Just nb)
-              Just ins <- lookupMap (orc perf) pn
               let toWait = nextTime - now
               waitT (toWait)
               Just p' <- lookupMap (orc perf) pn
               playLoop perf pn $ status p'
 
+
 playLoop perf p Stopped = do
-  changeStatus perf p Playing
-  playLoop perf p Playing
+  changeStatus perf p Init
+  playLoop perf p Init
+
+playLoop perf i Init = do
+  Just p <- lookupMap (orc perf) i
+  n <- beatInBar (clock perf)
+  let pb = toPlay p
+  if ((pb == Nothing) || ((timeF p )== ""))
+     then do  changeStatus perf i Stopping
+              Just p' <- lookupMap (orc perf) i
+              playLoop perf i $ status p'
+     else do  let tp = fromJust pb
+              Just timeString <- lookupMap (timePs perf) (timeF p)
+              let nb = nextBeat (max tp (TP n) ) timeString
+              updateToPlay perf i (Just nb)
+              changeStatus perf i Playing
+              Just p' <- lookupMap (orc perf) i
+              playLoop perf i $ status p'
 
 playLoop perf p Stopping = do
   changeStatus perf p Stopped
