@@ -130,6 +130,11 @@ defaultOrc = do
   return $ orc
 
 
+displayInstruments :: Performance -> IO String
+displayInstruments perf = do
+   ins <- readTVarIO (orc perf)
+   return $ unwords $ M.keys ins
+
 -- to add instruments
 addInstrument :: Performance -> String -> Instr -> IO ()
 addInstrument perf name instr = addToMap (orc perf) (name,instr)
@@ -144,11 +149,6 @@ createPfPat num pfields updtr = do
                  , updater = updtr
                  }
 
--- aliases for common pfields
-duration = createPfPat 3
-volume = createPfPat 4
-revSend = createPfPat 5
-samplePath = createPfPat 6
 
 -- function to default a pattern to the value of the pfield
 defaultPfpat :: Instr -> PfPat -> IO ()
@@ -156,6 +156,7 @@ defaultPfpat i pfp = do
   Just pf <- lookupMap (pf i) (pfNum pfp)
   atomically $ writeTVar (pat pfp) [pf]
   return ()
+
 
 addPfPath :: Instr -> Int -> PfPat -> IO ()
 addPfPath i num pfPat = addToMap (pats i) (num,pfPat)
