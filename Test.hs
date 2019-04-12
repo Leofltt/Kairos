@@ -1,7 +1,7 @@
 --inits && useful
 ------------------
 
-:set prompt ""
+:set prompt "   | "
 perf <- defaultPerformance
 displayIns = displayInstruments perf
 p = play perf
@@ -43,3 +43,17 @@ mapM_ playFx ["rev","del"]
 
 --TEST PERFORMANCE
 ----------------------
+
+cT 143
+
+cPat "downB" "hov"
+freq "hov" (toPfD $ [ 50, 55 ] ) randomize
+
+s "hov"
+
+cf "hov" (toPfD $ [4000]) keep
+res "hov" (toPfD $ [5, 8]) randomize
+dur "hov" [Pd 1.666] keep
+rev "hov" [Pd 0.4] keep
+
+

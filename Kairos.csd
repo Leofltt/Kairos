@@ -85,7 +85,7 @@ endin
 
 instr 4 ;Hoover Bass
 
-kcf expon 2, p3/2, 0.1
+kcf expseg 2, p3/2, 0.1
 kr3 unirand 1
 kr3 port kr3, 0.01
 klf3 lfo 0.5, 1.5*kr3, 0
