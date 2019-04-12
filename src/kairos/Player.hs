@@ -5,7 +5,7 @@ import Kairos.TimePoint
 import Kairos.Clock
 import Kairos.Instrument
 import Kairos.Network
-import Kairos.MapUtilities
+import Kairos.Utilities
 import Control.Concurrent
 import Control.Concurrent.STM
 import Data.Maybe

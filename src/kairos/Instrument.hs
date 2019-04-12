@@ -1,11 +1,11 @@
 module Kairos.Instrument where
 
 import Kairos.Base
-import Kairos.MapUtilities
+import Kairos.Utilities
 import Control.Concurrent
 import Control.Concurrent.STM
 import qualified Data.Map.Strict as M
-import System.Random (getStdRandom,randomR)
+--import System.Random (getStdRandom,randomR)
 
 pfToString :: [Pfield] -> String
 pfToString ps = unwords $ map show ps
@@ -168,24 +168,31 @@ addPfPath' e insname num pfPat = do
 
 -- updaters
 
-keep ::  PfPat -> IO Pfield
-keep n = do
-  pats <- readTVarIO (pat n)
-  return $ head pats
-
-nextVal :: PfPat -> IO Pfield
-nextVal n = do
-  patrn <- readTVarIO (pat n)
-  let pat' = (tail patrn)++[head patrn]
-  atomically $ writeTVar (pat n) pat'
-  return $ (head pat')
-
-randomize :: PfPat -> IO Pfield
-randomize n = do
-  p <- readTVarIO (pat n)
-  let l = (length p) - 1
-  ran <- randI l
-  return $ (!!) p ran
-
-randI :: Int -> IO Int
-randI i = getStdRandom (randomR (0, i))
+-- keep ::  PfPat -> IO Pfield
+-- keep n = do
+--   pats <- readTVarIO (pat n)
+--   return $ head pats
+--
+-- nextVal :: PfPat -> IO Pfield
+-- nextVal n = do
+--   patrn <- readTVarIO (pat n)
+--   let pat' = (tail patrn)++[head patrn]
+--   atomically $ writeTVar (pat n) pat'
+--   return $ (head pat')
+--
+-- rev :: PfPat -> IO Pfield
+-- rev n = do
+--   patrn <- readTVarIO (pat n)
+--   let pat' = (last patrn):(init patrn)
+--   atomically $ writeTVar (pat n) pat'
+--   return $ (head pat')
+--
+-- randomize :: PfPat -> IO Pfield
+-- randomize n = do
+--   p <- readTVarIO (pat n)
+--   let l = (length p) - 1
+--   ran <- randI l
+--   return $ (!!) p ran
+--
+-- randI :: Int -> IO Int
+-- randI i = getStdRandom (randomR (0, i))
