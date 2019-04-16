@@ -30,6 +30,14 @@ gisquare ftgen 2, 0, 4096, 7, 1, 2048, 1, 0, 0, 2048, 0 ; Square wave
 garvbL, garvbR init 0
 gadelL, gadelR init 0
 
+; INIT CHANNELS FOR FXs
+; Delay
+chn_k "fbdel", 1, 2, 0.33, 0, 0.99
+chn_k "dtdel", 1, 2, 450, 1, 3000
+;Reverb 
+chn_k "fbrev", 1, 2, 0.33, 0, 0.99
+chn_k "cfrev", 1, 2, 15000, 0, 20000
+
 ;opcode for declicking an audio signal. Should only be used in instruments that have positive p3 duration.
 ;taken from Steven Yi livecode.orc
 opcode declick, a, a
@@ -123,7 +131,6 @@ pa        =        (p7 >= 0.5 ? 1 : .15)   ; Select open or closed
 ifreq1    =        540                     ; Tune
 ifreq2    =        800                     ; Tune
 
-
 aenv     expsega  .01, .0005, 1, pa - .0005, .01   ; Percussive envelope
 asqr1    poscil    1, ifreq1, 2, -1
 asqr2    poscil    1, ifreq1*1.342, 2, -1
@@ -144,18 +151,10 @@ gadelR = gadelR + a808 * p4 * aenv * p6
 
 endin
 
-chn_k "fbdel", 1, 2, 0.33, 0, 0.99
-chn_k "dtdel", 1, 2, 175, 1, 3000
-
 instr 555 ; Delay
-
-
-kfb init 0.1
-kdt init 350
 
 kfb chnget "fbdel"
 kdt chnget "dtdel"
-
 
 adelL vdelay3 gadelL, kdt*1.2, 5000
 adelR vdelay3 gadelR, kdt*0.8, 5000
@@ -168,15 +167,11 @@ clear gadelL, gadelR
 
 endin
 
-chn_k "fbrev", 1, 2, 0.33, 0, 0.99
-chn_k "cfrev", 1, 2, 15000, 0, 20000
 
 instr 666 ; ReverbSC
 
-
 kfb chnget "fbrev"
 kcf chnget "cfrev"
-
 
 aoutL, aoutR reverbsc garvbL, garvbR, kfb, kcf
 outs aoutL * p4,  aoutR * p4
