@@ -87,7 +87,7 @@ hoover = do
 
 reverb :: IO Instr
 reverb = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd (-1)),(4,Pd 1),(5,Pd 0.7),(6,Pd 15000)] -- duration, volume, feedback, cutoff freq
+  pfields <- newTVarIO $ M.fromList [(3,Pd (-1)),(4,Pd 1)]--,(5,Pd 0.7),(6,Pd 15000)] -- duration, volume, feedback, cutoff freq
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 666
              , pf     = pfields
@@ -99,7 +99,7 @@ reverb = do
 
 delay :: IO Instr
 delay = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd (-1)),(4,Pd 1),(5,Pd 0.14),(6,Pd 450)] -- duration, volume, feedback, delay time
+  pfields <- newTVarIO $ M.fromList [(3,Pd (-1)),(4,Pd 1)]--,(5,Pd 0.14),(6,Pd 450)] -- duration, volume, feedback, delay time
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 555
              , pf     = pfields
@@ -165,34 +165,3 @@ addPfPath' :: Performance -> [Char] -> Int -> PfPat -> IO ()
 addPfPath' e insname num pfPat = do
   Just i <- lookupMap (orc e) insname
   addPfPath i num pfPat
-
--- updaters
-
--- keep ::  PfPat -> IO Pfield
--- keep n = do
---   pats <- readTVarIO (pat n)
---   return $ head pats
---
--- nextVal :: PfPat -> IO Pfield
--- nextVal n = do
---   patrn <- readTVarIO (pat n)
---   let pat' = (tail patrn)++[head patrn]
---   atomically $ writeTVar (pat n) pat'
---   return $ (head pat')
---
--- rev :: PfPat -> IO Pfield
--- rev n = do
---   patrn <- readTVarIO (pat n)
---   let pat' = (last patrn):(init patrn)
---   atomically $ writeTVar (pat n) pat'
---   return $ (head pat')
---
--- randomize :: PfPat -> IO Pfield
--- randomize n = do
---   p <- readTVarIO (pat n)
---   let l = (length p) - 1
---   ran <- randI l
---   return $ (!!) p ran
---
--- randI :: Int -> IO Int
--- randI i = getStdRandom (randomR (0, i))

@@ -144,27 +144,39 @@ gadelR = gadelR + a808 * p4 * aenv * p6
 
 endin
 
+chn_k "fbdel", 1, 2, 0.33, 0, 0.99
+chn_k "dtdel", 1, 2, 175, 1, 3000
 
 instr 555 ; Delay
 
-kfb = p5
-kdt = p6
+
+kfb init 0.1
+kdt init 350
+
+kfb chnget "fbdel"
+kdt chnget "dtdel"
+
 
 adelL vdelay3 gadelL, kdt*1.2, 5000
 adelR vdelay3 gadelR, kdt*0.8, 5000
 
 adelL = adelL + (gadelR * kfb)
 adelR = adelR + (gadelL * kfb)
-outs adelL, adelR
+outs adelL * p4, adelR * p4
 
 clear gadelL, gadelR
 
 endin
 
+chn_k "fbrev", 1, 2, 0.33, 0, 0.99
+chn_k "cfrev", 1, 2, 15000, 0, 20000
+
 instr 666 ; ReverbSC
 
-kfb = p5
-kcf = p6
+
+kfb chnget "fbrev"
+kcf chnget "cfrev"
+
 
 aoutL, aoutR reverbsc garvbL, garvbR, kfb, kcf
 outs aoutL * p4,  aoutR * p4

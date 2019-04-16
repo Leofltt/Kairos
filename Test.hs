@@ -36,6 +36,10 @@ addI "sS" $ sampler $ defPath "/snares/SNSandy.wav"
 addI "sj1" $ sampler $ defPath "/snares/Snare4JungleMidHigh.wav"
 addI "sj2" $ sampler $ defPath "/snares/Snare4JungleMidLow.wav"
 addI "glass" $ sampler $ defPath "/fracture/Glass1Dry.wav"
+fbdel = setChannel "fbdel"
+dtdel = setChannel "dtdel"
+fbrev = setChannel "fbrev"
+cfrev = setChannel "cfrev"
 mapM_ playFx ["rev","del"]
 
 :! clear
@@ -43,10 +47,23 @@ mapM_ playFx ["rev","del"]
 
 --TEST PERFORMANCE
 ----------------------
+ 
 
 cT 143
 
+s "CH808"
+
+addC "K909" "testa" $ toTP $ evolve 1 (interp1 4) (fromTP jGhost1)
+
+del "CH808" [Pd 0.6] keep
+rev "CH808" [Pd 0.7] keep
+
+fbdel 0.9
+
+dtdel 999
+
 cPat "downB" "hov"
+
 freq "hov" (toPfD $ [ 50, 55 ] ) randomize
 
 s "hov"
@@ -55,5 +72,3 @@ cf "hov" (toPfD $ [4000]) keep
 res "hov" (toPfD $ [5, 8]) randomize
 dur "hov" [Pd 1.666] keep
 rev "hov" [Pd 0.4] keep
-
-

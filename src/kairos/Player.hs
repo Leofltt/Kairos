@@ -21,6 +21,13 @@ defaultPerformance = do
              , timePs = t
              }
 
+
+setChannel :: String -> Double -> IO ()
+setChannel chanName val = do
+  let m = (show chanName) ++ " " ++ (show val)
+  setChan m
+
+
 playInstr :: Instr -> IO ()
 playInstr instr = do
   pfields <- readTVarIO $ pf instr
