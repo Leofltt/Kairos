@@ -15,12 +15,14 @@ data Performance = P { orc :: Orchestra
 
 -- clock
 data Clock = Clock { startAt :: Time
-                   , timeSig :: TVar [TimeSignature] }
+                   , timeSig :: TVar [TimeSignature]
+                   }
 
 -- time signature
 data TimeSignature = TS { beatInMsr :: Double
                         , bpm :: Double
-                        , startTime :: Time } deriving (Show,Eq)
+                        , startTime :: Time
+                        } deriving (Show,Eq)
 
 --  Performance seconds
 type Time = Double
@@ -37,7 +39,8 @@ data Instr = I { insN :: Int
                , status :: Status
                , toPlay :: Maybe TimePoint
                , pats :: TVar (M.Map Int PfPat)
-               , timeF :: String }
+               , timeF :: String
+               }
 
 -- is the instrument Playing ?
 data Status = Init | Playing | Stopped | Stopping deriving (Show)
