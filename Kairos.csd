@@ -32,13 +32,14 @@ gadelL, gadelR init 0
 
 ; INIT CHANNELS FOR FXs
 ; Delay
-chn_k "fbdel", 1, 2, 0.33, 0, 0.99
+chn_k "fbdel", 1, 2, 0.4, 0, 0.99
 chn_k "dtdel", 1, 2, 450, 1, 3000
-;Reverb 
-chn_k "fbrev", 1, 2, 0.33, 0, 0.99
+;Reverb
+chn_k "fbrev", 1, 2, 0.4, 0, 0.99
 chn_k "cfrev", 1, 2, 15000, 0, 20000
 
-;opcode for declicking an audio signal. Should only be used in instruments that have positive p3 duration.
+;opcode for declicking an audio signal.
+;Should only be used in instruments that have positive p3 duration.
 ;taken from Steven Yi livecode.orc
 opcode declick, a, a
   ain xin
@@ -151,7 +152,7 @@ gadelR = gadelR + a808 * p4 * aenv * p6
 
 endin
 
-instr 555 ; Delay
+instr 551 ; Delay
 
 kfb chnget "fbdel"
 kdt chnget "dtdel"
@@ -167,8 +168,7 @@ clear gadelL, gadelR
 
 endin
 
-
-instr 666 ; ReverbSC
+instr 550 ; ReverbSC
 
 kfb chnget "fbrev"
 kcf chnget "cfrev"
@@ -179,7 +179,6 @@ outs aoutL * p4,  aoutR * p4
 clear garvbL, garvbR
 
 endin
-
 
 </CsInstruments>
 <CsScore>

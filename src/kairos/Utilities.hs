@@ -34,14 +34,14 @@ nextVal n = do
   patrn <- readTVarIO (pat n)
   let pat' = (tail patrn)++[head patrn]
   atomically $ writeTVar (pat n) pat'
-  return $ (head pat')
+  return $ head pat'
 
 rev :: PfPat -> IO Pfield
 rev n = do
   patrn <- readTVarIO (pat n)
   let pat' = (last patrn):(init patrn)
   atomically $ writeTVar (pat n) pat'
-  return $ (head pat')
+  return $ head pat'
 
 randomize :: PfPat -> IO Pfield
 randomize n = do
@@ -51,4 +51,4 @@ randomize n = do
   return $ (!!) p ran
 
 randI :: Int -> IO Int
-randI i = getStdRandom (randomR (0, i))
+randI i = getStdRandom $ randomR (0, i)

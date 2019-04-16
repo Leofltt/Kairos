@@ -47,13 +47,13 @@ mapM_ playFx ["rev","del"]
 
 --TEST PERFORMANCE
 ----------------------
- 
+
 
 cT 143
 
 s "CH808"
 
-addC "K909" "testa" $ toTP $ evolve 1 (interp1 4) (fromTP jGhost1)
+addC "K909" "testA" $ toTP $ evolve 1 (interp1 4) (fromTP jGhost1)
 
 del "CH808" [Pd 0.6] keep
 rev "CH808" [Pd 0.7] keep
