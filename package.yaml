@@ -30,8 +30,7 @@ library:
   source-dirs: src
 
   exposed-modules:
-  - Kairos
-  other-modules:
+  - Kairos.Lib
   - Kairos.Base
   - Kairos.Clock
   - Kairos.TimePoint
@@ -40,16 +39,25 @@ library:
   - Kairos.Player
   - Kairos.Utilities
 
-executables:
-  Kairos-exe:
-    main:                Main.hs
-    source-dirs:         app
-    ghc-options:
-    - -threaded
-    - -rtsopts
-    - -with-rtsopts=-N
-    dependencies:
-    - Kairos
+#  other-modules:
+#  - Kairos.Base
+#  - Kairos.Clock
+#  - Kairos.TimePoint
+#  - Kairos.Instrument
+#  - Kairos.Network
+#  - Kairos.Player
+#  - Kairos.Utilities
+
+#executables:
+#  Kairos-exe:
+#    main:                Main.hs
+#    source-dirs:         app
+#    ghc-options:
+#    - -threaded
+#    - -rtsopts
+#    - -with-rtsopts=-N
+#    dependencies:
+#    - Kairos
 
 tests:
   Kairos-test:

@@ -32,11 +32,25 @@ gadelL, gadelR init 0
 
 ; INIT CHANNELS FOR FXs
 ; Delay
-chn_k "fbdel", 1, 2, 0.4, 0, 0.99
-chn_k "dtdel", 1, 2, 450, 1, 3000
+
+gkfbdel  init 0.9
+gkdtdel  init 375
+gkvoldel init 1
+
+gkfbdel chnexport "fbdel", 1, 2, 0.9, 0, 0.99
+gkdtdel chnexport "dtdel", 1, 2, 375, 1, 5000
+gkvoldel chnexport "voldel", 1, 2, 1, 0, 1
+
 ;Reverb
-chn_k "fbrev", 1, 2, 0.4, 0, 0.99
-chn_k "cfrev", 1, 2, 15000, 0, 20000
+
+gkfbrev init 0.4
+gkcfrev init 15000
+gkvolrev init 1
+
+gkfbrev chnexport "fbrev", 1, 2, 0.4, 0, 0.99
+gkcfrev chnexport "cfrev", 1, 2, 15000, 0, 20000
+gkvolrev chnexport "volrev", 1, 2, 1, 0, 1
+
 
 ;opcode for declicking an audio signal.
 ;Should only be used in instruments that have positive p3 duration.
@@ -71,6 +85,22 @@ garvbR = garvbR + p5 * aRight * p4
 gadelL = gadelL + aLeft * p4 * p6
 gadelR = gadelR + aRight * p4 * p6
 endif
+
+endin
+
+instr 2 ; Karplus - Strong
+
+kpitch expseg cpsmidinn(p7), p3, 432
+
+asig pluck 1, cpsmidinn(p7), 432, 0, 4, p8, (49*p9)+1 ; p8 = roughness p9 = stretch
+
+outs asig*p4, asig*p4
+
+garvbR = garvbR + p5 * asig * p4
+garvbL = garvbL + p5 * asig * p4
+
+gadelL = gadelL + asig * p4 * p6
+gadelR = gadelR + asig * p4 * p6
 
 endin
 
@@ -129,8 +159,8 @@ endin
 instr 5 ; HiHats 808
 
 pa        =        (p7 >= 0.5 ? 1 : .15)   ; Select open or closed
-ifreq1    =        540                     ; Tune
-ifreq2    =        800                     ; Tune
+ifreq1    =        540*p8                     ; Tune
+ifreq2    =        800*p8                     ; Tune
 
 aenv     expsega  .01, .0005, 1, pa - .0005, .01   ; Percussive envelope
 asqr1    poscil    1, ifreq1, 2, -1
@@ -154,15 +184,12 @@ endin
 
 instr 551 ; Delay
 
-kfb chnget "fbdel"
-kdt chnget "dtdel"
+adelL vdelay3 gadelL, gkdtdel*1.2, 5000
+adelR vdelay3 gadelR, gkdtdel*0.8, 5000
 
-adelL vdelay3 gadelL, kdt*1.2, 5000
-adelR vdelay3 gadelR, kdt*0.8, 5000
-
-adelL = adelL + (gadelR * kfb)
-adelR = adelR + (gadelL * kfb)
-outs adelL * p4, adelR * p4
+adelL = adelL + (gadelR * gkfbdel)
+adelR = adelR + (gadelL * gkfbdel)
+outs adelL * gkvoldel, adelR * gkvoldel
 
 clear gadelL, gadelR
 
@@ -170,11 +197,8 @@ endin
 
 instr 550 ; ReverbSC
 
-kfb chnget "fbrev"
-kcf chnget "cfrev"
-
-aoutL, aoutR reverbsc garvbL, garvbR, kfb, kcf
-outs aoutL * p4,  aoutR * p4
+aoutL, aoutR reverbsc garvbL, garvbR, gkfbrev, gkcfrev
+outs aoutL * gkvolrev ,  aoutR * gkvolrev
 
 clear garvbL, garvbR
 

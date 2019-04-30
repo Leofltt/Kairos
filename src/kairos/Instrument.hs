@@ -27,7 +27,7 @@ toPfS []     = []
 
 hihat :: Double -> IO Instr
 hihat oc = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6, Pd 0),(7,Pd oc)]
+  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6, Pd 0),(7,Pd oc),(8,Pd 1)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN = 5
              , pf     = pfields
@@ -85,9 +85,25 @@ hoover = do
              , pats = emptyPat
              }
 
+
+karp :: IO Instr
+karp = do
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6, Pd 0),(7,Pd 48),(8,Pd 0.2),(9,Pd 0.2)]
+  emptyPat <- newTVarIO M.empty
+  return $ I { insN   = 2
+             , pf     = pfields
+             , toPlay = Just (TP 0)
+             , status = Stopped
+             , timeF = ""
+             , pats = emptyPat
+             }
+
+
+-- default effects
+
 reverb :: IO Instr
 reverb = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd (-1)),(4,Pd 1)]--,(5,Pd 0.7),(6,Pd 15000)] -- duration, volume, feedback, cutoff freq
+  pfields <- newTVarIO $ M.fromList [(3,Pd (-1))]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 550
              , pf     = pfields
@@ -99,7 +115,7 @@ reverb = do
 
 delay :: IO Instr
 delay = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd (-1)),(4,Pd 1)]--,(5,Pd 0.14),(6,Pd 450)] -- duration, volume, feedback, delay time
+  pfields <- newTVarIO $ M.fromList [(3,Pd (-1))]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 551
              , pf     = pfields
@@ -119,6 +135,7 @@ defaultOrc = do
   a303 <- acidBass
   hov  <- hoover
   cp   <- sampler "/Users/leofltt/Desktop/KairosSamples/909/Clap-909.aif"
+  karpS <- karp
   rev  <- reverb
   del  <- delay
   kcj  <- sampler "/Users/leofltt/Desktop/KairosSamples/Kicks/KickCymbJungle.wav"
@@ -126,6 +143,7 @@ defaultOrc = do
                                             ,("CP909",cp),("kcj",kcj)
                                             ,("303",a303),("hov",hov)
                                             ,("rev",rev),("del",del)
+                                            ,("karp",karpS)
                                             ]
   return $ orc
 

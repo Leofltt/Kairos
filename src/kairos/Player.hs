@@ -24,7 +24,7 @@ defaultPerformance = do
 
 setChannel :: String -> Double -> IO ()
 setChannel chanName val = do
-  let m = (show chanName) ++ " " ++ (show val)
+  let m = chanName ++ " " ++ (show val)
   setChan m
 
 
