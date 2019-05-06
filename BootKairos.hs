@@ -2,7 +2,7 @@
 
 import Kairos.Lib
 
-:set prompt "   | "
+:set prompt "> "
 perf <- defaultPerformance
 displayIns = displayInstruments perf
 p = play perf
@@ -31,7 +31,14 @@ silence = stopAll perf
 playA = playAll perf
 playFx = playEffect perf
 solo = soloIns perf
-fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
+fbdel = setChannel "fbdel"
+dtdel = setChannel "dtdel"
+fbrev = setChannel "fbrev"
+cfrev = setChannel "cfrev"
+volrev = setChannel "volrev"
+voldel = setChannel "voldel"
+mapM_ playFx ["rev","del"]
+-- create Sampler instruments
 defPath s = "/Users/leofltt/Desktop/KairosSamples" ++ s
 addI "sh" $ sampler $ defPath "/ch/shortHat.wav"
 addI "r1" $ sampler $ defPath "/rim/HollowRim.wav"
@@ -40,10 +47,4 @@ addI "sS" $ sampler $ defPath "/snares/SNSandy.wav"
 addI "sj1" $ sampler $ defPath "/snares/Snare4JungleMidHigh.wav"
 addI "sj2" $ sampler $ defPath "/snares/Snare4JungleMidLow.wav"
 addI "glass" $ sampler $ defPath "/fracture/Glass1Dry.wav"
-fbdel = setChannel "fbdel"
-dtdel = setChannel "dtdel"
-fbrev = setChannel "fbrev"
-cfrev = setChannel "cfrev"
-volrev = setChannel "volrev"
-voldel = setChannel "voldel"
-mapM_ playFx ["rev","del"]
+fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
