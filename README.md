@@ -31,7 +31,7 @@ All the modules should be loaded and ready to play with!
 
 The library works assigning pattern of times when a note should be performed and patterns of pfields to modify the parameters of synthesis.
 
-###Basic usage
+### Basic usage
 
 When run, the script `BootKairos.hs` will instantiate a default performance named `perf`.
 The performance is a data structure  that holds informations  about timing (time Signature, bpm, bar length), the instruments and the patterns they use.
@@ -39,11 +39,12 @@ The performance is a data structure  that holds informations  about timing (time
 To display the names of all the instruments currently loaded, run
 `displayIns`.
 
-Type 
+Type
 `p "instrumentname"`
 to start an instrument and
 `s  instrumentname`
-to stop it; you can also run
+to stop it.
+You can also run
 `solo "instrumentname"`
 to solo a specific instrument or
 `silence`
