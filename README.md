@@ -58,7 +58,24 @@ to solo a specific instrument or
 to stop all the currently running instruments.
 
 
+#### Adding your own Csound Csound Instruments
 
+To add your own Csound instruments to the `Kairos.csd` file
+you need to keep in mind the following criteria:
 
+1. Amplitude is normalized to `0dbfs = 1`
+
+2. Reserved pfields:
+
+   The following pfields are common for all the instruments and should be implemented as such in new instruments for ease of use
+
+   - `p4` = volume (0-1)
+   - `p5` = reverb send (0-1)
+   - `p6` = delay send (0-1)
+
+3. Implementing instrument data structure:
+
+   - Each new instrument implemented in the `kairos.csd` file need to be also implemented in the file `Instrument.hs` following the example of the instruments already implemented.
+   - After that the new instrument need to be added to the `defaultOrc` function if we want the new instrument to be automatically added to the orchestra on boot.
 
 Leonardo Foletto, 2019
