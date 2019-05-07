@@ -1,3 +1,14 @@
+-- create Sampler instruments
+defPath s = "/Users/leofltt/Desktop/KairosSamples" ++ s
+addI "sh" $ sampler $ defPath "/ch/shortHat.wav"
+addI "r1" $ sampler $ defPath "/rim/HollowRim.wav"
+addI "rS" $ sampler $ defPath "/rim/SmallRim.wav"
+addI "sS" $ sampler $ defPath "/snares/SNSandy.wav"
+addI "sj1" $ sampler $ defPath "/snares/Snare4JungleMidHigh.wav"
+addI "sj2" $ sampler $ defPath "/snares/Snare4JungleMidLow.wav"
+addI "glass" $ sampler $ defPath "/fracture/Glass1Dry.wav"
+fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
+
 --TEST PERFORMANCE
 ----------------------
 
