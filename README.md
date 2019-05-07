@@ -20,10 +20,35 @@ To get started you'll need to download:
 
 run `csound kairos.csd` from within a terminal window or from within CsoundQt
 
-while csound is running, open another terminal window in the same folder and run `ghci` 
+while csound is running, open another terminal window in the same folder and run `ghci`
 
 within ghci run `:script BootKairos.hs`
 
 All the modules should be loaded and ready to play with!
+
+## Tutorial
+
+
+The library works assigning pattern of times when a note should be performed and patterns of pfields to modify the parameters of synthesis.
+
+###Basic usage
+
+When run, the script `BootKairos.hs` will instantiate a default performance named `perf`.
+The performance is a data structure  that holds informations  about timing (time Signature, bpm, bar length), the instruments and the patterns they use.
+
+To display the names of all the instruments currently loaded, run
+`displayIns`.
+
+Type 
+`p "instrumentname"`
+to start an instrument and
+`s  instrumentname`
+to stop it; you can also run
+`solo "instrumentname"`
+to solo a specific instrument or
+`silence`
+to stop all the currently running instruments.
+
+
 
 Leonardo Foletto, 2019
