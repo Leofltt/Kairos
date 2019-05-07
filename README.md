@@ -82,5 +82,5 @@ you need to keep in mind the following criteria:
 
 Leonardo Foletto, 2019
 
-[1] : www.haskell.org/downloads/
-[2] : csound.com/download.html
+[1]: https://www.haskell.org/downloads/
+[2]: ://csound.com/download.html
