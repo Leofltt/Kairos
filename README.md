@@ -38,7 +38,7 @@ The performance is a data structure  that holds informations  about timing (time
 
 To display the names of all the instruments currently loaded, run
 
-`displayIns`.
+`displayIns`
 
 Type
 
@@ -46,7 +46,7 @@ Type
 
 to start an instrument and
 
-`s  instrumentname`
+`s  "instrumentname"`
 
 to stop it.  You can also run
 
@@ -57,6 +57,8 @@ to solo a specific instrument or
 `silence`
 
 to stop all the currently running instruments.
+
+
 
 
 
