@@ -40,7 +40,6 @@ To display the names of all the instruments currently loaded, run
 
 `displayIns`
 
-Type
 
 `p "instrumentname"`
 
