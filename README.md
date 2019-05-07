@@ -37,12 +37,26 @@ When run, the script `BootKairos.hs` will instantiate a default performance name
 The performance is a data structure  that holds informations  about timing (time Signature, bpm, bar length), the instruments and the patterns they use.
 
 To display the names of all the instruments currently loaded, run
+
 `displayIns`.
 
-Type  `p "instrumentname"`  to start an instrument and
-  `s  instrumentname`  to stop it.  You can also run
-  `solo "instrumentname"`  to solo a specific instrument or
-  `silence`  to stop all the currently running instruments.
+Type
+
+`p "instrumentname"`
+
+to start an instrument and
+
+`s  instrumentname`
+
+to stop it.  You can also run
+
+`solo "instrumentname"`
+
+to solo a specific instrument or
+
+`silence`
+
+to stop all the currently running instruments.
 
 
 
