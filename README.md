@@ -7,8 +7,8 @@ This project has been started as my Thesis project for the Bachelor Degree in El
 The main goal of this software is to be able to perform and compose electronic music in a way that makes it more intuitive and immediate to interact with synthesis parameters compared to traditional virtual instruments and analog hardware. Focus of the development has been put in immediacy and easiness of usage, while also allowing for a high degree of customization and adaptability. This library is being developed based on the workflow that feels ideal for me, so it might not necessarily be the perfect tool for what you are looking for, but is provided nonetheless as Open Source Software for anyone to enjoy, modify, hack and get inspired by.
 
 To get started you'll need to download:
-- [the Haskell platform] (https://www.haskell.org/downloads/)
-- [Csound] (https://csound.com/download.html)
+- [the Haskell platform] [1]
+- [Csound] [2]
 - this repository
 
 ## Getting started
@@ -81,3 +81,6 @@ you need to keep in mind the following criteria:
    - After that the new instrument need to be added to the `defaultOrc` function if we want the new instrument to be automatically added to the orchestra on boot.
 
 Leonardo Foletto, 2019
+
+[1] : www.haskell.org/downloads/
+[2] : csound.com/download.html
