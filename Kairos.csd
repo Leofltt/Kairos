@@ -177,8 +177,8 @@ outs a808*aenv*p4* sqrt(1-p7), a808*aenv*p4* sqrt(p7)
 garvbR = garvbR + p5 * a808 * p4 * aenv* sqrt(1-p7)
 garvbL = garvbL + p5 * a808 * p4 * aenv* sqrt(p7)
 
-gadelL = gadelL + asig * p4 * p6 * sqrt(1-p7) * aenv
-gadelR = gadelR + asig * p4 * p6 * sqrt(p7) * aenv
+gadelL = gadelL + a808 * p4 * p6 * sqrt(1-p7) * aenv
+gadelR = gadelR + a808 * p4 * p6 * sqrt(p7) * aenv
 
 endin
 

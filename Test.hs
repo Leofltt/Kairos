@@ -1,7 +1,5 @@
 -- create Sampler instruments
 
-
-
 defPath s = "/Users/leofltt/Desktop/KairosSamples" ++ s
 addI "sh" $ sampler $ defPath "/ch/shortHat.wav"
 addI "r1" $ sampler $ defPath "/rim/HollowRim.wav"
@@ -10,11 +8,34 @@ addI "sS" $ sampler $ defPath "/snares/SNSandy.wav"
 addI "sj1" $ sampler $ defPath "/snares/Snare4JungleMidHigh.wav"
 addI "sj2" $ sampler $ defPath "/snares/Snare4JungleMidLow.wav"
 addI "glass" $ sampler $ defPath "/fracture/Glass1Dry.wav"
+addI "st1" $ sampler $ defPath "/stomps/stomp1.wav"
+addI "st2" $ sampler $ defPath "/stomps/stomp2.wav"
+addI "st3" $ sampler $ defPath "/stomps/stomp3.wav"
 fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
 
 --TEST PERFORMANCE
 ----------------------
 
+displayIns
+displayTP
+
+addC "st2" "stompy" $ toTP [0.75, 2.25]
+
+cPat "eightN" "st1"
+vol "st1" [Pd 0.3] keep
+p "st1"
+
+del "st2" (toPfD [0.0]) keep
+
+dtdel 666
+fbdel 0.9
+
+p "CH808"
+
+p "st2"
+p "K909"
+pan"K909" [Pd 0, Pd 0, Pd 1] retrograde
+pan "st2" [Pd 1] keep
 
 cT 143
 
@@ -30,23 +51,12 @@ rev "303" [Pd 0.4] keep
 
 p "303"
 
-p "K909"
-
 cPat "downB" "sS"
 p "sS"
 del "sS" [Pd 0.8] keep
 
-dtdel 300
-fbdel 0.2
 
 del "K909" [Pd 0.8] keep
-voldel 1
-fbdel 0.9
-
-dtdel 500
-
-fbrev 0.9
-cfrev 20000
 
 addC "karp" "p1" $ toTP $ [0.25, 1.75, 2.75]
 rough "karp" [Pd 0.5] randomize
