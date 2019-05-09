@@ -74,11 +74,19 @@ you need to keep in mind the following criteria:
    - `p4` = volume (0-1)
    - `p5` = reverb send (0-1)
    - `p6` = delay send (0-1)
+   - `p7` = panning  (0-1: Left to Right)
 
 3. Implementing instruments data structures:
 
    - Each new instrument implemented in the `kairos.csd` file need to be also implemented in the file `Instrument.hs` following the example of the instruments already implemented.
    - After that the new instrument need to be added to the `defaultOrc` function if we want the new instrument to be automatically added to the orchestra on boot.
+
+4. Effect instruments:
+
+   - should use channels instead of pfields to control parameters
+   - should have `p3 = -1`(play forever) and be played with the `playFx` function
+
+
 
 Leonardo Foletto, 2019
 

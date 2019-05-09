@@ -63,62 +63,62 @@ endop
 
 instr 1 ;Sampler
 
-inchs filenchnls p7
+inchs filenchnls p8
 
 if inchs = 1 then
-aLeft diskin2 p7, p8
-outs aLeft*p4, aLeft*p4
+aLeft diskin2 p8, p9
+outs aLeft*p4* sqrt(1-p7), aLeft*p4* sqrt(p7)
 
-garvbL = garvbL + p5 * aLeft * p4
-garvbR = garvbR + p5 * aLeft * p4
+garvbL = garvbL + p5 * aLeft * p4 * sqrt(1-p7)
+garvbR = garvbR + p5 * aLeft * p4 * sqrt(p7)
 
-gadelL = gadelL + aLeft  * p4 * p6
-gadelR = gadelR + aLeft * p4 * p6
+gadelL = gadelL + aLeft  * p4 * p6* sqrt(1-p7)
+gadelR = gadelR + aLeft * p4 * p6* sqrt(p7)
 
 else
-aLeft, aRight diskin2 p7, p8
-outs aLeft*p4, aRight*p4
+aLeft, aRight diskin2 p8, p9
+outs aLeft*p4* sqrt(1-p7), aRight*p4* sqrt(p7)
 
-garbL = garvbL + p5 * aLeft * p4
-garvbR = garvbR + p5 * aRight * p4
+garbL = garvbL + p5 * aLeft * p4* sqrt(1-p7)
+garvbR = garvbR + p5 * aRight * p4* sqrt(p7)
 
-gadelL = gadelL + aLeft * p4 * p6
-gadelR = gadelR + aRight * p4 * p6
+gadelL = gadelL + aLeft * p4 * p6* sqrt(1-p7)
+gadelR = gadelR + aRight * p4 * p6* sqrt(p7)
 endif
 
 endin
 
 instr 2 ; Karplus - Strong
 
-kpitch expseg cpsmidinn(p7), p3, 432
+kpitch expseg cpsmidinn(p8), p3, 432
 
-asig pluck 1, cpsmidinn(p7), 432, 0, 4, p8, (49*p9)+1 ; p8 = roughness p9 = stretch
+asig pluck 1, cpsmidinn(p8), 432, 0, 4, p9, (49*p10)+1 ; p8 = roughness p9 = stretch
 
-outs asig*p4, asig*p4
+outs asig*p4* sqrt(1-p7), asig*p4* sqrt(p7)
 
-garvbR = garvbR + p5 * asig * p4
-garvbL = garvbL + p5 * asig * p4
+garvbR = garvbR + p5 * asig * p4 * sqrt(1-p7)
+garvbL = garvbL + p5 * asig * p4 * sqrt(p7)
 
-gadelL = gadelL + asig * p4 * p6
-gadelR = gadelR + asig * p4 * p6
+gadelL = gadelL + asig * p4 * p6 * sqrt(1-p7)
+gadelR = gadelR + asig * p4 * p6 * sqrt(p7)
 
 endin
 
 instr 3 ;Bass 303
 
-acut = 200 + expon(1, p3, 0.001) * p8
-asig = vco2(1, cpsmidinn(p7))
-asig = diode_ladder(asig, acut, p9, 1, 4)
+acut = 200 + expon(1, p3, 0.001) * p9
+asig = vco2(1, cpsmidinn(p8))
+asig = diode_ladder(asig, acut, p10, 1, 4)
 asig = (tanh (asig * 4)) * 0.5
 asig declick asig
 
-outs asig*p4, asig*p4
+outs asig*p4* sqrt(1-p7), asig*p4* sqrt(p7)
 
-garvbR = garvbR + p5 * asig * p4
-garvbL = garvbL + p5 * asig * p4
+garvbR = garvbR + p5 * asig * p4 * sqrt(1-p7)
+garvbL = garvbL + p5 * asig * p4 * sqrt(p7)
 
-gadelL = gadelL + asig * p4 * p6
-gadelR = gadelR + asig * p4 * p6
+gadelL = gadelL + asig * p4 * p6 * sqrt(1-p7)
+gadelR = gadelR + asig * p4 * p6 * sqrt(p7)
 
 endin
 
@@ -129,11 +129,11 @@ kr3 unirand 1
 kr3 port kr3, 0.01
 klf3 lfo 0.5, 1.5*kr3, 0
 klf3 limit (klf3+0.5), 0.05, 0.95
-a1 = vco2(1, cpsmidinn(p7),4,(klf3*0.01))
-a2 = vco2(1, cpsmidinn(p7)*(0.08+(7/12)),4,(klf3*0.01))
-a3 = vco2(1, cpsmidinn(p7)*0.52)
+a1 = vco2(1, cpsmidinn(p8),4,(klf3*0.01))
+a2 = vco2(1, cpsmidinn(p8)*(0.08+(7/12)),4,(klf3*0.01))
+a3 = vco2(1, cpsmidinn(p8)*0.52)
 af = a1 + a3 * 0.88 + a2 * 0.66
-ao diode_ladder af, p8+(kcf * cpsmidinn(p7)), p9
+ao diode_ladder af, p9+(kcf * cpsmidinn(p8)), p10
 kr1 unirand 1
 kr2 unirand 1
 kr1 port kr1, 0.01
@@ -144,13 +144,13 @@ adel vdelay3 ao/2, (0.1+alfo)*1000, 1000
 adel2 vdelay3 ao/2, (0.1+alfo2)*1000, 1000
 adecl declick (ao+adel)
 adecr declick  (ao+adel2)
-outs adecl*p4,adecr*p4
+outs adecl*p4* sqrt(1-p7),adecr*p4* sqrt(p7)
 
-garvbR = garvbR + p5 * adecl * p4
-garvbL = garvbL + p5 * adecr * p4
+garvbR = garvbR + p5 * adecl * p4* sqrt(1-p7)
+garvbL = garvbL + p5 * adecr * p4* sqrt(p7)
 
-gadelL = gadelL + adecl * p4 * p6
-gadelR = gadelR + adecr * p4 * p6
+gadelL = gadelL + adecl * p4 * p6 * sqrt(1-p7)
+gadelR = gadelR + adecr * p4 * p6 * sqrt(p7)
 
 endin
 
@@ -158,9 +158,9 @@ endin
 
 instr 5 ; HiHats 808
 
-pa        =        (p7 >= 0.5 ? 1 : .15)   ; Select open or closed
-ifreq1    =        540*p8                     ; Tune
-ifreq2    =        800*p8                     ; Tune
+pa        =        (p8 >= 0.5 ? 1 : .15)   ; Select open or closed
+ifreq1    =        540*p9                     ; Tune
+ifreq2    =        800*p9                     ; Tune
 
 aenv     expsega  .01, .0005, 1, pa - .0005, .01   ; Percussive envelope
 asqr1    poscil    1, ifreq1, 2, -1
@@ -172,13 +172,13 @@ asqr6    poscil    1, ifreq1*2.1523, 2, -1
 a808 = sum(asqr1, asqr2, asqr3, asqr4, asqr5, asqr6)
 a808     butterhp a808, 5270
 a808     butterhp a808, 5270
-outs a808*aenv*p4, a808*aenv*p4
+outs a808*aenv*p4* sqrt(1-p7), a808*aenv*p4* sqrt(p7)
 
-garvbR = garvbR + p5 * a808 * p4 * aenv
-garvbL = garvbL + p5 * a808 * p4 * aenv
+garvbR = garvbR + p5 * a808 * p4 * aenv* sqrt(1-p7)
+garvbL = garvbL + p5 * a808 * p4 * aenv* sqrt(p7)
 
-gadelL = gadelL + a808 * p4 * aenv * p6
-gadelR = gadelR + a808 * p4 * aenv * p6
+gadelL = gadelL + asig * p4 * p6 * sqrt(1-p7) * aenv
+gadelR = gadelR + asig * p4 * p6 * sqrt(p7) * aenv
 
 endin
 
