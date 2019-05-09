@@ -40,6 +40,10 @@ To display the names of all the instruments currently loaded, run
 
 `displayIns`
 
+and to display the Time Patterns available and their names use
+
+`displayTP`
+
 
 You can run:
 
