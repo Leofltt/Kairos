@@ -44,11 +44,9 @@ silence
 addC "K909" "testA" $ toTP $ evolve 1 (interp1 4) (fromTP jGhost1)
 
 cPat "sixteenN" "303"
-
 vol "303" [Pd 0.51] keep
 cf "303" [Pd 9000] keep
 rev "303" [Pd 0.4] keep
-
 p "303"
 
 cPat "downB" "sS"
@@ -61,7 +59,7 @@ del "K909" [Pd 0.8] keep
 addC "karp" "p1" $ toTP $ [0.25, 1.75, 2.75]
 rough "karp" [Pd 0.5] randomize
 stretch "karp" [Pd 0.1,  Pd 0.2] nextVal
-freq "karp" (toPfD [36, 44, 48]) reverse
+freq "karp" (toPfD [36, 44, 48]) retrograde
 vol "karp" [Pd 0.2] keep
 del "karp" [Pd 0.8] keep
 p "karp"
@@ -69,17 +67,10 @@ p "karp"
 cPat "eightN" "hov"
 freq "hov" (toPfD [36, 40, 43, 36]) randomize
 dur "hov" [Pd 0.4] keep
-cf "hov" [Pd 10000, Pd 12000] reverse
-res "hov" [Pd 8, Pd 10, Pd 15] reverse
+cf "hov" [Pd 10000, Pd 12000] retrograde
+res "hov" [Pd 8, Pd 10, Pd 15] retrograde
 vol "hov" [Pd 0.8] keep
 p "hov"
 
 
-freq "hov" (toPfD $ [ 50, 55 ] ) randomize
-
 s "karp"
-
-cf "hov" (toPfD $ [4000]) keep
-res "hov" (toPfD $ [5, 8]) randomize
-dur "hov" [Pd 1.666] keep
-rev "hov" [Pd 0.4] keep
