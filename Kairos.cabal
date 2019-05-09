@@ -1,0 +1,72 @@
+-- This file has been generated from package.yaml by hpack version 0.28.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 637c63737965ef4ba1723d27175e0b6e0245f9a87e46f3bd0cc897dc79ecf7fe
+
+cabal-version:  >= 1.10
+name:           Kairos
+version:        0.1.1.1
+synopsis:       Live coding library
+description:    Please see the README on GitHub at <https://github.com/leofltt/Kairos#readme>
+homepage:       https://github.com/leofltt/Kairos#readme
+bug-reports:    https://github.com/leofltt/Kairos/issues
+author:         Leo Foletto
+maintainer:     flttleonardo@gmail.com
+copyright:      2018, Leonardo Foletto
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    ChangeLog.md
+    Kairos.csd
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/leofltt/Kairos
+
+library
+  exposed-modules:
+      Kairos.Lib
+      Kairos.Base
+      Kairos.Clock
+      Kairos.TimePoint
+      Kairos.Instrument
+      Kairos.Network
+      Kairos.Player
+      Kairos.Utilities
+  other-modules:
+      Paths_Kairos
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+    , bytestring
+    , containers
+    , network
+    , random
+    , stm
+    , time
+    , transformers
+  default-language: Haskell2010
+
+test-suite Kairos-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_Kairos
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      Kairos
+    , base >=4.7 && <5
+    , bytestring
+    , containers
+    , network
+    , random
+    , stm
+    , time
+    , transformers
+  default-language: Haskell2010
