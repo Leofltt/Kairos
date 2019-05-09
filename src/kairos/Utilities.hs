@@ -52,3 +52,9 @@ randomize n = do
 
 randI :: Int -> IO Int
 randI i = getStdRandom $ randomR (0, i)
+
+-- Misc Utilities
+
+interleave :: [a] -> [a] -> [a]
+interleave (a:as) (b:bs) = a : b : (interleave as bs)
+interleave _ _ = []
