@@ -151,10 +151,11 @@ jGhost = toTP [1.75,2.25,5.75]
 
 jGhost1 = toTP [1.75,2.25,5.75,6.25,7.75]
 
--- displayTPat :: Performance -> IO String
--- displayTPat perf = do
---    tpats <- readTVarIO (timePs perf)
---    return $  unwords $ interleave   ( M.keys tpats)  (map start (M.elems tpats))
+displayTPat :: Performance -> IO String
+displayTPat perf = do
+   tpats <- readTVarIO (timePs perf)
+   return $ unwords $ interleave ( M.keys tpats)  ( map show (map fromTP (M.elems tpats)))
+
 
 
 defaultTPMap :: IO (TVar (M.Map [Char] [TimePoint]))
