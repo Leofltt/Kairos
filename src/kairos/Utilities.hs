@@ -36,8 +36,8 @@ nextVal n = do
   atomically $ writeTVar (pat n) pat'
   return $ head pat'
 
-rev :: PfPat -> IO Pfield
-rev n = do
+retrograde :: PfPat -> IO Pfield
+retrograde n = do
   patrn <- readTVarIO (pat n)
   let pat' = (last patrn):(init patrn)
   atomically $ writeTVar (pat n) pat'

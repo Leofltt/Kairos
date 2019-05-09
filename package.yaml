@@ -40,13 +40,6 @@ library:
   - Kairos.Utilities
 
 #  other-modules:
-#  - Kairos.Base
-#  - Kairos.Clock
-#  - Kairos.TimePoint
-#  - Kairos.Instrument
-#  - Kairos.Network
-#  - Kairos.Player
-#  - Kairos.Utilities
 
 #executables:
 #  Kairos-exe:

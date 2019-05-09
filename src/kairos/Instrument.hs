@@ -27,7 +27,7 @@ toPfS []     = []
 
 hihat :: Double -> IO Instr
 hihat oc = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6, Pd 0),(7,Pd oc),(8,Pd 1)]
+  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8,Pd oc),(9,Pd 1)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN = 5
              , pf     = pfields
@@ -39,7 +39,7 @@ hihat oc = do
 
 kick909 :: IO Instr
 kick909 = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6, Pd 0),(7,Ps "/Users/leofltt/Desktop/KairosSamples/909/Kick-909.aif"),(8,Pd 1)]
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8,Ps "/Users/leofltt/Desktop/KairosSamples/909/Kick-909.aif"),(9,Pd 1)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 1
              , pf     = pfields
@@ -51,7 +51,7 @@ kick909 = do
 
 sampler :: String -> IO Instr
 sampler path = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6, Pd 0),(7,Ps path),(8,Pd 1)] -- p6 : Sample path, p7 : pitch
+  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8,Ps path),(9,Pd 1)] -- p8 : Sample path, p9 : pitch, 
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 1
              , pf     = pfields
@@ -63,7 +63,7 @@ sampler path = do
 
 acidBass :: IO Instr
 acidBass = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 0.7),(4,Pd 0.7),(5,Pd 0),(6, Pd 0),(7,Pd 48),(8,Pd 16000),(9,Pd 10)]
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 0.7),(4,Pd 0.7),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8,Pd 48),(9,Pd 14000),(10,Pd 9)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 3
              , pf     = pfields
@@ -75,7 +75,7 @@ acidBass = do
 
 hoover :: IO Instr
 hoover = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 0.7),(5,Pd 0),(6, Pd 0),(7,Pd 48),(8,Pd 888),(9,Pd 5)]
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 0.7),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8,Pd 48),(9,Pd 888),(10,Pd 5)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 4
              , pf     = pfields
@@ -88,7 +88,7 @@ hoover = do
 
 karp :: IO Instr
 karp = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6, Pd 0),(7,Pd 48),(8,Pd 0.2),(9,Pd 0.2)]
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 0.5),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8,Pd 48),(9,Pd 0.1),(10,Pd 0.1)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 2
              , pf     = pfields
