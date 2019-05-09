@@ -5,6 +5,7 @@ import Kairos.Lib
 :set prompt "> "
 perf <- defaultPerformance
 displayIns = displayInstruments perf
+displayTP = displayTPat perf
 p = play perf
 s = stop perf
 cPat p i = changeTimeF perf i p
