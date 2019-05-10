@@ -40,10 +40,12 @@ playOne :: Performance -> Instr -> TimePoint -> IO ()
 playOne perf i tp = do
    ts <- currentTS (clock perf)
    cb <- currentBeat (clock perf)
+   now <- timeD (clock perf)
    let toBePlayed = ((start (tp))/(beatInMsr ts)) + (thisBar cb)
    if (toBePlayed > cb)
-      then do toWait <- (timeAtBeat (clock perf) toBePlayed)
-              waitUntil (clock perf) (toWait)
+      then do nextT <- (timeAtBeat (clock perf) toBePlayed)
+              let toWait = (realToFrac $ floor ((nextT - now) * 10000))/ 10000
+              waitT (toWait)
               playOne perf i tp
       else do playInstr i
               updatePfields i
@@ -87,8 +89,8 @@ playLoop perf pn Playing = do
               nextTime <- timeAtBeat (clock perf) nextToPlay
               forkIO $ playOne perf p (wrapBar ts tp)
               updateToPlay perf pn (Just nb)
-              let toWait = nextTime - now
-              waitT $ toWait
+              let toWait = (realToFrac $ floor ((nextTime - now) * 10000))/ 10000
+              waitT (toWait)
               Just p' <- lookupMap (orc perf) pn
               playLoop perf pn $ status p'
 
