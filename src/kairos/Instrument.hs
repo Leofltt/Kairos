@@ -5,7 +5,7 @@ import Kairos.Utilities
 import Control.Concurrent
 import Control.Concurrent.STM
 import qualified Data.Map.Strict as M
---import System.Random (getStdRandom,randomR)
+
 
 pfToString :: [Pfield] -> String
 pfToString ps = unwords $ map show ps
@@ -51,7 +51,7 @@ kick909 = do
 
 sampler :: String -> IO Instr
 sampler path = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8,Ps path),(9,Pd 1)] -- p8 : Sample path, p9 : pitch, 
+  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8,Ps path),(9,Pd 1)] -- p8 : Sample path, p9 : pitch,
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 1
              , pf     = pfields

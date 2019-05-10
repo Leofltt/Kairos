@@ -2,7 +2,7 @@
 
 import Kairos.Lib
 
-:set prompt "> "
+:set prompt "κ> "
 perf <- defaultPerformance
 displayIns = displayInstruments perf
 displayTP = displayTPat perf

@@ -42,7 +42,7 @@ playOne perf i tp = do
    cb <- currentBeat (clock perf)
    let toBePlayed = ((start (tp))/(beatInMsr ts)) + (thisBar cb)
    if (toBePlayed > cb)
-      then do toWait <- timeAtBeat (clock perf) toBePlayed
+      then do toWait <- (timeAtBeat (clock perf) toBePlayed)
               waitUntil (clock perf) (toWait)
               playOne perf i tp
       else do playInstr i
