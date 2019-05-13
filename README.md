@@ -40,10 +40,6 @@ To display the names of all the instruments currently loaded, run
 
 `displayIns`
 
-and to display the Time Patterns available and their names use
-
-`displayTP`
-
 
 You can run:
 
@@ -63,6 +59,34 @@ to solo a specific instrument or
 
 to stop all the currently running instruments.
 
+#### TimePoint Patterns
+
+You can run
+
+`displayTP`
+
+to display the Time Patterns available and their names.
+
+To change the pattern assigned to an instrument use
+
+`cPat "patternName" "instrumentname"`
+
+To add a new pattern, name it and assign it to an instrument use
+
+`addC "instrumentname" "patternName" [timepointlist]`
+
+#### Parameter Patterns
+
+Parameter patterns are assigned for every pfield. A generic function to assign a new pattern to an instrument's pfield  is
+
+`addPf' "instrumentname" pfnumber list updatefunction`
+
+for simplicity of usage, we want to create partially applied functions based on what we need in every instrument. For example one such function common to all  instruments is
+
+`vol i list fun = addPf' i 4 list fun`
+
+that simply assigns the pattern to pfield number 4, which is used as the amplitude scaling value (0-1) common to all the default orchestra instruments.
+Check out the file [BootKairos.hs] to see all the functions already implemented in such way.
 
 #### Adding your own Csound Csound Instruments
 
@@ -96,3 +120,4 @@ Leonardo Foletto, 2019
 
 [the Haskell platform]: https://www.haskell.org/downloads/
 [Csound]: https://csound.com/download.html
+[BootKairos.hs]: https://github.com/Leofltt/Kairos/blob/master/BootKairos.hs
