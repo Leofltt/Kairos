@@ -30,6 +30,7 @@ All the modules should be loaded and ready to play with!
 
 
 The library works assigning pattern of times when a note should be performed and patterns of pfields to modify the parameters of synthesis.
+This tutorial will serve as an overview of the operational principles of the library. While reading this a quick overview of [Base.hs] is recommended to have some insight on the data types of the arguments of the functions.
 
 #### Basic usage
 
@@ -40,6 +41,7 @@ To display the names of all the instruments currently loaded, run
 
 `displayIns`
 
+Run `cT bpmvalue` to change the current tempo and
 
 You can run:
 
@@ -79,11 +81,11 @@ To add a new pattern, name it and assign it to an instrument use
 
 Parameter patterns are assigned for every pfield. A generic function to assign a new pattern to an instrument's pfield  is
 
-`addPf' "instrumentname" pfnumber list updatefunction`
+`addPf "instrumentname" pfnumber list updatefunction`
 
 for simplicity of usage, we want to create partially applied functions based on what we need in every instrument. For example one such function common to all  instruments is
 
-`vol i list fun = addPf' i 4 list fun`
+`vol i list fun = addPf i 4 list fun`
 
 that simply assigns the pattern to pfield number 4, which is used as the amplitude scaling value (0-1) common to all the default orchestra instruments.
 Check out the file [BootKairos.hs] to see all the functions already implemented in such way.
@@ -120,4 +122,5 @@ Leonardo Foletto, 2019
 
 [the Haskell platform]: https://www.haskell.org/downloads/
 [Csound]: https://csound.com/download.html
+[Base.hs]: https://github.com/Leofltt/Kairos/blob/master/src/kairos/Base.hs
 [BootKairos.hs]: https://github.com/Leofltt/Kairos/blob/master/BootKairos.hs
