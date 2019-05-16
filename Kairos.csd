@@ -21,6 +21,7 @@ nchnls = 2
 ; p4 : amplitude (0 - 1)
 ; p5 : reverb send (0 - 1)
 ; p6 : delay send (0 - 1)
+; p7 : panning (0 - 1) 
 
 ; TABLES
 gisine   ftgen 1, 0, 4096, 10, 1; Sine wave
