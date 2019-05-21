@@ -1,7 +1,10 @@
 module Kairos.TimePoint where
 
 import Kairos.Base
+import Kairos.Utilities
 import Data.Map.Strict as M
+import Data.Maybe
+import Control.Concurrent.STM
 import Control.Applicative (liftA2)
 
 
@@ -24,6 +27,11 @@ doubleRem bar beat = beat - (bar * (fromIntegral $ floor (beat/bar)))
 
 toTP :: [Double] -> [TimePoint]
 toTP times = Prelude.map pure times
+
+getTimePoint :: Performance -> String -> IO [Double]
+getTimePoint perf s = do
+  Just t <- lookupMap (timePs perf) s
+  return $ fromTP  t
 
 fromTP :: [TimePoint] -> [Double]
 fromTP (x:xs) = (start x):(fromTP xs)

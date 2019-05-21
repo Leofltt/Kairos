@@ -58,3 +58,6 @@ randI i = getStdRandom $ randomR (0, i)
 interleave :: [a] -> [a] -> [a]
 interleave (a:as) (b:bs) = a : b : (interleave as bs)
 interleave _ _ = []
+
+transpose :: Num a => a ->  [a] -> [a]
+transpose i = map (+ i)

@@ -14,6 +14,7 @@ addP = addTPf perf
 addIns = addInstrument perf
 addI name ins = addIns name =<< ins
 addC i n s = addP n s >> cPat n i
+getTP = getTimePoint perf 
 addPf' = addPfPath' perf
 addPf i pfnum list fun = addPf' i pfnum =<< createPfPat pfnum list fun
 vol i list fun = addPf i 4 list fun    -- global
