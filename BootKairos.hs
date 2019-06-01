@@ -14,7 +14,7 @@ addP = addTPf perf
 addIns = addInstrument perf
 addI name ins = addIns name =<< ins
 addC i n s = addP n s >> cPat n i
-getTP = getTimePoint perf 
+getTP = getTimePoint perf
 addPf' = addPfPath' perf
 addPf i pfnum list fun = addPf' i pfnum =<< createPfPat pfnum list fun
 vol i list fun = addPf i 4 list fun    -- global
@@ -41,3 +41,5 @@ cfrev = setChannel "cfrev"
 volrev = setChannel "volrev"
 voldel = setChannel "voldel"
 mapM_ playFx ["rev","del"]
+techno1 k s h = cPat "fourFloor" k >> cPat "downB" s >> cPat "upFour" h
+dNb1 k s h = cPat "dbk1" k >> cPat "downB" s >> cPat "eightN" h

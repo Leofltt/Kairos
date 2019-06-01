@@ -9,6 +9,9 @@
 -odac
 --port=10000
 -d
+-B 512
+-b 256
+
 </CsOptions>
 <CsInstruments>
 
@@ -21,7 +24,7 @@ nchnls = 2
 ; p4 : amplitude (0 - 1)
 ; p5 : reverb send (0 - 1)
 ; p6 : delay send (0 - 1)
-; p7 : panning (0 - 1) 
+; p7 : panning (0 - 1)
 
 ; TABLES
 gisine   ftgen 1, 0, 4096, 10, 1; Sine wave
@@ -185,11 +188,11 @@ endin
 
 instr 551 ; Delay
 
-adelL vdelay3 gadelL, gkdtdel*1.2, 5000
-adelR vdelay3 gadelR, gkdtdel*0.8, 5000
+adelL vdelay3 gadelL, gkdtdel, 5000
+adelR vdelay3 gadelR, gkdtdel, 5000
 
-adelL = adelL + (gadelR * gkfbdel)
-adelR = adelR + (gadelL * gkfbdel)
+adelL = adelL + (gadelL * gkfbdel)
+adelR = adelR + (gadelR * gkfbdel)
 outs adelL * gkvoldel, adelR * gkvoldel
 
 clear gadelL, gadelR

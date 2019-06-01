@@ -138,7 +138,7 @@ defaultOrc = do
   karpS <- karp
   rev  <- reverb
   del  <- delay
-  kcj  <- sampler "/Users/leofltt/Desktop/KairosSamples/Kicks/KickCymbJungle.wav"
+  kcj  <- sampler "/Users/leofltt/Desktop/KairosSamples/kicks/KickCymbJungle.wav"
   orc  <- atomically $ newTVar $ M.fromList [("K909",k),("OH808",ohh),("CH808",chh)
                                             ,("CP909",cp),("kcj",kcj)
                                             ,("303",a303),("hov",hov)
@@ -183,3 +183,9 @@ addPfPath' :: Performance -> [Char] -> Int -> PfPat -> IO ()
 addPfPath' e insname num pfPat = do
   Just i <- lookupMap (orc e) insname
   addPfPath i num pfPat
+
+-- parameters :: Perf -> [Char] -> [([Char] -> [Pfield] -> (PfPat -> IO Pfield) -> IO ())] -> IO ()
+-- parameters n [] = return ()
+-- parameters n [f:fs] = do
+--   parameters n fs
+--   f n
