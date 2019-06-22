@@ -75,7 +75,7 @@ acidBass = do
 
 hoover :: IO Instr
 hoover = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 0.7),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8,Pd 48),(9,Pd 888),(10,Pd 5)]
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 0.7),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8,Pd 48),(9,Pd 888),(10,Pd 5), (11, Pd 0.2)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 4
              , pf     = pfields
@@ -92,6 +92,18 @@ karp = do
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 2
              , pf     = pfields
+             , toPlay = Just (TP 0)
+             , status = Stopped
+             , timeF = ""
+             , pats = emptyPat
+             }
+fmSub :: IO Instr
+fmSub = do
+  pfields <- newTVarIO $ M.fromList [(3, Pd 1), (4, Pd 0.75), (5, Pd 0), (6, Pd 0), (7,Pd 0.5),(8, Pd 48),(9, Pd 20000)
+                                    ,(10, Pd 2), (11, Pd 0.2), (12, Pd 1), (13, Pd 1000), (14, Pd 2.45) ]
+  emptyPat <- newTVarIO M.empty
+  return $ I { insN = 6
+             , pf   = pfields
              , toPlay = Just (TP 0)
              , status = Stopped
              , timeF = ""
@@ -138,12 +150,13 @@ defaultOrc = do
   karpS <- karp
   rev  <- reverb
   del  <- delay
+  lpFM <- fmSub
   kcj  <- sampler "/Users/leofltt/Desktop/KairosSamples/kicks/KickCymbJungle.wav"
   orc  <- atomically $ newTVar $ M.fromList [("K909",k),("OH808",ohh),("CH808",chh)
                                             ,("CP909",cp),("kcj",kcj)
                                             ,("303",a303),("hov",hov)
                                             ,("rev",rev),("del",del)
-                                            ,("karp",karpS)
+                                            ,("karp",karpS), ("lpFM",lpFM)
                                             ]
   return $ orc
 

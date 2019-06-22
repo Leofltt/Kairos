@@ -6,7 +6,7 @@
 
 <CsoundSynthesizer>
 <CsOptions>
--odac
+-odac1
 --port=10000
 -d
 -B 512
@@ -73,21 +73,21 @@ if inchs = 1 then
 aLeft diskin2 p8, p9
 outs aLeft*p4* sqrt(1-p7), aLeft*p4* sqrt(p7)
 
-garvbL = garvbL + p5 * aLeft * p4 * sqrt(1-p7)
-garvbR = garvbR + p5 * aLeft * p4 * sqrt(p7)
+garvbL = garvbL + p5 * aLeft  * sqrt(1-p7)
+garvbR = garvbR + p5 * aLeft  * sqrt(p7)
 
-gadelL = gadelL + aLeft  * p4 * p6* sqrt(1-p7)
-gadelR = gadelR + aLeft * p4 * p6* sqrt(p7)
+gadelL = gadelL + aLeft   * p6 * sqrt(1-p7)
+gadelR = gadelR + aLeft  * p6 * sqrt(p7)
 
 else
 aLeft, aRight diskin2 p8, p9
 outs aLeft*p4* sqrt(1-p7), aRight*p4* sqrt(p7)
 
-garbL = garvbL + p5 * aLeft * p4* sqrt(1-p7)
-garvbR = garvbR + p5 * aRight * p4* sqrt(p7)
+garbL = garvbL + p5 * aLeft * sqrt(1-p7)
+garvbR = garvbR + p5 * aRight * sqrt(p7)
 
-gadelL = gadelL + aLeft * p4 * p6* sqrt(1-p7)
-gadelR = gadelR + aRight * p4 * p6* sqrt(p7)
+gadelL = gadelL + aLeft  * p6 * sqrt(1-p7)
+gadelR = gadelR + aRight  * p6 * sqrt(p7)
 endif
 
 endin
@@ -100,11 +100,11 @@ asig pluck 1, cpsmidinn(p8), 432, 0, 4, p9, (49*p10)+1 ; p8 = roughness p9 = str
 
 outs asig*p4* sqrt(1-p7), asig*p4* sqrt(p7)
 
-garvbR = garvbR + p5 * asig * p4 * sqrt(1-p7)
-garvbL = garvbL + p5 * asig * p4 * sqrt(p7)
+garvbR = garvbR + p5 * asig  * sqrt(1-p7)
+garvbL = garvbL + p5 * asig  * sqrt(p7)
 
-gadelL = gadelL + asig * p4 * p6 * sqrt(1-p7)
-gadelR = gadelR + asig * p4 * p6 * sqrt(p7)
+gadelL = gadelL + asig  * p6 * sqrt(1-p7)
+gadelR = gadelR + asig  * p6 * sqrt(p7)
 
 endin
 
@@ -118,16 +118,19 @@ asig declick asig
 
 outs asig*p4* sqrt(1-p7), asig*p4* sqrt(p7)
 
-garvbR = garvbR + p5 * asig * p4 * sqrt(1-p7)
-garvbL = garvbL + p5 * asig * p4 * sqrt(p7)
+garvbR = garvbR + p5 * asig  * sqrt(1-p7)
+garvbL = garvbL + p5 * asig  * sqrt(p7)
 
-gadelL = gadelL + asig * p4 * p6 * sqrt(1-p7)
-gadelR = gadelR + asig * p4 * p6 * sqrt(p7)
+gadelL = gadelL + asig  * p6 * sqrt(1-p7)
+gadelR = gadelR + asig  * p6 * sqrt(p7)
 
 endin
 
 instr 4 ;Hoover Bass
 
+
+iad = p11
+aenv linseg 0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0
 kcf expseg 2, p3/2, 0.1
 kr3 unirand 1
 kr3 port kr3, 0.01
@@ -148,13 +151,13 @@ adel vdelay3 ao/2, (0.1+alfo)*1000, 1000
 adel2 vdelay3 ao/2, (0.1+alfo2)*1000, 1000
 adecl declick (ao+adel)
 adecr declick  (ao+adel2)
-outs adecl*p4* sqrt(1-p7),adecr*p4* sqrt(p7)
+outs adecl*p4* sqrt(1-p7),adecr*p4* sqrt(p7) * aenv
 
-garvbR = garvbR + p5 * adecl * p4* sqrt(1-p7)
-garvbL = garvbL + p5 * adecr * p4* sqrt(p7)
+garvbR = garvbR + p5 * adecl * sqrt(1-p7) * aenv
+garvbL = garvbL + p5 * adecr * sqrt(p7) * aenv
 
-gadelL = gadelL + adecl * p4 * p6 * sqrt(1-p7)
-gadelR = gadelR + adecr * p4 * p6 * sqrt(p7)
+gadelL = gadelL + adecl  * p6 * sqrt(1-p7) * aenv
+gadelR = gadelR + adecr  * p6 * sqrt(p7) * aenv
 
 endin
 
@@ -178,11 +181,40 @@ a808     butterhp a808, 5270
 a808     butterhp a808, 5270
 outs a808*aenv*p4* sqrt(1-p7), a808*aenv*p4* sqrt(p7)
 
-garvbR = garvbR + p5 * a808 * p4 * aenv* sqrt(1-p7)
-garvbL = garvbL + p5 * a808 * p4 * aenv* sqrt(p7)
+garvbR = garvbR + p5 * a808 * aenv* sqrt(1-p7)
+garvbL = garvbL + p5 * a808 * aenv* sqrt(p7)
 
-gadelL = gadelL + a808 * p4 * p6 * sqrt(1-p7) * aenv
-gadelR = gadelR + a808 * p4 * p6 * sqrt(p7) * aenv
+gadelL = gadelL + a808 * p6 * sqrt(1-p7) * aenv
+gadelR = gadelR + a808 * p6 * sqrt(p7) * aenv
+
+endin
+
+instr 6 ; Simple subtractive-FM
+
+kindx = p14
+kfilt = p9
+kdpth = p13
+iad = p11
+kres = p10
+kdist = p12
+aenv linseg 0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0
+
+
+amod poscil kdpth, cpsmidinn(p8)* (1/(5*kindx)), gisine
+acar poscil 1, cpsmidi() + amod, gisine
+
+audio diode_ladder acar, kfilt, kres , 1, kdist
+
+aL = audio * p4 * sqrt(1-p7) * aenv
+aR = audio * p4 * sqrt(p7) * aenv
+
+outs aL, aR
+
+garvbR = garvbR + p5 * audio * sqrt(1-p7) * aenv
+garvbL = garvbL + p5 * audio * sqrt(p7) * aenv
+
+gadelL = gadelL + audio * p6 * sqrt(1-p7) * aenv
+gadelR = gadelR + audio * p6 * sqrt(p7) * aenv
 
 endin
 

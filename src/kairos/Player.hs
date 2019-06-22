@@ -153,7 +153,9 @@ jGhost = toTP [1.75,2.25,5.75]
 
 jGhost1 = toTP [1.75,2.25,5.75,6.25,7.75]
 
-sixBar = toTP $ map (*4) [1/24, 5,24 .. 21/24]
+sixBar = toTP $ map (*4) [1/24, 5/24 .. 21/24]
+
+uno = [TP 0]
 
 displayTPat :: Performance -> IO String
 displayTPat perf = do
@@ -166,7 +168,8 @@ defaultTPMap :: IO (TVar (M.Map [Char] [TimePoint]))
 defaultTPMap = do
   tpMap <- newTVarIO $ M.fromList [("upFour", upFour),("downB", downB),("eightN",eightN)
                                   ,("sixteenN",sixteenN),("fourFloor",fourFloor),("dbk1",dbk1)
-                                  ,("jGhost1",jGhost1),("jGhost",jGhost),("dubb",dubb), ("sixBar", sixBar)
+                                  ,("jGhost1",jGhost1),("jGhost",jGhost),("dubb",dubb)
+                                  ,("sixBar", sixBar),("uno", uno)
                                   ]
   return $ tpMap
 
