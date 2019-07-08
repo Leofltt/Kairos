@@ -6,11 +6,11 @@
 
 <CsoundSynthesizer>
 <CsOptions>
--odac1
+-odac2
 --port=10000
 -d
--B 512
--b 256
+-B 256
+-b 128
 
 </CsOptions>
 <CsInstruments>
@@ -29,6 +29,7 @@ nchnls = 2
 ; TABLES
 gisine   ftgen 1, 0, 4096, 10, 1; Sine wave
 gisquare ftgen 2, 0, 4096, 7, 1, 2048, 1, 0, 0, 2048, 0 ; Square wave
+
 
 ; GLOBAL VARIABLES
 garvbL, garvbR init 0
@@ -149,8 +150,8 @@ alfo lfo 0.005, kr2 + 0.1
 alfo2 lfo 0.005, kr1 + 0.1
 adel vdelay3 ao/2, (0.1+alfo)*1000, 1000
 adel2 vdelay3 ao/2, (0.1+alfo2)*1000, 1000
-adecl declick (ao+adel)
-adecr declick  (ao+adel2)
+adecl declick (ao+adel*0.8)
+adecr declick  (ao+adel2*0.8)
 outs adecl*p4* sqrt(1-p7),adecr*p4* sqrt(p7) * aenv
 
 garvbR = garvbR + p5 * adecl * sqrt(1-p7) * aenv
@@ -244,3 +245,20 @@ endin
 <CsScore>
 </CsScore>
 </CsoundSynthesizer>
+<bsbPanel>
+ <label>Widgets</label>
+ <objectName/>
+ <x>100</x>
+ <y>100</y>
+ <width>320</width>
+ <height>240</height>
+ <visible>true</visible>
+ <uuid/>
+ <bgcolor mode="nobackground">
+  <r>255</r>
+  <g>255</g>
+  <b>255</b>
+ </bgcolor>
+</bsbPanel>
+<bsbPresets>
+</bsbPresets>
