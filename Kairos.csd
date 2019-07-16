@@ -6,11 +6,11 @@
 
 <CsoundSynthesizer>
 <CsOptions>
--odac2
+-odac1
 --port=10000
 -d
--B 256
--b 128
+-B 128
+-b 64
 
 </CsOptions>
 <CsInstruments>

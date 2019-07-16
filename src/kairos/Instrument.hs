@@ -51,7 +51,10 @@ kick909 = do
 
 sampler :: String -> IO Instr
 sampler path = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8,Ps path),(9,Pd 1)] -- p8 : Sample path, p9 : pitch,
+  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1)
+                                    ,(5,Pd 0),(6, Pd 0)
+                                    ,(7,Pd 0.5),(8,Ps path)
+                                    ,(9,Pd 1)] -- p8 : Sample path, p9 : pitch
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 1
              , pf     = pfields
@@ -99,8 +102,8 @@ karp = do
              }
 fmSub :: IO Instr
 fmSub = do
-  pfields <- newTVarIO $ M.fromList [(3, Pd 1), (4, Pd 0.75), (5, Pd 0), (6, Pd 0), (7,Pd 0.5),(8, Pd 48),(9, Pd 20000)
-                                    ,(10, Pd 2), (11, Pd 0.2), (12, Pd 1), (13, Pd 1000), (14, Pd 2.45) ]
+  pfields <- newTVarIO $ M.fromList [(3, Pd 1), (4, Pd 1), (5, Pd 0), (6, Pd 0), (7,Pd 0.5),(8, Pd 60),(9, Pd 20000)
+                                    ,(10, Pd 2), (11, Pd 0.2), (12, Pd 1), (13, Pd 2000), (14, Pd 2.45) ]
   emptyPat <- newTVarIO M.empty
   return $ I { insN = 6
              , pf   = pfields

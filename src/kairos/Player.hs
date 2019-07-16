@@ -27,7 +27,6 @@ setChannel chanName val = do
   let m = chanName ++ " " ++ (show val)
   setChan m
 
-
 playInstr :: Instr -> IO ()
 playInstr instr = do
   pfields <- readTVarIO $ pf instr
@@ -42,8 +41,9 @@ playOne perf i tp = do
    cb <- currentBeat (clock perf)
    now <- timeD (clock perf)
    let toBePlayed = ((start (tp))/(beatInMsr ts)) + (thisBar cb)
-   if (toBePlayed > cb)
-      then do nextT <- (timeAtBeat (clock perf) toBePlayed)
+   if ((toBePlayed ) > cb)
+      then do
+              nextT <- timeAtBeat (clock perf) (toBePlayed)
               let toWait = (realToFrac $ floor ((nextT - now) * 10000))/ 10000
               waitT (toWait)
               playOne perf i tp
@@ -86,7 +86,7 @@ playLoop perf pn Playing = do
               let nb = nextBeat tp timeString
               let nextToPlay | (start nb) > (start tp) = ( (start  (wrapBar ts nb))/(beatInMsr ts)) + (thisBar cb) + ((fromIntegral $ floor $ (start  nb)/(beatInMsr ts)) - (fromIntegral $ floor $ (start  tp)/(beatInMsr ts)))
                              | (start nb) <= (start tp) = ((start nb)/(beatInMsr ts)) + (nextBar cb)
-              nextTime <- timeAtBeat (clock perf) nextToPlay
+              nextTime <- timeAtBeat (clock perf) (nextToPlay)
               forkIO $ playOne perf p (wrapBar ts tp)
               updateToPlay perf pn (Just nb)
               let toWait = (realToFrac $ floor ((nextTime - now) * 10000))/ 10000
