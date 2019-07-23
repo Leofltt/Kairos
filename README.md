@@ -4,7 +4,7 @@ live Coding library for music composition and performance using the Csound audio
 
 This project has been started as my Thesis project for the Bachelor Degree in Electronic Production and Design from Berklee College of Music, advised by Dr. Richard Boulanger.
 
-The main goal of this software is to be able to perform and compose electronic music in a way that makes it more intuitive and immediate to interact with synthesis parameters compared to traditional virtual instruments and analog hardware. Focus of the development has been put in immediacy and easiness of usage, while also allowing for a high degree of customization and adaptability. This library is being developed based on the workflow that feels ideal for me, so it might not necessarily be the perfect tool for what you are looking for, but is provided nonetheless as Open Source Software for anyone to enjoy, modify, hack and get inspired by.
+The main goal of this software is to be able to perform and compose electronic music in a way that makes it more intuitive and immediate to interact with synthesis parameters compared to traditional virtual instruments and analog hardware. Focus of the development has been put in immediacy and easiness of use, while also allowing for a high degree of customization and adaptability. This library is being developed based on the workflow that feels ideal for me, so it might not necessarily be the perfect tool for what you are looking for, but is provided nonetheless as Open Source Software for anyone to enjoy, modify, hack and get inspired by.
 
 To get started you'll need to download:
 - [the Haskell platform]
@@ -89,6 +89,10 @@ for simplicity of usage, we want to create partially applied functions based on 
 
 that simply assigns the pattern to pfield number 4, which is used as the amplitude scaling value (0-1) common to all the default orchestra instruments.
 Check out the file [BootKairos.hs] to see all the functions already implemented in such way.
+
+An alternative to this method is the `params` syntax that allows to set multiple parameters at once.
+
+`params "instrumentname" [(fun1, vol, list1), (fun2, pan, list2)]`
 
 #### Adding your own Csound Csound Instruments
 
