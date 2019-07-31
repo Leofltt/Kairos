@@ -9,3 +9,4 @@ import Kairos.TimePoint as K
 import Kairos.Instrument as K
 import Kairos.Player as K
 import Kairos.Utilities as K
+import Kairos.Scales as K

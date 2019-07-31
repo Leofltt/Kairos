@@ -1,3 +1,5 @@
+module Kairos.Scales where
+  
 import Kairos.Utilities
 
 type Scale = [Double]
@@ -31,3 +33,7 @@ persian :: Scale
 persian = [0,1,4,5,6,8,11]
 prometheus :: Scale
 prometheus = [0,2,4,6,9,10]
+wholeTone :: Scale
+wholeTone = [0,2,4,6,8,10]
+triTone :: Scale
+triTone = [0,1,4,6,7,10]
