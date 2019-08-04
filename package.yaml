@@ -26,6 +26,7 @@ dependencies:
 - bytestring
 - containers
 - transformers
+- csv
 library:
   source-dirs: src
 
@@ -39,6 +40,7 @@ library:
   - Kairos.Player
   - Kairos.Utilities
   - Kairos.Scales
+  - Kairos.Markov
 
 #  other-modules:
 

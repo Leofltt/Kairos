@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e301b6a4656dba12f7c148681fd52a46c940c5d0c1ce1da0bdd76388ec84f62e
+-- hash: 02520081cafed4be4eab6f4dbd07866be3698e9cd8d1752e2693a6ce94f132bd
 
 name:           Kairos
 version:        0.1.1.1
@@ -38,6 +38,7 @@ library
       Kairos.Player
       Kairos.Utilities
       Kairos.Scales
+      Kairos.Markov
   other-modules:
       Paths_Kairos
   hs-source-dirs:
@@ -46,6 +47,7 @@ library
       base >=4.7 && <5
     , bytestring
     , containers
+    , csv
     , network
     , random
     , stm
@@ -66,6 +68,7 @@ test-suite Kairos-test
     , base >=4.7 && <5
     , bytestring
     , containers
+    , csv
     , network
     , random
     , stm

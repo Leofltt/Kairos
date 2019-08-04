@@ -53,6 +53,12 @@ randomize n = do
 randI :: Int -> IO Int
 randI i = getStdRandom $ randomR (0, i)
 
+randF :: IO Double
+randF = do
+  x <- randI 100
+  return $ (fromIntegral x) / 100
+
+
 -- Misc Utilities
 
 interleave :: [a] -> [a] -> [a]
@@ -61,3 +67,9 @@ interleave _ _ = []
 
 transpose :: Num a => a ->  [a] -> [a]
 transpose i = map (+ i)
+
+--adapted from: https://stackoverflow.com/questions/27095647/convert-a-string-list-to-a-double-list-in-haskell
+stringToDouble :: [String] -> [Double]
+stringToDouble [x] = [read x :: Double]
+stringToDouble (x:xs) = (read x :: Double) : stringToDouble xs
+stringToDouble _ = []
