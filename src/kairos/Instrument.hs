@@ -32,7 +32,7 @@ hihat oc = do
   return $ I { insN = 5
              , pf     = pfields
              , toPlay = Just (TP 0)
-             , status = Stopped
+             , status = Init
              , timeF = "upFour"
              , pats = emptyPat
              }
@@ -44,7 +44,7 @@ kick909 = do
   return $ I { insN   = 1
              , pf     = pfields
              , toPlay = Just (TP 0)
-             , status = Stopped
+             , status = Init
              , timeF = "fourFloor"
              , pats = emptyPat
              }
@@ -59,7 +59,7 @@ sampler path = do
   return $ I { insN   = 1
              , pf     = pfields
              , toPlay = Nothing
-             , status = Stopped
+             , status = Inactive
              , timeF = ""
              , pats = emptyPat
              }
@@ -71,7 +71,7 @@ acidBass = do
   return $ I { insN   = 3
              , pf     = pfields
              , toPlay = Just (TP 0)
-             , status = Stopped
+             , status = Inactive
              , timeF = ""
              , pats = emptyPat
              }
@@ -83,7 +83,7 @@ hoover = do
   return $ I { insN   = 4
              , pf     = pfields
              , toPlay = Just (TP 0)
-             , status = Stopped
+             , status = Inactive
              , timeF = ""
              , pats = emptyPat
              }
@@ -96,7 +96,7 @@ karp = do
   return $ I { insN   = 2
              , pf     = pfields
              , toPlay = Just (TP 0)
-             , status = Stopped
+             , status = Inactive
              , timeF = ""
              , pats = emptyPat
              }
@@ -108,7 +108,7 @@ fmSub = do
   return $ I { insN = 6
              , pf   = pfields
              , toPlay = Just (TP 0)
-             , status = Stopped
+             , status = Inactive
              , timeF = ""
              , pats = emptyPat
              }
@@ -123,7 +123,7 @@ reverb = do
   return $ I { insN   = 550
              , pf     = pfields
              , toPlay = Nothing
-             , status = Stopped
+             , status = Inactive
              , timeF = ""
              , pats = emptyPat
              }
@@ -135,7 +135,7 @@ delay = do
   return $ I { insN   = 551
              , pf     = pfields
              , toPlay = Nothing
-             , status = Stopped
+             , status = Inactive
              , timeF = ""
              , pats = emptyPat
              }

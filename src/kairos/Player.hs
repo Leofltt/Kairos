@@ -61,17 +61,17 @@ playEffect = playNow
 
 play :: Performance -> String -> IO ()
 play perf pn = let
-  checkStatus i Stopped  = ( forkIO $ playLoop perf pn $ Stopped)  >> return ()
+  checkStatus i Inactive  = ( forkIO $ playLoop perf pn $ Inactive)  >> return ()
   checkStatus i Stopping = ( playLoop perf pn $ Stopping) >> return ()
   checkStatus i Init = ( playLoop perf pn $ Init) >> return ()
-  checkStatus i Playing  = putStrLn $ "the instrument " ++ pn ++ " is already playing!"
+  checkStatus i Active  = putStrLn $ "the instrument " ++ pn ++ " is already Active!"
   in do Just i <- lookupMap (orc perf) pn
         checkStatus i $ status i
 
 -- play loop callBack
 playLoop :: Performance -> String -> Status -> IO ()
 
-playLoop perf pn Playing = do
+playLoop perf pn Active = do
   Just p <- lookupMap (orc perf) pn
   now <- timeD (clock perf)
   cb <- currentBeat (clock perf)
@@ -95,7 +95,7 @@ playLoop perf pn Playing = do
               playLoop perf pn $ status p'
 
 
-playLoop perf p Stopped = do
+playLoop perf p Inactive = do
   changeStatus perf p Init
   playLoop perf p Init
 
@@ -111,13 +111,13 @@ playLoop perf i Init = do
               Just timeString <- lookupMap (timePs perf) (timeF p)
               let nb = nextBeat (max tp (TP n) ) timeString
               updateToPlay perf i (Just nb)
-              changeStatus perf i Playing
+              changeStatus perf i Active
               Just p' <- lookupMap (orc perf) i
               playLoop perf i $ status p'
 
 playLoop perf p Stopping = do
-  changeStatus perf p Stopped
-  putStrLn $ "instrument " ++ p ++ " has been stopped."
+  changeStatus perf p Inactive
+  putStrLn $ "instrument " ++ p ++ " is now Inactive."
   return ()
 
 stop :: Performance -> String -> IO ()
