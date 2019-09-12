@@ -122,7 +122,9 @@ playLoop perf p Stopping = do
 
 stop :: Performance -> String -> IO ()
 stop perf i = do
-  changeStatus perf i Stopping
+  Just p <- lookupMap (orc perf) i
+  if (status p) == Active
+    changeStatus perf i Stopping >> return ()
 
 
 stopAll perf = (mapM_ (stop perf)) .  notEffect . M.keys =<< readTVarIO (orc perf)
