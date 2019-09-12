@@ -6,8 +6,8 @@
 
 <CsoundSynthesizer>
 <CsOptions>
-;s-odac1
 -odac
+;-odac
 --port=10000
 -d
 -B 128

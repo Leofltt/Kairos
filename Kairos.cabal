@@ -7,7 +7,7 @@ cabal-version: 1.12
 -- hash: f87961982faab22b5143165e941f979fc3ce303b7db6e8bbc0c31b9576a3b77c
 
 name:           Kairos
-version:        0.1.2
+version:        0.1.5
 synopsis:       Live coding library
 description:    Please see the README on GitHub at <https://github.com/leofltt/Kairos#readme>
 homepage:       https://github.com/leofltt/Kairos#readme

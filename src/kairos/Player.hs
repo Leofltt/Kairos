@@ -46,8 +46,7 @@ playOne perf i tp = do
               nextT <- timeAtBeat (clock perf) (toBePlayed)
               let toWait = (realToFrac $ floor ((nextT - now) * 10000))/ 10000
               waitT (toWait)
-              forkIO $ playOne perf i tp
-              return ()
+              playOne perf i tp
       else do playInstr i
               updatePfields i
               return ()
@@ -62,9 +61,9 @@ playEffect = playNow
 
 play :: Performance -> String -> IO ()
 play perf pn = let
-  checkStatus i Inactive  = ( playLoop perf pn $ Inactive)  >> return ()
-  checkStatus i Stopping = ( forkIO $ playLoop perf pn $ Stopping) >> return ()
-  checkStatus i Init = ( forkIO $ playLoop perf pn $ Init) >> return ()
+  checkStatus i Inactive  = ( forkIO $ playLoop perf pn $ Inactive)  >> return ()
+  checkStatus i Stopping = ( playLoop perf pn $ Stopping) >> return ()
+  checkStatus i Init = ( playLoop perf pn $ Init) >> return ()
   checkStatus i Active  = putStrLn $ "the instrument " ++ pn ++ " is already Active!"
   in do Just i <- lookupMap (orc perf) pn
         checkStatus i $ status i
