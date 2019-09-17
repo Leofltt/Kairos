@@ -6,8 +6,7 @@
 
 <CsoundSynthesizer>
 <CsOptions>
--odac
-;-odac
+-odac1
 --port=10000
 -d
 -B 128
@@ -85,7 +84,7 @@ else
 aLeft, aRight diskin2 p8, p9
 outs aLeft*p4* sqrt(1-p7), aRight*p4* sqrt(p7)
 
-garbL = garvbL + p5 * aLeft * sqrt(1-p7)
+garvbL = garvbL + p5 * aLeft * sqrt(1-p7)
 garvbR = garvbR + p5 * aRight * sqrt(p7)
 
 gadelL = gadelL + aLeft  * p6 * sqrt(1-p7)

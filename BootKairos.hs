@@ -45,8 +45,11 @@ fbrev = setChannel "fbrev"
 cfrev = setChannel "cfrev"
 volrev = setChannel "volrev"
 voldel = setChannel "voldel"
-mapM_ playFx ["rev","del"]
+--mapM_ playFx ["rev","del"]
 techno1 k s h = cPat "fourFloor" k >> cPat "downB" s >> cPat "upFour" h
 dnb1 k s h = cPat "dbk1" k >> cPat "downB" s >> cPat "eightN" h
-params i ((a,b,c):xs) = b i c a >> params i xs
-params i ((a,b,c):_) = b i c a
+-- params i [(a,b,c)] | length [(a,b,c)] > 1 = b i c a >> params i (tail [(a,b,c)])
+--                    | length [(a,b,c)] == 1 = b i c a
+--                    | otherwise = return ()
+runPfield i (a,b,c) = b i c a
+params i ls = mapM_ (runPfield i) ls
