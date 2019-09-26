@@ -1,5 +1,6 @@
 module Kairos.Network where
 
+import Kairos.Base
 import Network.Socket hiding (recv)
 import Network.Socket.ByteString (recv, sendAll)
 import qualified Data.ByteString.Char8 as C

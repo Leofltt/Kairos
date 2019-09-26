@@ -6,7 +6,7 @@
 
 <CsoundSynthesizer>
 <CsOptions>
--odac1
+-odac2
 --port=10000
 -d
 -B 128
@@ -66,7 +66,7 @@ opcode declick, a, a
   xout ain * aenv
 endop
 
-instr 1 ;Sampler
+instr 1 ; Sampler
 
 inchs filenchnls p8
 
@@ -109,7 +109,7 @@ gadelR = gadelR + asig  * p6 * sqrt(p7)
 
 endin
 
-instr 3 ;Bass 303
+instr 3 ; Bass 303
 
 acut = 200 + expon(1, p3, 0.001) * p9
 asig = vco2(1, cpsmidinn(p8))
@@ -127,7 +127,7 @@ gadelR = gadelR + asig  * p6 * sqrt(p7)
 
 endin
 
-instr 4 ;Hoover Bass
+instr 4 ; Hoover Bass
 
 
 iad = p11

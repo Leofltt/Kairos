@@ -47,8 +47,8 @@ playOne perf i tp = do
               let toWait = (realToFrac $ floor ((nextT - now) * 10000))/ 10000
               waitT (toWait)
               playOne perf i tp
-      else do playInstr i
-              updatePfields i
+      else do updatePfields i
+              playInstr i
               return ()
 
 playNow :: Performance -> String -> IO ()
@@ -123,8 +123,9 @@ playLoop perf p Stopping = do
 stop :: Performance -> String -> IO ()
 stop perf i = do
   Just p <- lookupMap (orc perf) i
-  if (status p) == Active
-    changeStatus perf i Stopping >> return ()
+  --if (status p) == Active
+  changeStatus perf i Stopping
+  return ()
 
 
 stopAll perf = (mapM_ (stop perf)) .  notEffect . M.keys =<< readTVarIO (orc perf)
