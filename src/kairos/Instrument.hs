@@ -113,6 +113,18 @@ fmSub = do
              , pats = emptyPat
              }
 
+superSaw :: IO Instr
+superSaw = do
+  pfields <- newTVarIO $ M.fromList [(3, Pd 1), (4, Pd 1), (5, Pd 0), (6, Pd 0), (7,Pd 0.5),(8, Pd 60),(9, Pd 500)
+                                    ,(10, Pd 2), (11, Pd 0.2),]
+  emptyPat <- newTVarIO M.empty
+  return $ I { insN = 6
+             , pf   = pfields
+             , toPlay = Just (TP 0)
+             , status = Inactive
+             , timeF = ""
+             , pats = emptyPat
+             }
 
 -- default effects
 
@@ -160,6 +172,7 @@ defaultOrc = do
                                             ,("303",a303),("hov",hov)
                                             ,("rev",rev),("del",del)
                                             ,("karp",karpS), ("lpFM",lpFM)
+                                            ,("sSaw", superSaw)
                                             ]
   return $ orc
 

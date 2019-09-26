@@ -2,11 +2,11 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: beb72be8b1fb90e2a8bd824b905c3560c8e31d5eb25a9f20bcdeb5473f4acb4b
+-- hash: a5b58808d02065a255892cc595af9c092ef1e540a6a66101d3241863a3318995
 
 cabal-version:  >= 1.10
 name:           Kairos
-version:        0.1.5
+version:        0.1.6
 synopsis:       Live coding library
 description:    Please see the README on GitHub at <https://github.com/leofltt/Kairos#readme>
 homepage:       https://github.com/leofltt/Kairos#readme
@@ -39,6 +39,7 @@ library
       Kairos.Scales
       Kairos.Markov
   other-modules:
+      Kairos.ClockServer
       Paths_Kairos
   hs-source-dirs:
       src

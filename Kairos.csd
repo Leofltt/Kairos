@@ -219,6 +219,42 @@ gadelR = gadelR + audio * p6 * sqrt(p7) * aenv
 
 endin
 
+instr 7 ; SuperSaw
+
+iad = p11
+
+aenv linseg 0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0
+
+asig = vco2(1,  cpsmidinn(p8))
+asig += vco2(1, cpsmidinn(p8) * cent(9.04234))
+asig += vco2(1,  cpsmidinn(p8) * cent(-7.214342))
+
+asig += vco2(1,  cpsmidinn(p8) * cent(1206.294143))
+asig += vco2(1,  cpsmidinn(p8) * cent(1193.732))
+asig += vco2(1,  cpsmidinn(p8) * cent(1200))
+
+asig += vco2(1,  cpsmidinn(p8) * cent(2406.294143))
+asig += vco2(1,  cpsmidinn(p8) * cent(2393.732))
+asig += vco2(1,  cpsmidinn(p8) * cent(2400))
+
+asig *= 0.1 ;expseg(16000, p3 - 0.05, 16000, 0.05, 200)
+
+asig = K35_hpf(asig, p9, p10)
+asig = declick(asig)
+
+aL = asig * p4 * sqrt(1-p7) * aenv
+aR = asig * p4 * sqrt(p7) * aenv
+
+outs aL, aR
+
+garvbR = garvbR + p5 * asig * sqrt(1-p7) * aenv
+garvbL = garvbL + p5 * asig * sqrt(p7) * aenv
+
+gadelL = gadelL + asig * p6 * sqrt(1-p7) * aenv
+gadelR = gadelR + asig * p6 * sqrt(p7) * aenv
+
+endin
+
 instr 551 ; Delay
 
 adelL vdelay3 gadelL, gkdtdel, 5000
