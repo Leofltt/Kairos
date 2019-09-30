@@ -118,7 +118,7 @@ superSaw = do
   pfields <- newTVarIO $ M.fromList [(3, Pd 1), (4, Pd 1), (5, Pd 0), (6, Pd 0), (7,Pd 0.5),(8, Pd 60),(9, Pd 500)
                                     ,(10, Pd 2), (11, Pd 0.2)]
   emptyPat <- newTVarIO M.empty
-  return $ I { insN = 6
+  return $ I { insN = 7
              , pf   = pfields
              , toPlay = Just (TP 0)
              , status = Inactive
@@ -213,9 +213,3 @@ addPfPath' :: Performance -> [Char] -> Int -> PfPat -> IO ()
 addPfPath' e insname num pfPat = do
   Just i <- lookupMap (orc e) insname
   addPfPath i num pfPat
-
--- parameters :: Perf -> [Char] -> [([Char] -> [Pfield] -> (PfPat -> IO Pfield) -> IO ())] -> IO ()
--- parameters n [] = return ()
--- parameters n [f:fs] = do
---   parameters n fs
---   f n
