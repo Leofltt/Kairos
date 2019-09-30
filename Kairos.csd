@@ -71,7 +71,7 @@ instr 1 ; Sampler
 inchs filenchnls p8
 
 if inchs = 1 then
-aLeft = diskin2 (p8, p9)
+aLeft diskin2 p8, p9
 outs aLeft*p4* sqrt(1-p7), aLeft*p4* sqrt(p7)
 
 garvbL +=  p5 * aLeft  * sqrt(1-p7)
