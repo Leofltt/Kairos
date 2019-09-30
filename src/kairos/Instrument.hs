@@ -31,21 +31,9 @@ hihat oc = do
   emptyPat <- newTVarIO M.empty
   return $ I { insN = 5
              , pf     = pfields
-             , toPlay = Just (TP 0)
+             , toPlay = Nothing
              , status = Init
              , timeF = "upFour"
-             , pats = emptyPat
-             }
-
-kick909 :: IO Instr
-kick909 = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8,Ps "/Users/leofltt/Desktop/KairosSamples/909/Kick-909.aif"),(9,Pd 1)]
-  emptyPat <- newTVarIO M.empty
-  return $ I { insN   = 1
-             , pf     = pfields
-             , toPlay = Just (TP 0)
-             , status = Init
-             , timeF = "fourFloor"
              , pats = emptyPat
              }
 
@@ -70,7 +58,7 @@ acidBass = do
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 3
              , pf     = pfields
-             , toPlay = Just (TP 0)
+             , toPlay = Nothing
              , status = Inactive
              , timeF = ""
              , pats = emptyPat
@@ -82,7 +70,7 @@ hoover = do
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 4
              , pf     = pfields
-             , toPlay = Just (TP 0)
+             , toPlay = Nothing
              , status = Inactive
              , timeF = ""
              , pats = emptyPat
@@ -95,7 +83,7 @@ karp = do
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 2
              , pf     = pfields
-             , toPlay = Just (TP 0)
+             , toPlay = Nothing
              , status = Inactive
              , timeF = ""
              , pats = emptyPat
@@ -107,7 +95,7 @@ fmSub = do
   emptyPat <- newTVarIO M.empty
   return $ I { insN = 6
              , pf   = pfields
-             , toPlay = Just (TP 0)
+             , toPlay = Nothing
              , status = Inactive
              , timeF = ""
              , pats = emptyPat
@@ -120,7 +108,7 @@ superSaw = do
   emptyPat <- newTVarIO M.empty
   return $ I { insN = 7
              , pf   = pfields
-             , toPlay = Just (TP 0)
+             , toPlay = Nothing
              , status = Inactive
              , timeF = ""
              , pats = emptyPat
@@ -158,18 +146,14 @@ defaultOrc :: IO Orchestra
 defaultOrc = do
   chh  <- hihat 0.2
   ohh  <- hihat 0.8
-  k    <- kick909
   a303 <- acidBass
   hov  <- hoover
-  cp   <- sampler "/Users/leofltt/Desktop/KairosSamples/909/Clap-909.aif"
   karpS <- karp
   rev  <- reverb
   del  <- delay
   lpFM <- fmSub
   sSaw <- superSaw
-  kcj  <- sampler "/Users/leofltt/Desktop/KairosSamples/kicks/KickCymbJungle.wav"
-  orc  <- atomically $ newTVar $ M.fromList [("K909",k),("OH808",ohh),("CH808",chh)
-                                            ,("CP909",cp),("kcj",kcj)
+  orc  <- atomically $ newTVar $ M.fromList [("OH808",ohh),("CH808",chh)
                                             ,("303",a303),("hov",hov)
                                             ,("rev",rev),("del",del)
                                             ,("karp",karpS), ("lpFM",lpFM)

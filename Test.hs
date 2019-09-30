@@ -2,8 +2,14 @@
 
 defPath s = "/Users/leofltt/Desktop/KairosSamples" ++ s
 markPath s = "/Users/leofltt/Desktop/Kairos/MarkovTables"
+k909 = defPath "/909/Kick-909.aif"
+addI "K909" $ sampler k909
+kcj = defPath "/kicks/KickCymbJungle.wav"
+addI "kcj" $ sampler kcj
+cp909 = defPath "/909/Clap-909.aif"
+addI "CP909" $ sampler cp909 
 sh = defPath "/ch/shortHat.wav"
-addI "sh" $ sampler $ sh
+addI "sh" $ sampler sh
 r1 = defPath "/rim/HollowRim.wav"
 addI "r1" $ sampler r1
 rS = defPath "/rim/SmallRim.wav"
@@ -189,7 +195,7 @@ p "shae"
 p "K909"
 
 
-cPat "downB" "CP909" 
+cPat "downB" "CP909"
 vol "CP909" [Pd 0.7] keep
 pan "CP909" [Pd 0, Pd 1] randomize
 p "CP909"

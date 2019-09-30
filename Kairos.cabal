@@ -2,11 +2,11 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a5b58808d02065a255892cc595af9c092ef1e540a6a66101d3241863a3318995
+-- hash: 76aa6398822bcbd4cceecf27a3eb60131bc3b3f5b9ee008b510475fb99d99af7
 
 cabal-version:  >= 1.10
 name:           Kairos
-version:        0.1.6
+version:        0.2
 synopsis:       Live coding library
 description:    Please see the README on GitHub at <https://github.com/leofltt/Kairos#readme>
 homepage:       https://github.com/leofltt/Kairos#readme
