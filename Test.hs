@@ -7,7 +7,7 @@ addI "K909" $ sampler k909
 kcj = defPath "/kicks/KickCymbJungle.wav"
 addI "kcj" $ sampler kcj
 cp909 = defPath "/909/Clap-909.aif"
-addI "CP909" $ sampler cp909 
+addI "CP909" $ sampler cp909
 sh = defPath "/ch/shortHat.wav"
 addI "sh" $ sampler sh
 r1 = defPath "/rim/HollowRim.wav"
@@ -127,6 +127,7 @@ addI "cp808d" $ sampler cp808d
 cp808m = defPath "/808/808_clap_3_TL.wav"
 addI "cp808m" $ sampler cp808m
 fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
+csv1 = markPath ++ "/Test.csv"
 :! clear
 
 -- PERFORMANCE
@@ -134,8 +135,42 @@ fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
 
 
 displayIns
+
 displayTP
 
+
+--PRACTICE
+
+--pats
+--
+
+solo "ohsE"
+
+cPat "eightN" "sh"
+addC "kN" "jgk" jgk
+addC "siS" "jgs"  jgs
+
+cPat "downB" "cp808m"
+addC "kN" "ukgk" ukgk
+addC "r707" "ukgrs" ukgrs
+addC "sh" "ukgch" ukgch
+mapM_ p ["r707", "cp808m"]
+
+addC "kN" "ir1ab" ir1abk
+
+addC "siS" "ir1sn" ir1sn
+
+addC "kN" "stdk3" stdbk3k
+addC "snS" "stds3" stdbk3s
+
+
+
+
+-------------------------
+--
+--
+--
+--
 
 cT 134
 
