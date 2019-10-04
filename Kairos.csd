@@ -74,21 +74,21 @@ if inchs = 1 then
 aLeft diskin2 p8, p9
 outs aLeft*p4* sqrt(1-p7), aLeft*p4* sqrt(p7)
 
-garvbL +=  p5 * aLeft  * sqrt(1-p7)
-garvbR +=  p5 * aLeft  * sqrt(p7)
+garvbL +=  p5 * aLeft  * sqrt(1-p7)* p4
+garvbR +=  p5 * aLeft  * sqrt(p7)* p4
 
-gadelL +=  aLeft   * p6 * sqrt(1-p7)
-gadelR +=  aLeft  * p6 * sqrt(p7)
+gadelL +=  aLeft   * p6 * sqrt(1-p7)* p4
+gadelR +=  aLeft  * p6 * sqrt(p7)* p4
 
 else
 aLeft, aRight diskin2 p8, p9
 outs aLeft*p4* sqrt(1-p7), aRight*p4* sqrt(p7)
 
-garvbL +=  p5 * aLeft * sqrt(1-p7)
-garvbR +=  p5 * aRight * sqrt(p7)
+garvbL +=  p5 * aLeft * sqrt(1-p7)* p4
+garvbR +=  p5 * aRight * sqrt(p7)* p4
 
-gadelL +=  aLeft  * p6 * sqrt(1-p7)
-gadelR +=  aRight  * p6 * sqrt(p7)
+gadelL +=  aLeft  * p6 * sqrt(1-p7)* p4
+gadelR +=  aRight  * p6 * sqrt(p7)* p4
 endif
 
 endin
@@ -101,11 +101,11 @@ asig = pluck(1, cpsmidinn(p8), 432, 0, 4, p9, (49*p10)+1); p8 = roughness p9 = s
 
 outs asig*p4* sqrt(1-p7), asig*p4* sqrt(p7)
 
-garvbR +=  p5 * asig  * sqrt(1-p7)
-garvbL +=  p5 * asig  * sqrt(p7)
+garvbR +=  p5 * asig  * sqrt(1-p7)* p4
+garvbL +=  p5 * asig  * sqrt(p7)* p4
 
-gadelL += asig  * p6 * sqrt(1-p7)
-gadelR +=  asig  * p6 * sqrt(p7)
+gadelL += asig  * p6 * sqrt(1-p7)* p4
+gadelR +=  asig  * p6 * sqrt(p7)* p4
 
 endin
 
@@ -121,11 +121,11 @@ asig declick asig
 
 outs asig*p4* sqrt(1-p7), asig*p4* sqrt(p7)
 
-garvbR +=  p5 * asig  * sqrt(1-p7)
-garvbL +=  p5 * asig  * sqrt(p7)
+garvbR +=  p5 * asig  * sqrt(1-p7)* p4
+garvbL +=  p5 * asig  * sqrt(p7)* p4
 
-gadelL +=  asig  * p6 * sqrt(1-p7)
-gadelR +=  asig  * p6 * sqrt(p7)
+gadelL +=  asig  * p6 * sqrt(1-p7) * p4
+gadelR +=  asig  * p6 * sqrt(p7)* p4
 
 endin
 
@@ -156,11 +156,11 @@ adecl declick (ao+adel*0.8)
 adecr declick  (ao+adel2*0.8)
 outs adecl*p4* sqrt(1-p7),adecr*p4* sqrt(p7) * aenv
 
-garvbR +=  p5 * adecl * sqrt(1-p7) * aenv
-garvbL +=  p5 * adecr * sqrt(p7) * aenv
+garvbR +=  p5 * adecl * sqrt(1-p7) * aenv * p4
+garvbL +=  p5 * adecr * sqrt(p7) * aenv * p4
 
-gadelL +=  adecl  * p6 * sqrt(1-p7) * aenv
-gadelR +=  adecr  * p6 * sqrt(p7) * aenv
+gadelL +=  adecl  * p6 * sqrt(1-p7) * aenv * p4
+gadelR +=  adecr  * p6 * sqrt(p7) * aenv * p4
 
 endin
 
@@ -183,12 +183,12 @@ a808 = sum(asqr1, asqr2, asqr3, asqr4, asqr5, asqr6)
 a808 =    butterhp(a808, 5270)
 a808 =    butterhp(a808, 5270)
 outs a808*aenv*p4* sqrt(1-p7), a808*aenv*p4* sqrt(p7)
+ 
+garvbR +=  p5 * a808 * aenv* sqrt(1-p7) * p4
+garvbL +=  p5 * a808 * aenv* sqrt(p7) * p4
 
-garvbR +=  p5 * a808 * aenv* sqrt(1-p7)
-garvbL +=  p5 * a808 * aenv* sqrt(p7)
-
-gadelL +=  a808 * p6 * sqrt(1-p7) * aenv
-gadelR +=  a808 * p6 * sqrt(p7) * aenv
+gadelL +=  a808 * p6 * sqrt(1-p7) * aenv * p4
+gadelR +=  a808 * p6 * sqrt(p7) * aenv * p4
 
 endin
 
@@ -213,11 +213,11 @@ aR = audio * p4 * sqrt(p7) * aenv
 
 outs aL, aR
 
-garvbR += p5 * audio * sqrt(1-p7) * aenv
-garvbL +=  p5 * audio * sqrt(p7) * aenv
+garvbR += p5 * audio * sqrt(1-p7) * aenv * p4
+garvbL +=  p5 * audio * sqrt(p7) * aenv * p4
 
-gadelL += audio * p6 * sqrt(1-p7) * aenv
-gadelR += audio * p6 * sqrt(p7) * aenv
+gadelL += audio * p6 * sqrt(1-p7) * aenv * p4
+gadelR += audio * p6 * sqrt(p7) * aenv * p4
 
 endin
 
@@ -251,11 +251,11 @@ aR = asig * p4 * sqrt(p7) * aenv
 
 outs aL, aR
 
-garvbR +=  p5 * asig * sqrt(1-p7) * aenv
-garvbL +=  p5 * asig * sqrt(p7) * aenv
+garvbR +=  p5 * asig * sqrt(1-p7) * aenv * p4
+garvbL +=  p5 * asig * sqrt(p7) * aenv * p4
 
-gadelL +=  asig * p6 * sqrt(1-p7) * aenv
-gadelR +=  asig * p6 * sqrt(p7) * aenv
+gadelL +=  asig * p6 * sqrt(1-p7) * aenv * p4
+gadelR +=  asig * p6 * sqrt(p7) * aenv  * p4
 
 endin
 
@@ -286,3 +286,20 @@ endin
 <CsScore>
 </CsScore>
 </CsoundSynthesizer>
+<bsbPanel>
+ <label>Widgets</label>
+ <objectName/>
+ <x>100</x>
+ <y>100</y>
+ <width>320</width>
+ <height>240</height>
+ <visible>true</visible>
+ <uuid/>
+ <bgcolor mode="nobackground">
+  <r>255</r>
+  <g>255</g>
+  <b>255</b>
+ </bgcolor>
+</bsbPanel>
+<bsbPresets>
+</bsbPresets>
