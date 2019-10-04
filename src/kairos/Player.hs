@@ -138,6 +138,8 @@ notEffect = filter (/= "rev") . filter (/= "del")
 
 --- default Patterns ----------------------------------------
 
+tupleForBar b t = takeWhile (<b) $ map (+(b/t*b)) [0/t*b, 1/t*b ..]
+
 downB = [(TP 1),(TP 3)]
 dbk1 = toTP [0,2.5]
 upFour = toTP $ takeWhile (< 4) [0.5,1.5..]

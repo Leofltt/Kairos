@@ -40,7 +40,7 @@ fromTP [] = []
 evolve ::  Int -> ([Double] -> [Double]) -> [Double] -> [Double]
 evolve n rule xs  | n <= 0 = xs | otherwise = evolve (n-1) rule (rule xs)
 
---rules :: [Double] -> [Double]
+-- rules :: [Double] -> [Double]
 
 interp1 :: Double -> [Double] -> [Double]
 interp1 total (x:[]) = (x:[((x + total)/2)])

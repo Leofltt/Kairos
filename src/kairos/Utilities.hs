@@ -65,8 +65,8 @@ interleave :: [a] -> [a] -> [a]
 interleave (a:as) (b:bs) = a : b : (interleave as bs)
 interleave _ _ = []
 
-transpose :: Num a => a ->  [a] -> [a]
-transpose i = map (+ i)
+offset :: Num a => a ->  [a] -> [a]
+offset i = map (+ i)
 
 --adapted from: https://stackoverflow.com/questions/27095647/convert-a-string-list-to-a-double-list-in-haskell
 stringToDouble :: [String] -> [Double]

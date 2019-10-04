@@ -5,7 +5,7 @@ import Kairos.Utilities
 type Scale = [Double]
 
 withScale :: Double -> Scale -> Scale
-root `withScale` scale = transpose root scale
+root `withScale` scale = offset root scale
 
 -- scales source : https://en.wikipedia.org/wiki/List_of_musical_scales_and_modes
 

@@ -120,7 +120,7 @@ timeDelta :: [TimeSignature] -> [Double] -> Double
 timeDelta (x:xs) (now:sts) = (timeToBeat (now  - (head sts)) x) + (timeDelta xs sts)
 timeDelta [] _ = 0
 
---elapsedSinceTSC
+-- elapsedSinceTSC
 -- return the current beat in a bar
 beatInBar :: Clock -> IO Double
 beatInBar c = do
