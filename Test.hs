@@ -1,7 +1,7 @@
 -- create Sampler instruments
 
 defPath s = "/Users/leofltt/Desktop/KairosSamples" ++ s
-markPath s = "/Users/leofltt/Desktop/Kairos/MarkovTables"
+markPath s = "/Users/leofltt/Desktop/Kairos/MarkovTables" ++ s
 k909 = defPath "/909/Kick-909.aif"
 addI "K909" $ sampler k909
 kcj = defPath "/kicks/KickCymbJungle.wav"
@@ -126,8 +126,32 @@ cp808d = defPath "/808/808_clap_7_TL.wav"
 addI "cp808d" $ sampler cp808d
 cp808m = defPath "/808/808_clap_3_TL.wav"
 addI "cp808m" $ sampler cp808m
+shtb = defPath "/shakeIt/LM-2_TAMB_1_TL.wav"
+addI "shtb" $ sampler shtb
+shnoi = defPath "/shakeIt/LM-2_SHAKER_1_TL.wav"
+addI "shnoi" $ sampler shnoi
+kOns = defPath "/kicks/KickOpen1_NateSmith.wav"
+addI "kOns" $ sampler kOns
+kCns = defPath "/kicks/KickTight1_NateSmith.wav"
+addI "kCns" $ sampler kCns
+kNns = defPath "/kicks/KickTight2_NateSmith.wav"
+addI "cp808d" $ sampler kNns
+tl2 = defPath "/808/808_tom_4_TL.wav"
+addI "808tl2" $ sampler tl2
+ks808 = defPath "/808/808_kick_21_TL.wav"
+addI "ks808" $ sampler ks808
+hh808sh = defPath "/808/808_hi_hat_13_TL.wav"
+addI "hh808sh" $ sampler hh808sh
+sn808noi = defPath "/808/808_snare_29_TL.wav"
+addI "sn808noi" $ sampler sn808noi
+sn808cl = defPath "/808/808_snare_9_TL.wav"
+addI "sn808cl" $ sampler sn808cl
+sn808hi = defPath "/808/808_snare_34_TL.wav"
+addI "sn808hi" $ sampler sn808hi
 fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
-csv1 = markPath ++ "/Test.csv"
+csv1 = markPath "/Test.csv"
+csv2 = markPath "/Test2.csv"
+
 :! clear
 
 -- PERFORMANCE
@@ -135,14 +159,37 @@ csv1 = markPath ++ "/Test.csv"
 
 
 displayIns
-
 displayTP
 
 
 --PRACTICE
 
---pats
 --
+-- WONDERVILLE
+
+
+-- start with hov make kind of drone and grow from there
+
+
+params "hov" [ (keep, vol, [Pd 0.8]),((runMarkov csv1), freq, toPfD (withScale 30 aeolian)), (randomize, pan, (toPfD [0, 1, 0.8, 0.2])),(randomize,dur,toPfD[ 1.7,2,1.5]) ]
+p "hov"
+
+cPat "uno" "kbaSh"
+p "kbaSh"
+
+
+
+
+
+
+
+
+
+
+
+--
+--
+
 
 solo "ohsE"
 
@@ -152,11 +199,14 @@ addC "siS" "jgs"  jgs
 
 cPat "downB" "cp808m"
 addC "kN" "ukgk" ukgk
-addC "r707" "ukgrs" ukgrs
-addC "sh" "ukgch" ukgch
-mapM_ p ["r707", "cp808m"]
 
-addC "kN" "ir1ab" ir1abk
+cPat"ukgrs" "r707"
+cPat "ukgch" "sh"
+mapM_ p ["r707", "sh"]
+
+
+
+addC "r707" "irb" $ toTP $ evolve 2 (interp1 4) (fromTP ukgrs)
 
 addC "siS" "ir1sn" ir1sn
 
