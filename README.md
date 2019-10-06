@@ -94,6 +94,12 @@ An alternative to this method is the `params` syntax that allows to set multiple
 
 `params "instrumentname" [(fun1, vol, list1), (fun2, pan, list2)]`
 
+Here is a list of the currently implemented update functions:
+- `nextVal` : picks the successive value in the list
+- `randomize` : picks a random value
+- `percentNext int` : given an int probability (0-100), returns the next value with int % probability, otherwise keeps current value
+- `runMarkov csv-file` : given a csv file with a table of probabilities, picks the next value appropriately
+
 #### Adding your own Csound Csound Instruments
 
 To add your own Csound instruments to the `Kairos.csd` file
