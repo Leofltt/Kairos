@@ -17,9 +17,25 @@ displayTP
 
 
 
-params "hov" [ (keep, vol, [Pd 0.8]),(nextVal, cf, [Pd 900, Pd 1222]),((runMarkov csv2), freq, toPfD (withScale 30 aeolian)), (randomize, pan, (toPfD [0, 1, 0.8, 0.2])),(randomize,dur,toPfD[ 1.7,2,1.5]) ]
+params "hov" [ (keep, vol, [Pd 0.3]),(nextVal, cf, [Pd 900, Pd 1222]),((runMarkov csv2), freq, toPfD (withScale 30 aeolian)), (randomize, pan, (toPfD [0, 1, 0.8, 0.2])),(randomize,dur,toPfD[ 1.7,2,1.5]) ]
+
 addC "hov" "tre" $ toTP $ tupleForBar 4 3
+
 p "hov"
+
+cPat "sixteenN" "sh"
+vol "sh" [Pd 0.4] keep
+p "sh"
+
+
+mapM_ p ["K909", "CH808", "CP909"]
+
+
+params "303" [ (keep, vol, [Pd 0.8]),(nextVal, cf, [Pd 2111, Pd 1822, Pd 1933]),((runMarkov csv2), freq, toPfD (withScale 30 aeolian)), (randomize, pan, (toPfD [0.7, 0.3, 0.8, 0.1])),(randomize,dur,toPfD[ 0.25,0.3]) ]
+
+cPat "sixteenN" "303"
+
+p "303"
 
 cPat "uno" "kbaSh"
 p "kbaSh"

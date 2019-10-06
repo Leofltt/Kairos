@@ -58,6 +58,17 @@ randF = do
   x <- randI 100
   return $ (fromIntegral x) / 100
 
+percentNext :: Int -> PfPat -> IO Pfield
+percentNext i n = do
+  val <- randI 100
+  p <- readTVarIO (pat n)
+  let result = checkPercent val i p
+  atomically $ writeTVar (pat n) result
+  return $ head result
+
+checkPercent :: Int -> Int -> [Pfield] -> [Pfield]
+checkPercent v i p | v <= i = (tail p)++[head p]
+                   | otherwise = p
 
 -- Misc Utilities
 

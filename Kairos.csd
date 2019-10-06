@@ -6,7 +6,7 @@
 
 <CsoundSynthesizer>
 <CsOptions>
--odac
+-odac1
 --port=10000
 -d
 -B 128
@@ -61,9 +61,15 @@ gkvolrev chnexport "volrev", 1, 2, 1, 0, 1
 ;Should only be used in instruments that have positive p3 duration.
 ;taken from Steven Yi livecode.orc
 opcode declick, a, a
-  ain xin
-  aenv = linseg(0, 0.01, 1, p3 - 0.02, 1, 0.01, 0)
-  xout ain * aenv
+ain xin
+aenv = linseg(0, 0.01, 1, p3 - 0.02, 1, 0.01, 0)
+xout ain * aenv
+endop
+
+opcode loadSample, i, S
+Sample xin
+iNum ftgen 0, 0, 0, -1, Sample, 0, 0, 0
+xout iNum
 endop
 
 instr 1 ; Sampler
@@ -95,7 +101,7 @@ endin
 
 instr 2 ; Karplus - Strong
 
-kpitch expseg cpsmidinn(p8), p3, 432
+kpitch = expseg:k(cpsmidinn(p8), p3, 432)
 
 asig = pluck(1, cpsmidinn(p8), 432, 0, 4, p9, (49*p10)+1); p8 = roughness p9 = stretch
 
@@ -130,7 +136,6 @@ gadelR +=  asig  * p6 * sqrt(p7)* p4
 endin
 
 instr 4 ; Hoover Bass
-
 
 iad = p11
 aenv linseg 0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0
@@ -183,7 +188,7 @@ a808 = sum(asqr1, asqr2, asqr3, asqr4, asqr5, asqr6)
 a808 =    butterhp(a808, 5270)
 a808 =    butterhp(a808, 5270)
 outs a808*aenv*p4* sqrt(1-p7), a808*aenv*p4* sqrt(p7)
- 
+
 garvbR +=  p5 * a808 * aenv* sqrt(1-p7) * p4
 garvbL +=  p5 * a808 * aenv* sqrt(p7) * p4
 
@@ -286,20 +291,3 @@ endin
 <CsScore>
 </CsScore>
 </CsoundSynthesizer>
-<bsbPanel>
- <label>Widgets</label>
- <objectName/>
- <x>100</x>
- <y>100</y>
- <width>320</width>
- <height>240</height>
- <visible>true</visible>
- <uuid/>
- <bgcolor mode="nobackground">
-  <r>255</r>
-  <g>255</g>
-  <b>255</b>
- </bgcolor>
-</bsbPanel>
-<bsbPresets>
-</bsbPresets>

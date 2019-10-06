@@ -32,8 +32,8 @@ hihat oc = do
   return $ I { insN = 5
              , pf     = pfields
              , toPlay = Nothing
-             , status = Init
-             , timeF = "upFour"
+             , status = Inactive
+             , timeF = ""
              , pats = emptyPat
              }
 

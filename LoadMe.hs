@@ -1,4 +1,4 @@
--- create Sampler instruments
+-- create Sampler instruments && CSVs
 
 defPath s = "/Users/leofltt/Desktop/KairosSamples" ++ s
 markPath s = "/Users/leofltt/Desktop/Kairos/MarkovTables" ++ s
