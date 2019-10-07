@@ -138,11 +138,11 @@ endin
 instr 4 ; Hoover Bass
 
 iad = p11
-aenv linseg 0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0
-kcf expseg 2, p3/2, 0.1
+aenv = linseg(0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0)
+kcf = expseg:k(2, p3/2, 0.1)
 kr3 unirand 1
 kr3 port kr3, 0.01
-klf3 = lfo(0.5, 1.5*kr3, 0)
+klf3 = lfo:k(0.5, 1.5*kr3, 0)
 klf3 = limit((klf3+0.5), 0.05, 0.95)
 a1 = vco2(1, cpsmidinn(p8),4,(klf3*0.01))
 a2 = vco2(1, cpsmidinn(p8)*(0.08+(7/12)),4,(klf3*0.01))
@@ -157,8 +157,8 @@ alfo = lfo(0.005, kr2 + 0.1)
 alfo2 = lfo(0.005, kr1 + 0.1)
 adel = vdelay3(ao/2, (0.1+alfo)*1000, 1000)
 adel2 = vdelay3(ao/2, (0.1+alfo2)*1000, 1000)
-adecl declick (ao+adel*0.8)
-adecr declick  (ao+adel2*0.8)
+adecl = declick(ao+adel*0.8)
+adecr = declick(ao+adel2*0.8)
 outs adecl*p4* sqrt(1-p7),adecr*p4* sqrt(p7) * aenv
 
 garvbR +=  p5 * adecl * sqrt(1-p7) * aenv * p4
@@ -246,8 +246,9 @@ asig += vco2(1,  cpsmidinn(p8) * cent(2406.294143))
 asig += vco2(1,  cpsmidinn(p8) * cent(2393.732))
 asig += vco2(1,  cpsmidinn(p8) * cent(2400))
 
-asig *= 0.1 ;expseg(16000, p3 - 0.05, 16000, 0.05, 200)
+asig *= 0.1
 
+asig = zdf_ladder(asig, expseg(16000, p3 - 0.05, 16000, 0.05, 250), 0.5)
 asig = K35_hpf(asig, p9, p10)
 asig = declick(asig)
 
