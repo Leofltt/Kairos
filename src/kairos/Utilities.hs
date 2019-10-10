@@ -6,6 +6,7 @@ import Control.Concurrent.STM
 import qualified Data.Map.Strict as M
 import System.Random (getStdRandom,randomR)
 
+
 -- Map Utilities
 
 modifyMap :: TVar a -> (a -> a) -> IO ()
@@ -89,6 +90,30 @@ binaryDigit :: Int -> Int
 binaryDigit 0 = 0
 binaryDigit x = 10 * binaryDigit (x `div` 2) + x `mod` 2
 
-
 stringToBinary :: String -> [Int]
 stringToBinary s = (map binaryDigit) $ map fromEnum s
+
+binaryToBinString :: Show a => [a] -> String
+binaryToBinString s = foldl1 (++) $ map show s
+
+binStringToList :: [a] -> [[a]]
+binStringToList [] = []
+binStringToList (b:bs) = [b] : binStringToList bs
+
+textToBinary :: String -> [Double]
+textToBinary t = stringToDouble $ binStringToList $ binaryToBinString $ stringToBinary t
+
+intToDouble :: Int -> Double
+intToDouble = fromIntegral
+
+binToNormSum x =  map (/ (intToDouble $ length x)) $ map intToDouble $ binToSum x
+
+binToSum [] = []
+binToSum x | (last x) == 0 = 0 : (binToSum $ init x)
+           | (last x) == 1 = (length x) : (binToSum $ init x)
+
+numSeqFromText :: String -> [Double]
+numSeqFromText t = reverse $ filter (/=0) (binToNormSum $ textToBinary t)
+
+textToTP :: Double -> String -> [Double]
+textToTP maxbeats t = map (*maxbeats) $ numSeqFromText t 
