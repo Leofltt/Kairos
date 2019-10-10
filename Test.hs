@@ -12,10 +12,12 @@ displayTP
 
 
 --
--- WONDERVILLE
+--
 
 
+addC "kN" "text1" $ toTP $ textToTP 8 "hi"
 
+addC "r707" "evolve1" $ toTP $ evolve 2 (interp1 4) [0, 2, 2.5]
 
 params "hov" [ (keep, vol, [Pd 0.3]),(nextVal, cf, [Pd 900, Pd 1222]),((runMarkov csv2), freq, toPfD (withScale 30 aeolian)), (randomize, pan, (toPfD [0, 1, 0.8, 0.2])),(randomize,dur,toPfD[ 1.7,2,1.5]) ]
 

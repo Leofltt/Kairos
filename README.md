@@ -77,6 +77,8 @@ To add a new pattern, name it and assign it to an instrument use
 
 `addC "instrumentname" "patternName" [timepointlist]`
 
+There are multiple ways to create TP lists and a convenience function `toTP` is provided to convert `[Double]` into `[TimePoint]` and `fromTP` to do the opposite.
+
 #### Parameter Patterns
 
 Parameter patterns are assigned for every pfield. A generic function to assign a new pattern to an instrument's pfield  is
@@ -91,6 +93,7 @@ that simply assigns the pattern to pfield number 4, which is used as the amplitu
 Check out the file [BootKairos.hs] to see all the functions already implemented in such way.
 
 An alternative to this method is the `params` syntax that allows to set multiple parameters at once.
+Some examples can be seen in the file `Test.hs`
 
 `params "instrumentname" [(fun1, vol, list1), (fun2, pan, list2)]`
 

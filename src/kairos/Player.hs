@@ -68,7 +68,7 @@ play perf pn = let
   in do Just i <- lookupMap (orc perf) pn
         checkStatus i $ status i
 
--- play loop callBack
+-- play loop callBack - inspired by Conductive, R. Bell https://lac.linuxaudio.org/2011/papers/35.pdf
 playLoop :: Performance -> String -> Status -> IO ()
 
 playLoop perf pn Active = do
