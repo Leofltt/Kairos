@@ -84,3 +84,11 @@ stringToDouble :: [String] -> [Double]
 stringToDouble [x] = [read x :: Double]
 stringToDouble (x:xs) = (read x :: Double) : stringToDouble xs
 stringToDouble _ = []
+
+binaryDigit :: Int -> Int
+binaryDigit 0 = 0
+binaryDigit x = 10 * binaryDigit (x `div` 2) + x `mod` 2
+
+
+stringToBinary :: String -> [Int]
+stringToBinary s = (map binaryDigit) $ map fromEnum s

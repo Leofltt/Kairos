@@ -39,7 +39,6 @@ library
       Kairos.Scales
       Kairos.Markov
   other-modules:
-      Kairos.ClockServer
       Paths_Kairos
   hs-source-dirs:
       src

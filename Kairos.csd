@@ -248,7 +248,7 @@ asig += vco2(1,  cpsmidinn(p8) * cent(2400))
 
 asig *= 0.1
 
-asig = zdf_ladder(asig, expseg(16000, p3 - 0.05, 16000, 0.05, 250), 0.5)
+asig = zdf_ladder(asig, expseg(18000, p3 - 0.05, 18000, 0.05, 250), 0.5)
 asig = K35_hpf(asig, p9, p10)
 asig = declick(asig)
 
