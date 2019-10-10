@@ -59,6 +59,7 @@ playNow perf i = do
 
 playEffect = playNow
 
+-- inspired by Conductive, R. Bell https://lac.linuxaudio.org/2011/papers/35.pdf
 play :: Performance -> String -> IO ()
 play perf pn = let
   checkStatus i Inactive  = ( forkIO $ playLoop perf pn $ Inactive)  >> return ()
@@ -68,7 +69,7 @@ play perf pn = let
   in do Just i <- lookupMap (orc perf) pn
         checkStatus i $ status i
 
--- play loop callBack - inspired by Conductive, R. Bell https://lac.linuxaudio.org/2011/papers/35.pdf
+-- play loop callBack
 playLoop :: Performance -> String -> Status -> IO ()
 
 playLoop perf pn Active = do
