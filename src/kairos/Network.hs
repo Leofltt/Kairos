@@ -17,8 +17,8 @@ sendMsg n = do
   sendAll sock $ C.pack n
   close sock
 
-sendNote :: String -> IO ()
-sendNote n = let m = "$ " ++ n in
+sendScore :: String -> IO ()
+sendScore n = let m = "$ " ++ n in
   sendMsg m
 
 sendEvent :: String -> IO ()

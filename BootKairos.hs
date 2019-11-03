@@ -11,6 +11,7 @@ s = stop perf
 pn = playNow perf
 cPat p i = changeTimeF perf i p
 cT = changeTempo (clock perf)
+addT =  addTS (clock perf)
 addP = addTPf perf
 addIns = addInstrument perf
 addI name ins = addIns name =<< ins
@@ -23,7 +24,7 @@ pan i list fun = addPf i 7 list fun
 rev i list fun = addPf i 5 list fun
 del i list fun = addPf i 6 list fun
 dur i list fun = addPf i 3 list fun
-freq i list fun = addPf i 8 list fun    -- 303, hoover, karp, lpFM, superSaw
+pitch i list fun = addPf i 8 list fun    -- 303, hoover, karp, lpFM, superSaw
 cf i list fun = addPf i 9 list fun      -- 303, hoover, lpFM, superSaw
 res i list fun = addPf i 10 list fun     -- 303, hoover, lpFM, superSaw
 cps i list fun = addPf i 9 list fun     -- sampler
