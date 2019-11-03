@@ -82,6 +82,7 @@ There are multiple ways to create TP lists and a convenience function `toTP` is 
 Some TPfunctions
 
 `tupleForBar maxBeats desiredBeats`
+
 `textToTP maxBeats "textString"`
 
 Some examples can be seen in the file `Test.hs`

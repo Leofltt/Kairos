@@ -148,6 +148,30 @@ sn808cl = defPath "/808/808_snare_9_TL.wav"
 addI "sn808cl" $ sampler sn808cl
 sn808hi = defPath "/808/808_snare_34_TL.wav"
 addI "sn808hi" $ sampler sn808hi
+ride626 = defPath "/626/ride.wav"
+shkr626 = defPath "/626/shaker.wav"
+sn1626 = defPath "/626/snare1.wav"
+sn2626 = defPath "/626/snare2.wav"
+sn3626 = defPath "/626/snare3.wav"
+tambo626 = defPath "/626/tambo.wav"
+cb626 = defPath "/626/cowb.wav"
+clv626 = defPath "/626/claves.wav"
+colo626 = defPath "/626/conga-lo.wav"
+comi626 = defPath "/626/conga-m.wav"
+k1626 = defPath "/626/bd1.wav"
+k2626 = defPath "/626/bd2.wav"
+addI "ride626" $ sampler ride626
+addI "shkr626" $ sampler shkr626
+addI "sn1626" $ sampler sn1626
+addI "sn2626" $ sampler sn2626
+addI "sn3626" $ sampler sn3626
+addI "tambo626" $ sampler tambo626
+addI "cb626" $ sampler cb626
+addI "clv626" $ sampler clv626
+addI "colo626" $ sampler colo626
+addI "comi626" $ sampler comi626
+addI "k1626" $ sampler k1626
+addI "k2626" $ sampler k2626
 fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
 csv1 = markPath "/Test.csv"
 csv2 = markPath "/Test2.csv"
