@@ -6,7 +6,7 @@
 
 <CsoundSynthesizer>
 <CsOptions>
--odac
+-odac10
 --port=10000
 -d
 -B 128
@@ -214,7 +214,7 @@ kdist = p12
 aenv = linseg:a(0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0)
 
 
-amod = poscil(kdpth, cpsmidinn(p8)* (1/(5*kindx)), gisine)
+amod = poscil(kdpth, cpsmidinn(p8)* kindx, gisine)
 acar = poscil(1, cpsmidi() + amod, gisine)
 
 audio = diode_ladder(acar, kfilt, kres , 1, kdist)

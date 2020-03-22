@@ -16,7 +16,8 @@ rS = defPath "/rim/SmallRim.wav"
 addI "rS" $ sampler rS
 r707 = defPath "/rim/707_rim.wav"
 addI "r707" $ sampler r707
-addI "rRev" $ sampler $ defPath "/rim/HeavyRevRim.wav"
+rRev = defPath "/rim/HeavyRevRim.wav"
+addI "rRev" $ sampler rRev
 snS = defPath "/snares/SNSandy.wav"
 addI "snS" $ sampler snS
 sj1 = defPath "/snares/Snare4JungleMidHigh.wav"
@@ -25,8 +26,10 @@ sj2 = defPath "/snares/Snare4JungleMidLow.wav"
 addI "sj2" $ sampler sj2
 sSnap = defPath "/snares/EkaliShortSnare.wav"
 addI "sSnap" $ sampler sSnap
-addI "siS" $ sampler $ defPath "/snares/SNDry2.wav"
-addI "snMute" $ sampler $ defPath "/snares/SNMuteAC.wav"
+siS = defPath "/snares/SNDry2.wav"
+addI "siS" $ sampler siS
+snMute = defPath "/snares/SNMuteAC.wav"
+addI "snMute" $ sampler snMute
 sSplash = defPath "/snares/snSplash.wav"
 addI "sSplash" $ sampler sSplash
 glass = defPath "/fracture/Glass1Dry.wav"
@@ -161,6 +164,8 @@ comi626 = defPath "/626/conga-m.wav"
 k1626 = defPath "/626/bd1.wav"
 k2626 = defPath "/626/bd2.wav"
 ri707 = defPath "/cym/707_Ride.wav"
+kc1 = defPath "kicks/kickCarlo1.wav"
+kc2 = defPath "kicks/kickCarlo2.wav"
 addI "ride626" $ sampler ride626
 addI "shkr626" $ sampler shkr626
 addI "sn1626" $ sampler sn1626
@@ -174,7 +179,14 @@ addI "comi626" $ sampler comi626
 addI "k1626" $ sampler k1626
 addI "k2626" $ sampler k2626
 addI "ri707" $ sampler ri707
+addI "kc1" $ sampler kc1
+addI "kc2" $ sampler kc2
 fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
 csv1 = markPath "/Test.csv"
 csv2 = markPath "/Test2.csv"
+csv3 = markPath "/Test3.csv"
+adk = toTP [0, 1, 2,2.5,3,4,5,5.5,6,7,8,8.5,9,10,11,11.5]
+addP "adk" adk
+adb = toTP [0,1,2,3,4.5,5,6,7,8,9.5,10]
+addP "adb" adb
 :! clear

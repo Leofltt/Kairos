@@ -114,6 +114,3 @@ binToSum x | (last x) == 0 = 0 : (binToSum $ init x)
 
 numSeqFromText :: String -> [Double]
 numSeqFromText t = reverse $ filter (/=0) (binToNormSum $ textToBinary t)
-
-textToTP :: Double -> String -> [Double]
-textToTP maxbeats t = map (*maxbeats) $ numSeqFromText t

@@ -50,3 +50,6 @@ interp2 :: Double -> [Double] -> [Double]
 interp2 tot (x:y:[]) = [((x+y)/2)]
 interp2 tot (x:[]) = [(x + tot)/2]
 interp2 tot (x:y:xs) = ((x+y)/2):(interp2 tot xs)
+
+textToTP :: Double -> String -> [TimePoint]
+textToTP maxbeats t = toTP $ Prelude.map (*maxbeats) $ numSeqFromText t

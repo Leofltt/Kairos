@@ -8,6 +8,7 @@
 
 
 displayIns
+
 displayTP
 
 
@@ -15,13 +16,13 @@ displayTP
 --
 
 
-addC "kN" "text1" $ toTP $ textToTP 8 "hi"
+addC "rRev" "text2" $ toTP $ textToTP 12 "hih"
+addC "sj2" "evolve3" $ toTP $ evolve 2 (interp1 4) [1, 2.5, 3]
+addC "hov" "tre" $ toTP $ tupleForBar 8 3
 
-addC "r707" "evolve1" $ toTP $ evolve 2 (interp1 4) [0, 2, 2.5]
+params "hov" [ (keep, vol, [Pd 0.3]),(nextVal, cf, [Pd 900, Pd 1222]),((runMarkov csv2), pitch, toPfD (withScale 30 aeolian)), (randomize, pan, (toPfD [0, 1, 0.8, 0.2])),(randomize,dur,toPfD[ 1.7,2]) ]
 
-params "hov" [ (keep, vol, [Pd 0.3]),(nextVal, cf, [Pd 900, Pd 1222]),((runMarkov csv2), freq, toPfD (withScale 30 aeolian)), (randomize, pan, (toPfD [0, 1, 0.8, 0.2])),(randomize,dur,toPfD[ 1.7,2,1.5]) ]
-
-addC "hov" "tre" $ toTP $ tupleForBar 4 3
+addC "hov" "tre" $ toTP $ tupleForBar 8 3
 
 p "hov"
 
@@ -33,7 +34,7 @@ p "sh"
 mapM_ p ["K909", "CH808", "CP909"]
 
 
-params "303" [ (keep, vol, [Pd 0.8]),(nextVal, cf, [Pd 2111, Pd 1822, Pd 1933]),((runMarkov csv2), freq, toPfD (withScale 30 aeolian)), (randomize, pan, (toPfD [0.7, 0.3, 0.8, 0.1])),(randomize,dur,toPfD[ 0.25,0.3]) ]
+params "303" [ (keep, vol, [Pd 0.8]),(nextVal, cf, [Pd 11111]),((runMarkov csv2), pitch, toPfD (withScale 30 aeolian)), (randomize, pan, (toPfD [0.7, 0.3, 0.8, 0.1])),(randomize,dur,toPfD[ 0.25,0.3]) ]
 
 cPat "sixteenN" "303"
 
