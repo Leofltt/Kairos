@@ -6,7 +6,7 @@
 
 <CsoundSynthesizer>
 <CsOptions>
--odac3
+-odac
 --port=10000
 -d
 -B 128
@@ -34,6 +34,7 @@ gisquare ftgen 2, 0, 4096, 7, 1, 2048, 1, 0, 0, 2048, 0 ; Square wave
 ; GLOBAL VARIABLES
 garvbL, garvbR init 0
 gadelL, gadelR init 0
+gacompL, gacompR init 0
 
 ; INIT CHANNELS FOR FXs
 ; Delay
@@ -46,7 +47,7 @@ gkfbdel chnexport "fbdel", 1, 2, 0.9, 0, 0.99
 gkdtdel chnexport "dtdel", 1, 2, 375, 1, 5000
 gkvoldel chnexport "voldel", 1, 2, 1, 0, 1
 
-;Reverb
+; Reverb
 
 gkfbrev init 0.4
 gkcfrev init 15000
@@ -56,13 +57,18 @@ gkfbrev chnexport "fbrev", 1, 2, 0.4, 0, 0.99
 gkcfrev chnexport "cfrev", 1, 2, 15000, 0, 20000
 gkvolrev chnexport "volrev", 1, 2, 1, 0, 1
 
+; Parallel Compressor
+
+gkvolcomp init 1
+
+gkvolcomp chnexport "volcomp", 1, 2, 1, 0, 1
 
 ;opcode for declicking an audio signal.
 ;Should only be used in instruments that have positive p3 duration.
 ;taken from Steven Yi livecode.orc
 opcode declick, a, a
 ain xin
-aenv = linseg(0, 0.01, 1, p3 - 0.02, 1, 0.01, 0)
+aenv = linseg:a(0, 0.01, 1, p3 - 0.02, 1, 0.01, 0)
 xout ain * aenv
 endop
 
@@ -138,7 +144,7 @@ endin
 instr 4 ; Hoover Bass
 
 iad = p11
-aenv = linseg(0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0)
+aenv = linseg:a(0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0)
 kcf = expseg:k(2, p3/2, 0.1)
 kr3 unirand 1
 kr3 port kr3, 0.01
@@ -205,7 +211,7 @@ kdpth = p13
 iad = p11
 kres = p10
 kdist = p12
-aenv = linseg(0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0)
+aenv = linseg:a(0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0)
 
 
 amod = poscil(kdpth, cpsmidinn(p8)* (1/(5*kindx)), gisine)
@@ -248,7 +254,7 @@ asig += vco2(1,  cpsmidinn(p8) * cent(2400))
 
 asig *= 0.1
 
-asig = zdf_ladder(asig, expseg(18000, p3 - 0.05, 18000, 0.05, 250), 0.5)
+asig = zdf_ladder(asig, expseg(800 + p9, p3 - 0.05, p9 + 5000, 0.05, 250), 0.5)
 asig = K35_hpf(asig, p9, p10)
 asig = declick(asig)
 
@@ -287,8 +293,35 @@ clear garvbL, garvbR
 
 endin
 
+;instr 660 ; Parallel Compressor
+;
+;aoutL compress gacompL, gacompL, kthresh, kloknee, khiknee, kratio, katt, krel, ilook
+;aoutR compress gacompR, gacompR, kthresh, kloknee, khiknee, kratio, katt, krel, ilook
+;outs aoutL * gkvolcomp, aoutR * gkvolcomp
+;
+;clear gacompL, gacompR
+;
+;endin
+
 
 </CsInstruments>
 <CsScore>
 </CsScore>
 </CsoundSynthesizer>
+<bsbPanel>
+ <label>Widgets</label>
+ <objectName/>
+ <x>644</x>
+ <y>176</y>
+ <width>320</width>
+ <height>240</height>
+ <visible>true</visible>
+ <uuid/>
+ <bgcolor mode="nobackground">
+  <r>255</r>
+  <g>255</g>
+  <b>255</b>
+ </bgcolor>
+</bsbPanel>
+<bsbPresets>
+</bsbPresets>

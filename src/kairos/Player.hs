@@ -104,7 +104,7 @@ playLoop perf i Init = do
   Just p <- lookupMap (orc perf) i
   n <- beatInBar (clock perf)
   let pb = toPlay p
-  if ((pb == Nothing) || ((timeF p )== ""))
+  if ((pb == Nothing) && ((timeF p )== ""))
      then do  changeStatus perf i Stopping
               Just p' <- lookupMap (orc perf) i
               playLoop perf i $ status p'

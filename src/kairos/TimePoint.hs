@@ -10,7 +10,7 @@ import Control.Applicative (liftA2)
 
 instance Applicative TimePointf where
   pure t = TP t
-  (<*>)(TP first)(TP second) = TP (first + second)
+  (<*>)(TP f)(TP second) = TP (f second)
 
 instance (Num a) => Num (TimePointf a) where
   (+) = liftA2 (+)

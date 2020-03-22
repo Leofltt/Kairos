@@ -51,14 +51,6 @@ randomize n = do
   ran <- randI l
   return $ (!!) p ran
 
-randI :: Int -> IO Int
-randI i = getStdRandom $ randomR (0, i)
-
-randF :: IO Double
-randF = do
-  x <- randI 100
-  return $ (fromIntegral x) / 100
-
 percentNext :: Int -> PfPat -> IO Pfield
 percentNext i n = do
   val <- randI 100
@@ -67,11 +59,19 @@ percentNext i n = do
   atomically $ writeTVar (pat n) result
   return $ head result
 
+-- Misc Utilities
+
+randI :: Int -> IO Int
+randI i = getStdRandom $ randomR (0, i)
+
+randF :: IO Double
+randF = do
+  x <- randI 100
+  return $ (fromIntegral x) / 100
+
 checkPercent :: Int -> Int -> [Pfield] -> [Pfield]
 checkPercent v i p | v <= i = (tail p)++[head p]
                    | otherwise = p
-
--- Misc Utilities
 
 interleave :: [a] -> [a] -> [a]
 interleave (a:as) (b:bs) = a : b : (interleave as bs)
@@ -116,4 +116,4 @@ numSeqFromText :: String -> [Double]
 numSeqFromText t = reverse $ filter (/=0) (binToNormSum $ textToBinary t)
 
 textToTP :: Double -> String -> [Double]
-textToTP maxbeats t = map (*maxbeats) $ numSeqFromText t 
+textToTP maxbeats t = map (*maxbeats) $ numSeqFromText t

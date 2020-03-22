@@ -160,6 +160,7 @@ colo626 = defPath "/626/conga-lo.wav"
 comi626 = defPath "/626/conga-m.wav"
 k1626 = defPath "/626/bd1.wav"
 k2626 = defPath "/626/bd2.wav"
+ri707 = defPath "/cym/707_Ride.wav"
 addI "ride626" $ sampler ride626
 addI "shkr626" $ sampler shkr626
 addI "sn1626" $ sampler sn1626
@@ -172,6 +173,7 @@ addI "colo626" $ sampler colo626
 addI "comi626" $ sampler comi626
 addI "k1626" $ sampler k1626
 addI "k2626" $ sampler k2626
+addI "ri707" $ sampler ri707
 fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
 csv1 = markPath "/Test.csv"
 csv2 = markPath "/Test2.csv"
