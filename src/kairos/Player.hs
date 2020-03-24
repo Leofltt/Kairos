@@ -139,7 +139,7 @@ notEffect = filter (/= "rev") . filter (/= "del")
 
 --- default Patterns ----------------------------------------
 
-tupleForBar b t = takeWhile (<b) $ map (+(b/(t*b))) [(0/t*b), (1/t*b) ..]
+tupleForBar b t = toTP $ takeWhile (<b) $ map (+(b/(t*b))) [(0/t*b), (1/t*b) ..]
 
 
 -- a few time patterns in 4/4

@@ -72,4 +72,4 @@ addC "CH808" "evolve2" $ toTP $ evolve 1 (interp1 8) $ fromTP upFour
 
 addC "303" "evolve1" $ toTP $ evolve 1 (interp1 12) $ fromTP adb
 
-addC "kcj" "tre" $ toTP $ tupleForBar 8 3
+addC "kcj" "tre" $ tupleForBar 8 3

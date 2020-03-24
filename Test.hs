@@ -16,13 +16,13 @@ displayTP
 --
 
 
-addC "rRev" "text2" $ toTP $ textToTP 12 "hih"
+addC "rRev" "text2" $ textToTP 12 "hih"
 addC "sj2" "evolve3" $ toTP $ evolve 2 (interp1 4) [1, 2.5, 3]
-addC "hov" "tre" $ toTP $ tupleForBar 8 3
+addC "hov" "tre" $ tupleForBar 8 3
 
 params "hov" [ (keep, vol, [Pd 0.3]),(nextVal, cf, [Pd 900, Pd 1222]),((runMarkov csv2), pitch, toPfD (withScale 30 aeolian)), (randomize, pan, (toPfD [0, 1, 0.8, 0.2])),(randomize,dur,toPfD[ 1.7,2]) ]
 
-addC "hov" "tre" $ toTP $ tupleForBar 8 3
+addC "hov" "tre" $ tupleForBar 8 3
 
 p "hov"
 
