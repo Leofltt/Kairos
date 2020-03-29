@@ -79,11 +79,15 @@ To add a new pattern, name it and assign it to an instrument use
 
 There are multiple ways to create TP lists and a convenience function `toTP` is provided to convert `[Double]` into `[TimePoint]` and `fromTP` to do the opposite.
 
-Some TPfunctions
+Some functions that generate a `[TimePoint]` :
 
 `tupleForBar maxBeats desiredBeats`
 
 `textToTP maxBeats "textString"`
+
+`evolve genN ruleFunction TPPattern`
+
+`=<< patternWithDensity totNumBeats numBeatsToGen density`
 
 Some examples can be seen in the file `Test.hs`
 
