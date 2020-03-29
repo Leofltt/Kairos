@@ -68,8 +68,8 @@ params "hov" [ (keep,dur,toPfD[ 1.2]),(keep, vol, [Pd 0.3]),(keep, cf, [Pd 800])
 
 addC "cbE" "text1" $ textToTP 12 "kyy"
 
-addC "CH808" "evolve2" $ toTP $ evolve 1 (interp1 8) $ fromTP upFour
+addC "CH808" "evolve2" $ evolve 1 (interp1 8)  upFour
 
-addC "303" "evolve1" $ toTP $ evolve 1 (interp1 12) $ fromTP adb
+addC "303" "evolve1" $ evolve 1 (interp1 12)  adb
 
 addC "kcj" "tre" $ tupleForBar 8 3

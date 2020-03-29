@@ -10,7 +10,7 @@ import Control.Concurrent
 
 sendMsg :: String -> IO ()
 sendMsg n = do
-  addrinfos <- getAddrInfo Nothing (Just "127.0.0.1") (Just "10000")
+  addrinfos <- getAddrInfo Nothing (Just "127.0.0.1") (Just "11000")
   let serveraddr = head addrinfos
   sock <- socket (addrFamily serveraddr) Datagram defaultProtocol
   connect sock (addrAddress serveraddr)

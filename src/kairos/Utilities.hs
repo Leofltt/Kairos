@@ -4,7 +4,7 @@ import Kairos.Base
 import Control.Concurrent
 import Control.Concurrent.STM
 import qualified Data.Map.Strict as M
-import System.Random (getStdRandom,randomR)
+import System.Random (getStdRandom,randomR, mkStdGen, randomRs)
 
 
 -- Map Utilities
@@ -55,7 +55,7 @@ percentNext :: Int -> PfPat -> IO Pfield
 percentNext i n = do
   val <- randI 100
   p <- readTVarIO (pat n)
-  let result = checkPercent val i p
+  let result = checkPercentNext val i p
   atomically $ writeTVar (pat n) result
   return $ head result
 
@@ -69,9 +69,13 @@ randF = do
   x <- randI 100
   return $ (fromIntegral x) / 100
 
-checkPercent :: Int -> Int -> [Pfield] -> [Pfield]
-checkPercent v i p | v <= i = (tail p)++[head p]
-                   | otherwise = p
+checkPercentNext :: Int -> Int -> [a] -> [a]
+checkPercentNext v i p | v <= i = (tail p)++[head p]
+                       | otherwise = p
+
+genNRandomValues :: Int -> Int -> [Int]
+genNRandomValues n seed = take n $ (randomRs (0, 100) generator) where
+    generator = mkStdGen seed
 
 interleave :: [a] -> [a] -> [a]
 interleave (a:as) (b:bs) = a : b : (interleave as bs)

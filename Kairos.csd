@@ -6,8 +6,8 @@
 
 <CsoundSynthesizer>
 <CsOptions>
--odac10
---port=10000
+-odac
+--port=11000
 -d
 -B 128
 -b 64
@@ -311,8 +311,8 @@ endin
 <bsbPanel>
  <label>Widgets</label>
  <objectName/>
- <x>644</x>
- <y>176</y>
+ <x>242</x>
+ <y>122</y>
  <width>320</width>
  <height>240</height>
  <visible>true</visible>
