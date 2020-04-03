@@ -29,6 +29,8 @@ nchnls = 2
 ; TABLES
 gisine   ftgen 1, 0, 4096, 10, 1; Sine wave
 gisquare ftgen 2, 0, 4096, 7, 1, 2048, 1, 0, 0, 2048, 0 ; Square wave
+; Waveform for the string-pad
+iwave ftgen 3, 0, 16384, 7, 1, 16384, -1
 
 
 ; GLOBAL VARIABLES
@@ -271,6 +273,40 @@ gadelR +=  asig * p6 * sqrt(p7) * aenv  * p4
 
 endin
 
+instr 8	;String pad
+
+  ihz= cpsmidinn(p8)
+  iamp = p4
+  
+
+  ; Slow attack and release
+  kctrl = linseg(0, p3*.3, iamp, p3*.3, iamp, p3*.4, 0)  
+  anoise = rand(kctrl)
+  anoise = butterlp(anoise, 5*ihz)
+  ; Sligth chorus effect
+  afund = oscil(kctrl, ihz, 3)           ; audio oscillator
+  acel1 = oscil(kctrl, ihz - .1, 3)        ; audio oscillator - flat
+  acel2 = oscil(kctrl, ihz + .1, 3)        ; audio oscillator - sharp
+  asig = afund + acel1 + acel2 
+  ; Cut-off high frequencies depending on midi-velocity
+  ; (larger velocity implies more brighter sound)
+  asig = asig + .2*anoise
+  asig = butterlp(asig, (p4 * 127 - 60)*40+600)
+
+  aL = asig*sqrt(p7);
+  aR = asig*sqrt(1-p7);
+
+  outs aL, aR
+
+  garvbR +=  p5 * asig * sqrt(1-p7)
+  garvbL +=  p5 * asig * sqrt(p7) 
+
+  gadelL +=  asig * p6 * sqrt(1-p7)
+  gadelR +=  asig * p6 * sqrt(p7)
+
+
+	endin
+
 instr 551 ; Delay
 
 adelL = vdelay3(gadelL, gkdtdel, 5000)
@@ -311,8 +347,8 @@ endin
 <bsbPanel>
  <label>Widgets</label>
  <objectName/>
- <x>242</x>
- <y>122</y>
+ <x>590</x>
+ <y>311</y>
  <width>320</width>
  <height>240</height>
  <visible>true</visible>

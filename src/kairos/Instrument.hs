@@ -114,6 +114,18 @@ superSaw = do
              , pats = emptyPat
              }
 
+stringPad :: IO Instr
+stringPad = do
+  pfields <- newTVarIO $ M.fromList [(3, Pd 1), (4, Pd 1), (5, Pd 0), (6, Pd 0), (7,Pd 0.5),(8, Pd 60)]
+  emptyPat <- newTVarIO M.empty
+  return $ I { insN = 8
+             , pf   = pfields
+             , toPlay = Nothing
+             , status = Inactive
+             , timeF = ""
+             , pats = emptyPat
+             }
+
 -- default effects
 
 reverb :: IO Instr
@@ -153,11 +165,12 @@ defaultOrc = do
   del  <- delay
   lpFM <- fmSub
   sSaw <- superSaw
+  strPad <- stringPad
   orc  <- atomically $ newTVar $ M.fromList [("OH808",ohh),("CH808",chh)
                                             ,("303",a303),("hov",hov)
                                             ,("rev",rev),("del",del)
                                             ,("karp",karpS), ("lpFM",lpFM)
-                                            ,("sSaw", sSaw)
+                                            ,("sSaw", sSaw), ("strPad",strPad)
                                             ]
   return $ orc
 
