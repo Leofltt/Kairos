@@ -16,7 +16,7 @@ To get started you'll need to download:
 
 `cd` into the repository folder
 
-`cabal install`
+`stack build`
 
 run `csound kairos.csd` from within a terminal window or from within CsoundQt
 
