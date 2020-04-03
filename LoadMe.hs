@@ -164,8 +164,9 @@ comi626 = defPath "/626/conga-m.wav"
 k1626 = defPath "/626/bd1.wav"
 k2626 = defPath "/626/bd2.wav"
 ri707 = defPath "/cym/707_Ride.wav"
-kc1 = defPath "kicks/kickCarlo1.wav"
-kc2 = defPath "kicks/kickCarlo2.wav"
+kc1 = defPath "/kicks/kickCarlo1.wav"
+kc2 = defPath "/kicks/kickCarlo2.wav"
+fa1 = defPath "/fx/far1.aif"
 addI "ride626" $ sampler ride626
 addI "shkr626" $ sampler shkr626
 addI "sn1626" $ sampler sn1626
@@ -181,6 +182,7 @@ addI "k2626" $ sampler k2626
 addI "ri707" $ sampler ri707
 addI "kc1" $ sampler kc1
 addI "kc2" $ sampler kc2
+addI "fa1" $ sampler fa1
 fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
 csv1 = markPath "/Test.csv"
 csv2 = markPath "/Test2.csv"
@@ -189,4 +191,9 @@ adk = toTP [0, 1, 2,2.5,3,4,5,5.5,6,7,8,8.5,9,10,11,11.5]
 addP "adk" adk
 adb = toTP [0,1,2,3,4.5,5,6,7,8,9.5,10]
 addP "adb" adb
+params "lpFM" [ (keep, vol, [Pd 0.7]),(keep, rev, [Pd 0.5]),((percentNext 73), pitch, toPfD [53, 56, 58, 53, 48]),(keep, fmIndx, [Pd 12.3]), (keep, fmDepth, [Pd 987.23]), (keep, dist, [Pd 1.15]),(keep,cf,[Pd 3880]),( keep, rev, [Pd 0.6]),(keep, adRatio,[Pd 0.7]),(randomize,pan,toPfD[0.4,0.6,0.75,0.35])]
+params "303" [ (keep,dur,toPfD[ 0.25]),(keep,res,[Pd 4]),(keep, vol, [Pd 0.5]),(keep, cf, [Pd 3500]),((runMarkov csv3), pitch, toPfD (withScale 41 dorian)),(keep, rev, [Pd 0.4])]
+params "hov" [ (keep,dur,toPfD[ 1.2]),(keep, vol, [Pd 0.3]),(keep, cf, [Pd 800]),((runMarkov csv3), pitch, toPfD (withScale 41 dorian)),(keep, rev, [Pd 0.7])]
+let plucky = cf "303" [Pd 5000] keep >> res "303" [Pd 6] keep >>dur "303" [Pd 0.17] keep
+plucky
 :! clear
