@@ -78,7 +78,7 @@ playLoop perf pn Active = do
   cb <- currentBeat (clock perf)
   ts <- currentTS (clock perf)
   let pb = toPlay p
-  if ((pb == Nothing) || ((timeF p )== ""))
+  if (timeF p )== "" --((pb == Nothing) || ((timeF p )== ""))
      then do  changeStatus perf pn Stopping
               Just p' <- lookupMap (orc perf) pn
               playLoop perf pn $ status p'

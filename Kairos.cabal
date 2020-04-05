@@ -1,12 +1,13 @@
--- This file has been generated from package.yaml by hpack version 0.28.2.
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.2.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 15ea899df6683755eb0abbc62d202a2644e817472028bc7e6c688e4f08f4c407
+-- hash: d252a861cd648867e551ed1c3932568261293def1ca6dca1abe2208244df2275
 
-cabal-version:  >= 1.10
 name:           Kairos
-version:        0.2.6
+version:        0.2.7
 synopsis:       Live coding library
 description:    Please see the README on GitHub at <https://github.com/leofltt/Kairos#readme>
 homepage:       https://github.com/leofltt/Kairos#readme
@@ -18,9 +19,9 @@ license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
+    README.md
     ChangeLog.md
     Kairos.csd
-    README.md
 
 source-repository head
   type: git
