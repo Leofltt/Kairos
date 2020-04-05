@@ -47,9 +47,13 @@ playOne perf i tp = do
               let toWait = (realToFrac $ floor ((nextT - now) * 10000))/ 10000
               waitT (toWait)
               playOne perf i tp
-      else do updatePfields i
-              playInstr i
-              return ()
+      else if (cb - toBePlayed <= 0.020)
+           then do
+                   updatePfields i
+                   playInstr i
+                   return ()
+           else do
+                   return ()
 
 playNow :: Performance -> String -> IO ()
 playNow perf i = do
@@ -78,14 +82,14 @@ playLoop perf pn Active = do
   cb <- currentBeat (clock perf)
   ts <- currentTS (clock perf)
   let pb = toPlay p
-  if (timeF p )== "" --((pb == Nothing) || ((timeF p )== ""))
+  if (timeF p )== ""
      then do  changeStatus perf pn Stopping
               Just p' <- lookupMap (orc perf) pn
               playLoop perf pn $ status p'
      else do  let tp = fromJust pb
               Just timeString <- lookupMap (timePs perf) (timeF p)
               let nb = nextBeat tp timeString
-              let nextToPlay | (start nb) > (start tp) = ( (start  (wrapBar ts nb))/(beatInMsr ts)) + (thisBar cb) + ((fromIntegral $ floor $ (start  nb)/(beatInMsr ts)) - (fromIntegral $ floor $ (start  tp)/(beatInMsr ts)))
+              let nextToPlay | (start nb) > (start tp) = ((start  (wrapBar ts nb))/(beatInMsr ts)) + (thisBar cb) + ((fromIntegral $ floor $ (start  nb)/(beatInMsr ts)) - (fromIntegral $ floor $ (start  tp)/(beatInMsr ts)))
                              | (start nb) <= (start tp) = ((start nb)/(beatInMsr ts)) + (nextBar cb)
               nextTime <- timeAtBeat (clock perf) (nextToPlay)
               forkIO $ playOne perf p (wrapBar ts tp)
