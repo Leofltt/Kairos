@@ -135,7 +135,7 @@ playAll perf = (mapM_ (play perf)) .  notEffect . M.keys =<< readTVarIO (orc per
 
 soloIns perf i = (mapM_ (stop perf)) . filter (/=i) . notEffect . M.keys =<< readTVarIO (orc perf)
 
-notEffect = filter (/= "rev") . filter (/= "del")
+notEffect = filter (/= "rev") . filter (/= "del") . filter (/= "mix")
 
 --- default Patterns ----------------------------------------
 

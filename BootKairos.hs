@@ -46,7 +46,8 @@ fbrev = setChannel "fbrev"
 cfrev = setChannel "cfrev"
 volrev = setChannel "volrev"
 voldel = setChannel "voldel"
-mapM_ playFx ["rev","del"]
+m_vol = setChannel "m_vol"
+mapM_ playFx ["rev","del","mix"]
 techno1 k s h = cPat "fourFloor" k >> cPat "downB" s >> cPat "upFour" h
 dnb1 k s h = cPat "dbk" k >> cPat "downB" s >> cPat "eightN" h
 runPfield i (a,b,c) = b i c a
