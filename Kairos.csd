@@ -47,7 +47,7 @@ iwave ftgen 3, 0, 16384, 7, 1, 16384, -1 ; Waveform for the string-pad
 ; INIT CHANNELS FOR FXs
 ; Delay
 
-gkfbdel  init 0.9
+gkfbdel  init 0.5
 gkdtdel  init 375
 gkvoldel init 1
 
@@ -281,7 +281,7 @@ aenv = linseg:a(0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0)
 
 
 amod = poscil(kdpth, cpsmidinn(p9)* kindx, gisine)
-acar = poscil(1, cpsmidi() + amod, gisine)
+acar = poscil(1, cpsmidinn(p9) + amod, gisine)
 
 audio = diode_ladder(acar, kfilt, kres , 1, kdist)
 
@@ -386,13 +386,20 @@ instr 551 ; Delay
 adelLr zar 7
 adelRr zar 8
 
-adelL = vdelay3(adelLr, gkdtdel, 5000)
-adelR = vdelay3(adelRr, gkdtdel, 5000)
+kporttime	linseg		0, .001, 1, 1, 1
+kdlt		portk		(gkdtdel/1000.0), kporttime	
+adlt		interp		kdlt
+							
+abufferL	delayr 	5		
+adelL 	deltap3	adlt									
+		delayw	 adelLr + (adelL * gkfbdel)	
+
+abufferR	delayr	 5							
+adelR 	deltap3	adlt									
+		delayw	 adelRr + (adelR * gkfbdel)	
 
 zawm adelL * gkvoldel, 9
 zawm adelR * gkvoldel, 10
-zawm adelL * gkfbdel, 7
-zawm adelR * gkfbdel, 8
 
 endin
 
