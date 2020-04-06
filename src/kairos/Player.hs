@@ -47,7 +47,7 @@ playOne perf i tp = do
               let toWait = (realToFrac $ floor ((nextT - now) * 10000))/ 10000
               waitT (toWait)
               playOne perf i tp
-      else if (cb - toBePlayed <= 0.020)
+      else if (cb - toBePlayed <= 0.010)
            then do
                    updatePfields i
                    playInstr i
@@ -139,7 +139,7 @@ playAll perf = (mapM_ (play perf)) .  notEffect . M.keys =<< readTVarIO (orc per
 
 soloIns perf i = (mapM_ (stop perf)) . filter (/=i) . notEffect . M.keys =<< readTVarIO (orc perf)
 
-notEffect = filter (/= "rev") . filter (/= "del") . filter (/= "mix")
+notEffect = filter (/= "rev") . filter (/= "del") . filter (/= "mix") . filter ( /= "chorus")
 
 --- default Patterns ----------------------------------------
 

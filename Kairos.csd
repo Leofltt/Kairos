@@ -20,13 +20,15 @@ ksmps = 128
 nchnls = 2
 0dbfs = 1.0
 
-zakinit 50,50 
-; channels (L,R): 
+zakinit 50,50
+; channels (L,R):
 ; 1, 2 : mix
 ; 3, 4 : rev in
 ; 5, 6 : rev out
 ; 7, 8 : del in
 ; 9, 10 : del out
+; 11, 12 chorus in
+; 13, 14 chorus out
 
 ; common p-fields :
 ; p4 : amplitude (0 - 1)
@@ -35,10 +37,9 @@ zakinit 50,50
 ; p7 : panning (0 - 1)
 
 ; TABLES
-gisine   ftgen 1, 0, 4096, 10, 1; Sine wave
+gisine   ftgen 1, 0, 4096, 10, 1 ; Sine wave
 gisquare ftgen 2, 0, 4096, 7, 1, 2048, 1, 0, 0, 2048, 0 ; Square wave
-; Waveform for the string-pad
-iwave ftgen 3, 0, 16384, 7, 1, 16384, -1
+iwave ftgen 3, 0, 16384, 7, 1, 16384, -1 ; Waveform for the string-pad
 
 
 
@@ -70,6 +71,16 @@ gkvolcomp init 1
 
 gkvolcomp chnexport "volcomp", 1, 2, 1, 0, 1
 
+; Chorus
+
+gkvolchorus init 1
+gkdelchorus init 0
+gkdivchorus init 30
+
+gkvolchorus chnexport "volchorus", 1, 2, 1, 0, 1
+gkdelchorus chnexport "delchorus", 1, 2, 0, 0, 500
+gkdivchorus chnexport "divchorus", 1, 2, 30, 1, 60
+
 ; Mixer / Master
 
 gkvolMaster init 1
@@ -93,11 +104,11 @@ endop
 
 instr 1 ; Sampler
 
-inchs filenchnls p8
+inchs filenchnls p9
 
 if inchs = 1 then
 
-aLeft diskin2 p8, p9
+aLeft diskin2 p9, p10
 aL =  aLeft*p4* sqrt(1-p7)
 aR = aLeft*p4* sqrt(p7)
 
@@ -110,9 +121,12 @@ zawm p5 * aR, 4
 zawm p6 * aL, 7
 zawm p6 * aR, 8
 
+zawm p8 * aL, 11
+zawm p8 * aR, 12
+
 else
 
-aLeft, aRight diskin2 p8, p9
+aLeft, aRight diskin2 p9, p10
 
 aL =  aLeft*p4* sqrt(1-p7)
 aR = aRight*p4* sqrt(p7)
@@ -126,15 +140,18 @@ zawm p5 * aR, 4
 zawm p6 * aL, 7
 zawm p6 * aR, 8
 
+zawm p8 * aL, 11
+zawm p8 * aR, 12
+
 endif
 
 endin
 
 instr 2 ; Karplus - Strong
 
-kpitch = expseg:k(cpsmidinn(p8), p3, 432)
+kpitch = expseg:k(cpsmidinn(p9), p3, 432)
 
-asig = pluck(1, cpsmidinn(p8), 432, 0, 4, p9, (49*p10)+1); p8 = roughness p9 = stretch
+asig = pluck(1, cpsmidinn(p9), 432, 0, 4, p10, (49*p11)+1); p8 = roughness p9 = stretch
 
 aL = asig*p4* sqrt(1-p7)
 aR =  asig*p4* sqrt(p7)
@@ -148,15 +165,18 @@ zawm p5 * aR, 4
 zawm p6 * aL, 7
 zawm p6 * aR, 8
 
+zawm p8 * aL, 11
+zawm p8 * aR, 12
+
 endin
 
 instr 3 ; Bass 303
 
 ;adapted from Steven Yi Livecode.orc
 
-acut = 200 + expon(1, p3, 0.001) * p9
-asig = vco2(1, cpsmidinn(p8))
-asig = diode_ladder(asig, acut, p10, 1, 4)
+acut = 200 + expon(1, p3, 0.001) * p10
+asig = vco2(1, cpsmidinn(p9))
+asig = diode_ladder(asig, acut, p11, 1, 4)
 asig = (tanh (asig * 4)) * 0.5
 asig declick asig
 aL =  asig*p4* sqrt(1-p7)
@@ -170,22 +190,25 @@ zawm p5 * aR, 4
 zawm p6 * aL, 7
 zawm p6 * aR, 8
 
+zawm p8 * aL, 11
+zawm p8 * aR, 12
+
 endin
 
 instr 4 ; Hoover Bass
 
-iad = p11
+iad = p12
 aenv = linseg:a(0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0)
 kcf = expseg:k(2, p3/2, 0.1)
 kr3 unirand 1
 kr3 port kr3, 0.01
 klf3 = lfo:k(0.5, 1.5*kr3, 0)
 klf3 = limit((klf3+0.5), 0.05, 0.95)
-a1 = vco2(1, cpsmidinn(p8),4,(klf3*0.01))
-a2 = vco2(1, cpsmidinn(p8)*(0.08+(7/12)),4,(klf3*0.01))
-a3 = vco2(1, cpsmidinn(p8)*0.52)
+a1 = vco2(1, cpsmidinn(p9),4,(klf3*0.01))
+a2 = vco2(1, cpsmidinn(p9)*(0.08+(7/12)),4,(klf3*0.01))
+a3 = vco2(1, cpsmidinn(p9)*0.52)
 af = a1 + a3 * 0.88 + a2 * 0.66
-ao = diode_ladder(af, p9+(kcf * cpsmidinn(p8)), p10)
+ao = diode_ladder(af, p10+(kcf * cpsmidinn(p9)), p11)
 kr1 unirand 1
 kr2 unirand 1
 kr1 port kr1, 0.01
@@ -198,7 +221,7 @@ adecl = declick(ao+adel*0.8)
 adecr = declick(ao+adel2*0.8)
 aL = adecl*p4* sqrt(1-p7) * aenv
 aR = adecr*p4* sqrt(p7) * aenv
-zawm aL, 1 
+zawm aL, 1
 zawm aR, 2
 
 zawm p5 * aL, 3
@@ -207,15 +230,18 @@ zawm p5 * aR, 4
 zawm p6 * aL, 7
 zawm p6 * aR, 8
 
+zawm p8 * aL, 11
+zawm p8 * aR, 12
+
 endin
 
 
 
 instr 5 ; HiHats 808
 
-pa        =        (p8 >= 0.5 ? 1 : .15)   ; Select open or closed
-ifreq1    =        540*p9                     ; Tune
-ifreq2    =        800*p9                     ; Tune
+pa        =        (p9 >= 0.5 ? 1 : .15)   ; Select open or closed
+ifreq1    =        540*p10                     ; Tune
+ifreq2    =        800*p10                     ; Tune
 
 aenv  =   expsega(.01, .0005, 1, pa - .0005, .01)   ; Percussive envelope
 asqr1 =   poscil(1, ifreq1, 2, -1)
@@ -238,20 +264,23 @@ zawm p5 * aR, 4
 zawm p6 * aL, 7
 zawm p6 * aR, 8
 
+zawm p8 * aL, 11
+zawm p8 * aR, 12
+
 endin
 
 instr 6 ; Simple subtractive-FM
 
-kindx = p14
-kfilt = p9
-kdpth = p13
-iad = p11
-kres = p10
-kdist = p12
+kindx = p15
+kfilt = p10
+kdpth = p14
+iad = p12
+kres = p11
+kdist = p13
 aenv = linseg:a(0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0)
 
 
-amod = poscil(kdpth, cpsmidinn(p8)* kindx, gisine)
+amod = poscil(kdpth, cpsmidinn(p9)* kindx, gisine)
 acar = poscil(1, cpsmidi() + amod, gisine)
 
 audio = diode_ladder(acar, kfilt, kres , 1, kdist)
@@ -268,6 +297,9 @@ zawm p5 * aR, 4
 zawm p6 * aL, 7
 zawm p6 * aR, 8
 
+zawm p8 * aL, 11
+zawm p8 * aR, 12
+
 endin
 
 instr 7 ; SuperSaw
@@ -279,21 +311,21 @@ iad = p11
 aenv  = linseg(0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0)
 
 asig = vco2(1,  cpsmidinn(p8))
-asig += vco2(1, cpsmidinn(p8) * cent(9.04234))
-asig += vco2(1,  cpsmidinn(p8) * cent(-7.214342))
+asig += vco2(1, cpsmidinn(p9) * cent(9.04234))
+asig += vco2(1,  cpsmidinn(p9) * cent(-7.214342))
 
-asig += vco2(1,  cpsmidinn(p8) * cent(1206.294143))
-asig += vco2(1,  cpsmidinn(p8) * cent(1193.732))
-asig += vco2(1,  cpsmidinn(p8) * cent(1200))
+asig += vco2(1,  cpsmidinn(p9) * cent(1206.294143))
+asig += vco2(1,  cpsmidinn(p9) * cent(1193.732))
+asig += vco2(1,  cpsmidinn(p9) * cent(1200))
 
-asig += vco2(1,  cpsmidinn(p8) * cent(2406.294143))
-asig += vco2(1,  cpsmidinn(p8) * cent(2393.732))
-asig += vco2(1,  cpsmidinn(p8) * cent(2400))
+asig += vco2(1,  cpsmidinn(p9) * cent(2406.294143))
+asig += vco2(1,  cpsmidinn(p9) * cent(2393.732))
+asig += vco2(1,  cpsmidinn(p9) * cent(2400))
 
 asig *= 0.1
 
-asig = zdf_ladder(asig, expseg(800 + p9, p3 - 0.05, p9 + 5000, 0.05, 250), 0.5)
-asig = K35_hpf(asig, p9, p10)
+asig = zdf_ladder(asig, expseg(800 + p10, p3 - 0.05, p10 + 5000, 0.05, 250), 0.5)
+asig = K35_hpf(asig, p10, p11)
 asig = declick(asig)
 
 aL = asig * p4 * sqrt(1-p7) * aenv
@@ -308,22 +340,25 @@ zawm p5 * aR, 4
 zawm p6 * aL, 7
 zawm p6 * aR, 8
 
+zawm p8 * aL, 11
+zawm p8 * aR, 12
+
 endin
 
-instr 8	;String pad
+instr 8	;String pad from Bay at Night, Diaz
 
-ihz= cpsmidinn(p8)
+ihz= cpsmidinn(p9)
 iamp = p4
 
   ; Slow attack and release
-kctrl = linseg(0, p3*.3, iamp, p3*.3, iamp, p3*.4, 0)  
+kctrl = linseg(0, p3*.3, iamp, p3*.3, iamp, p3*.4, 0)
 anoise = rand(kctrl)
 anoise = butterlp(anoise, 5*ihz)
   ; Sligth chorus effect
 afund = oscil(kctrl, ihz, 3)           ; audio oscillator
 acel1 = oscil(kctrl, ihz - .1, 3)        ; audio oscillator - flat
 acel2 = oscil(kctrl, ihz + .1, 3)        ; audio oscillator - sharp
-asig = afund + acel1 + acel2 
+asig = afund + acel1 + acel2
   ; Cut-off high frequencies depending on midi-velocity
   ; (larger velocity implies more brighter sound)
 asig = asig + .2*anoise
@@ -341,6 +376,8 @@ zawm p5 * aR, 4
 zawm p6 * aL, 7
 zawm p6 * aR, 8
 
+zawm p8 * aL, 11
+zawm p8 * aR, 12
 
 endin
 
@@ -362,12 +399,39 @@ endin
 instr 550 ; ReverbSC
 
 arvbL zar 3
-arvbR zar 4 
+arvbR zar 4
 
 aoutL, aoutR reverbsc arvbL, arvbR, gkfbrev, gkcfrev
 
 zawm aoutL * gkvolrev, 5
 zawm aoutR * gkvolrev, 6
+
+endin
+
+instr 552	;Chorus
+
+ a1 zar 11
+ a2 zar 12
+
+ kdlyml = gkdelchorus ;delay in milliseconds
+
+ k1 = oscili:k(kdlyml/gkdivchorus, 1, 2)
+ ar1l = vdelay3(a1, kdlyml/5+k1, 900)
+ ar1r = vdelay3(a2, kdlyml/5+k1, 900)
+ k2 = oscili:k(kdlyml/gkdivchorus, .995, 2)
+ ar2l = vdelay3(a1, kdlyml/5+k2, 700)
+ ar2r = vdelay3(a2, kdlyml/5+k2, 700)
+ k3 = oscili:k(kdlyml/gkdivchorus, 1.05, 2)
+ ar3l = vdelay3(a1, kdlyml/5+k3, 700)
+ ar3r = vdelay3(a2, kdlyml/5+k3, 700)
+ k4 = oscili:k(kdlyml/gkdivchorus, 1, 2)
+ ar4l = vdelay3(a1, kdlyml/5+k4, 900)
+ ar4r = vdelay3(a2, kdlyml/5+k4, 900)
+ aoutl = (a1+ar1l+ar2l+ar3l+ar4l)*.5 * gkvolchorus
+ aoutr = (a2+ar1r+ar2r+ar3r+ar4r)*.5 * gkvolchorus
+
+ zawm aoutl, 13
+ zawm aoutr, 14
 
 endin
 
@@ -389,11 +453,15 @@ arvbL zar 5
 arvbR zar 6
 adelL zar 9
 adelR zar 10
+achoL zar 13
+achoR zar 14
 
 aL += arvbL
 aR += arvbR
 aL += adelL
 aR += adelR
+aL += achoL
+aR += achoR
 aL *= gkvolMaster
 aR *= gkvolMaster
 
@@ -409,8 +477,8 @@ endin
 <bsbPanel>
  <label>Widgets</label>
  <objectName/>
- <x>590</x>
- <y>311</y>
+ <x>100</x>
+ <y>100</y>
  <width>320</width>
  <height>240</height>
  <visible>true</visible>

@@ -27,7 +27,7 @@ toPfS []     = []
 
 hihat :: Double -> IO Instr
 hihat oc = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8,Pd oc),(9,Pd 1)]
+  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8,Pd oc),(9,Pd oc),(10,Pd 1)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN = 5
              , pf     = pfields
@@ -41,8 +41,8 @@ sampler :: String -> IO Instr
 sampler path = do
   pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1)
                                     ,(5,Pd 0),(6, Pd 0)
-                                    ,(7,Pd 0.5),(8,Ps path)
-                                    ,(9,Pd 1)] -- p8 : Sample path, p9 : pitch
+                                    ,(7,Pd 0.5),(8, Pd 0)
+                                    ,(9,Ps path),(10,Pd 1)] -- p9 : Sample path, p10 : pitch
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 1
              , pf     = pfields
@@ -54,7 +54,7 @@ sampler path = do
 
 acidBass :: IO Instr
 acidBass = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 0.7),(4,Pd 0.7),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8,Pd 48),(9,Pd 14000),(10,Pd 9)]
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 0.7),(4,Pd 0.7),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8, Pd 0),(9,Pd 48),(10,Pd 14000),(11,Pd 9)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 3
              , pf     = pfields
@@ -66,7 +66,7 @@ acidBass = do
 
 hoover :: IO Instr
 hoover = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 0.7),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8,Pd 48),(9,Pd 888),(10,Pd 5), (11, Pd 0.2)]
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 0.7),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8, Pd 0),(9,Pd 48),(10,Pd 888),(11,Pd 5),(12, Pd 0.2)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 4
              , pf     = pfields
@@ -79,7 +79,7 @@ hoover = do
 
 karp :: IO Instr
 karp = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 0.5),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8,Pd 48),(9,Pd 0.1),(10,Pd 0.1)]
+  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 0.5),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8, Pd 0),(9,Pd 48),(10,Pd 0.1),(11,Pd 0.1)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 2
              , pf     = pfields
@@ -90,8 +90,8 @@ karp = do
              }
 fmSub :: IO Instr
 fmSub = do
-  pfields <- newTVarIO $ M.fromList [(3, Pd 1), (4, Pd 1), (5, Pd 0), (6, Pd 0), (7,Pd 0.5),(8, Pd 60),(9, Pd 20000)
-                                    ,(10, Pd 2), (11, Pd 0.2), (12, Pd 1), (13, Pd 2000), (14, Pd 2.45) ]
+  pfields <- newTVarIO $ M.fromList [(3, Pd 1), (4, Pd 1), (5, Pd 0), (6, Pd 0), (7,Pd 0.5),(8, Pd 0),(9, Pd 60),(10, Pd 20000)
+                                    ,(11, Pd 2), (12, Pd 0.2), (13, Pd 1), (14, Pd 2000), (15, Pd 2.45) ]
   emptyPat <- newTVarIO M.empty
   return $ I { insN = 6
              , pf   = pfields
@@ -103,8 +103,8 @@ fmSub = do
 
 superSaw :: IO Instr
 superSaw = do
-  pfields <- newTVarIO $ M.fromList [(3, Pd 1), (4, Pd 1), (5, Pd 0), (6, Pd 0), (7,Pd 0.5),(8, Pd 60),(9, Pd 500)
-                                    ,(10, Pd 2), (11, Pd 0.2)]
+  pfields <- newTVarIO $ M.fromList [(3, Pd 1), (4, Pd 1), (5, Pd 0), (6, Pd 0), (7,Pd 0.5),(8, Pd 0),(9, Pd 60),(10, Pd 500)
+                                    ,(11, Pd 2), (12, Pd 0.2)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN = 7
              , pf   = pfields
@@ -116,7 +116,7 @@ superSaw = do
 
 stringPad :: IO Instr
 stringPad = do
-  pfields <- newTVarIO $ M.fromList [(3, Pd 1), (4, Pd 1), (5, Pd 0), (6, Pd 0), (7,Pd 0.5),(8, Pd 60)]
+  pfields <- newTVarIO $ M.fromList [(3, Pd 1), (4, Pd 1), (5, Pd 0), (6, Pd 0), (7,Pd 0.5),(8, Pd 0),(9, Pd 60)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN = 8
              , pf   = pfields
@@ -152,6 +152,17 @@ delay = do
              , pats = emptyPat
              }
 
+chorus :: IO Instr
+chorus = do
+   pfields <- newTVarIO $ M.fromList [(3, Pd (-1))]
+   emptyPat <- newTVarIO M.empty
+   return $ I { insN   = 552
+              , pf     = pfields
+              , toPlay = Nothing
+              , status = Inactive
+              , timeF  = ""
+              , pats   = emptyPat
+              }
 master :: IO Instr
 master = do
   pfields <- newTVarIO $ M.fromList [(3, Pd (-1))]
@@ -178,13 +189,14 @@ defaultOrc = do
   lpFM <- fmSub
   sSaw <- superSaw
   strPad <- stringPad
+  chorus <- chorus
   mix <- master
   orc  <- atomically $ newTVar $ M.fromList [("OH808",ohh),("CH808",chh)
                                             ,("303",a303),("hov",hov)
                                             ,("rev",rev),("del",del)
                                             ,("karp",karpS), ("lpFM",lpFM)
                                             ,("sSaw", sSaw), ("strPad",strPad)
-                                            ,("mix",mix)
+                                            ,("mix",mix),("chorus",chorus)
                                             ]
   return $ orc
 

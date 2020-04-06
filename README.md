@@ -129,6 +129,7 @@ you need to keep in mind the following criteria:
    - `p5` = reverb send (0-1)
    - `p6` = delay send (0-1)
    - `p7` = panning  (0-1: Left to Right)
+   - `p8` = chorus (0-1)
 
 3. Implementing instruments data structures:
 
