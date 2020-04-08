@@ -90,12 +90,12 @@ stringToDouble [x] = [read x :: Double]
 stringToDouble (x:xs) = (read x :: Double) : stringToDouble xs
 stringToDouble _ = []
 
-binaryDigit :: Int -> Int
+binaryDigit :: Integer -> Integer
 binaryDigit 0 = 0
 binaryDigit x = 10 * binaryDigit (x `div` 2) + x `mod` 2
 
-stringToBinary :: String -> [Int]
-stringToBinary s = (map binaryDigit) $ map fromEnum s
+stringToBinary :: String -> [Integer]
+stringToBinary s = (map binaryDigit) $ map toInteger $ map fromEnum s
 
 binaryToBinString :: Show a => [a] -> String
 binaryToBinString s = foldl1 (++) $ map show s
@@ -104,12 +104,16 @@ binStringToList :: [a] -> [[a]]
 binStringToList [] = []
 binStringToList (b:bs) = [b] : binStringToList bs
 
+numToBinary :: Double -> [Double]
+numToBinary n = stringToDouble $ binStringToList $ binaryToBinString [binaryDigit $ floor n]
+
 textToBinary :: String -> [Double]
 textToBinary t = stringToDouble $ binStringToList $ binaryToBinString $ stringToBinary t
 
 intToDouble :: Int -> Double
 intToDouble = fromIntegral
 
+binToNormSum :: [Double] -> [Double]
 binToNormSum x =  map (/ (intToDouble $ length x)) $ map intToDouble $ binToSum x
 
 binToSum [] = []
@@ -118,3 +122,6 @@ binToSum x | (last x) == 0 = 0 : (binToSum $ init x)
 
 numSeqFromText :: String -> [Double]
 numSeqFromText t = reverse $ filter (/=0) (binToNormSum $ textToBinary t)
+
+numSeqFromBin :: Double -> [Double]
+numSeqFromBin d = reverse $ filter (/=0) (binToNormSum $ numToBinary d)

@@ -6,7 +6,7 @@
 
 <CsoundSynthesizer>
 <CsOptions>
--odac
+-odac4
 --port=11000
 -d
 -B 128
@@ -174,8 +174,10 @@ instr 3 ; Bass 303
 
 ;adapted from Steven Yi Livecode.orc
 
+imode = p12
+
 acut = 200 + expon(1, p3, 0.001) * p10
-asig = vco2(1, cpsmidinn(p9))
+asig = vco2(1, cpsmidinn(p9), imode)
 asig = diode_ladder(asig, acut, p11, 1, 4)
 asig = (tanh (asig * 4)) * 0.5
 asig declick asig

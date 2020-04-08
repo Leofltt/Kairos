@@ -28,6 +28,7 @@ chorus i list fun = addPf i 8 list fun
 pitch i list fun = addPf i 9 list fun    -- 303, hoover, karp, lpFM, superSaw, stringPad
 cf i list fun = addPf i 10 list fun       -- 303, hoover, lpFM, superSaw
 res i list fun = addPf i 11 list fun     -- 303, hoover, lpFM, superSaw
+wf02 i list fun = addPf i  12 list fun      -- 303 : 0 is saw, 2 or 10 is square, 12 is triangle 
 cps i list fun = addPf i 10 list fun      -- sampler
 sample i list fun = addPf i 9 list fun   -- sampler
 tune i list fun = addPf i 10 list fun     -- hihat 808 tuning

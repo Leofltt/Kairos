@@ -28,6 +28,9 @@ doubleRem bar beat = beat - (bar * (fromIntegral $ floor (beat/bar)))
 toTP :: [Double] -> [TimePoint]
 toTP times = Prelude.map pure times
 
+tpD :: Double -> TimePoint
+tpD = pure
+
 getTimePoint :: Performance -> String -> IO [TimePoint]
 getTimePoint perf s = do
   Just t <- lookupMap (timePs perf) s
@@ -60,6 +63,9 @@ tempF (x:xs) (v:vs) d | v <= d = x:(tempF xs (vs++[v]) d)
 
 textToTP :: Double -> String -> [TimePoint]
 textToTP maxbeats t = toTP $ Prelude.map (*maxbeats) $ numSeqFromText t
+
+binToTP :: Double -> Double -> [TimePoint]
+binToTP maxbeats b = toTP $ Prelude.map (*maxbeats) $ numSeqFromBin b
 
 evolve ::  Int -> ([Double] -> [Double]) -> [TimePoint] -> [TimePoint]
 evolve n rule xs  | n <= 0 = xs | otherwise = evolve (n-1) rule (toTP $ rule $ fromTP xs)
