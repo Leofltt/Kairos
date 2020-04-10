@@ -85,6 +85,8 @@ Some functions that generate a `[TimePoint]` :
 
 `textToTP maxBeats "textString"`
 
+`binToTP maxBeats number`
+
 `evolve genN ruleFunction TPPattern`
 
 `=<< patternWithDensity totNumBeats numBeatsToGen density`

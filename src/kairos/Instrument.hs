@@ -29,12 +29,13 @@ hihat :: Double -> IO Instr
 hihat oc = do
   pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8,Pd oc),(9,Pd oc),(10,Pd 1)]
   emptyPat <- newTVarIO M.empty
-  return $ I { insN = 5
+  return $ I { insN   = 5
              , pf     = pfields
              , toPlay = Nothing
              , status = Inactive
-             , timeF = ""
-             , pats = emptyPat
+             , timeF  = ""
+             , pats   = emptyPat
+             , kind   = Csound
              }
 
 sampler :: String -> IO Instr
@@ -48,8 +49,9 @@ sampler path = do
              , pf     = pfields
              , toPlay = Nothing
              , status = Inactive
-             , timeF = ""
-             , pats = emptyPat
+             , timeF  = ""
+             , pats   = emptyPat
+             , kind   = Csound
              }
 
 acidBass :: IO Instr
@@ -60,8 +62,9 @@ acidBass = do
              , pf     = pfields
              , toPlay = Nothing
              , status = Inactive
-             , timeF = ""
-             , pats = emptyPat
+             , timeF  = ""
+             , pats   = emptyPat
+             , kind   = Csound
              }
 
 hoover :: IO Instr
@@ -72,10 +75,10 @@ hoover = do
              , pf     = pfields
              , toPlay = Nothing
              , status = Inactive
-             , timeF = ""
-             , pats = emptyPat
+             , timeF  = ""
+             , pats   = emptyPat
+             , kind   = Csound
              }
-
 
 karp :: IO Instr
 karp = do
@@ -85,20 +88,23 @@ karp = do
              , pf     = pfields
              , toPlay = Nothing
              , status = Inactive
-             , timeF = ""
-             , pats = emptyPat
+             , timeF  = ""
+             , pats   = emptyPat
+             , kind   = Csound
              }
+
 fmSub :: IO Instr
 fmSub = do
   pfields <- newTVarIO $ M.fromList [(3, Pd 1), (4, Pd 1), (5, Pd 0), (6, Pd 0), (7,Pd 0.5),(8, Pd 0),(9, Pd 60),(10, Pd 20000)
                                     ,(11, Pd 2), (12, Pd 0.2), (13, Pd 1), (14, Pd 2000), (15, Pd 2.45) ]
   emptyPat <- newTVarIO M.empty
-  return $ I { insN = 6
-             , pf   = pfields
+  return $ I { insN   = 6
+             , pf     = pfields
              , toPlay = Nothing
              , status = Inactive
-             , timeF = ""
-             , pats = emptyPat
+             , timeF  = ""
+             , pats   = emptyPat
+             , kind   = Csound
              }
 
 superSaw :: IO Instr
@@ -106,24 +112,26 @@ superSaw = do
   pfields <- newTVarIO $ M.fromList [(3, Pd 1), (4, Pd 1), (5, Pd 0), (6, Pd 0), (7,Pd 0.5),(8, Pd 0),(9, Pd 60),(10, Pd 500)
                                     ,(11, Pd 2), (12, Pd 0.2)]
   emptyPat <- newTVarIO M.empty
-  return $ I { insN = 7
-             , pf   = pfields
+  return $ I { insN   = 7
+             , pf     = pfields
              , toPlay = Nothing
              , status = Inactive
-             , timeF = ""
-             , pats = emptyPat
+             , timeF  = ""
+             , pats   = emptyPat
+             , kind   = Csound
              }
 
 stringPad :: IO Instr
 stringPad = do
   pfields <- newTVarIO $ M.fromList [(3, Pd 1), (4, Pd 1), (5, Pd 0), (6, Pd 0), (7,Pd 0.5),(8, Pd 0),(9, Pd 60)]
   emptyPat <- newTVarIO M.empty
-  return $ I { insN = 8
-             , pf   = pfields
+  return $ I { insN   = 8
+             , pf     = pfields
              , toPlay = Nothing
              , status = Inactive
-             , timeF = ""
-             , pats = emptyPat
+             , timeF  = ""
+             , pats   = emptyPat
+             , kind   = Csound
              }
 
 -- default effects
@@ -136,8 +144,9 @@ reverb = do
              , pf     = pfields
              , toPlay = Nothing
              , status = Inactive
-             , timeF = ""
-             , pats = emptyPat
+             , timeF  = ""
+             , pats   = emptyPat
+             , kind   = Csound
              }
 
 delay :: IO Instr
@@ -148,8 +157,9 @@ delay = do
              , pf     = pfields
              , toPlay = Nothing
              , status = Inactive
-             , timeF = ""
-             , pats = emptyPat
+             , timeF  = ""
+             , pats   = emptyPat
+             , kind   = Csound
              }
 
 chorus :: IO Instr
@@ -162,7 +172,9 @@ chorus = do
               , status = Inactive
               , timeF  = ""
               , pats   = emptyPat
+              , kind   = Csound
               }
+
 master :: IO Instr
 master = do
   pfields <- newTVarIO $ M.fromList [(3, Pd (-1))]
@@ -173,6 +185,19 @@ master = do
              , status = Inactive
              , timeF  = ""
              , pats   = emptyPat
+             , kind   = Csound
+             }
+
+other :: Int -> [(Int,Pfield)] -> IO Instr
+other i_n pfields = do
+  pfieldss <- newTVarIO $ M.fromList pfields
+  emptyPat <- newTVarIO M.empty
+  return $ I { insN = i_n
+             , pf = pfieldss
+             , toPlay = Nothing
+             , timeF = ""
+             , pats = emptyPat
+             , kind = Other
              }
 
 -- default Orchestra
@@ -191,12 +216,13 @@ defaultOrc = do
   strPad <- stringPad
   chorus <- chorus
   mix <- master
+  ot <- other 666 [(1,Pd 0.8),(2,Ps "Test")]
   orc  <- atomically $ newTVar $ M.fromList [("OH808",ohh),("CH808",chh)
                                             ,("303",a303),("hov",hov)
                                             ,("rev",rev),("del",del)
                                             ,("karp",karpS), ("lpFM",lpFM)
                                             ,("sSaw", sSaw), ("strPad",strPad)
-                                            ,("mix",mix),("chorus",chorus)
+                                            ,("mix",mix),("chorus",chorus),("test",ot)
                                             ]
   return $ orc
 

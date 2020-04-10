@@ -40,10 +40,14 @@ data Instr = I { insN :: Int
                , toPlay :: Maybe TimePoint
                , pats :: TVar (M.Map Int PfPat)
                , timeF :: String
+               , kind :: MessageTo
                }
 
 -- is the instrument Active ?
 data Status = Init | Active | Inactive | Stopping deriving (Show)
+
+-- where are we sending the data
+data MessageTo = Csound | Other deriving (Show,Eq)
 
 -- Map of Pfields
 type PfMap = M.Map Int Pfield
