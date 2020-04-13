@@ -183,6 +183,25 @@ addI "ri707" $ sampler ri707
 addI "kc1" $ sampler kc1
 addI "kc2" $ sampler kc2
 addI "fa1" $ sampler fa1
+alzir = defPath "/breaks/Alzir.wav"
+back = defPath "/breaks/Back.wav"
+bad = defPath "/breaks/Bad.wav"
+blue = defPath "/breaks/Blue.wav"
+boo = defPath "/breaks/Boo.wav"
+booWorm = defPath "/breaks/BooWorm.wav"
+bringingMe = defPath "/breaks/BringingMe.wav"
+bulldozer = defPath "/breaks/Bulldozer.wav"
+bulldozer2 = defPath "/breaks/Bulldozer2.wav"
+control = defPath "/breaks/Control.wav"
+dPercussion = defPath "/breaks/DetroitPercussion.wav"
+essential = defPath "/breaks/Essential.wav"
+heaven = defPath "/breaks/Heaven.wav"
+hurtuso = defPath "/breaks/HurtUSo.wav"
+johnny = defPath "/breaks/Johnny.wav"
+addI "alzir" $ stutter alzir
+addI "back" $ stutter back
+addI "bad" $ stutter bad
+addI "blue" $ stutter blue
 fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
 csv1 = markPath "/Test.csv"
 csv2 = markPath "/Test2.csv"

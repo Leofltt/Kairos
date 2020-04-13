@@ -15,7 +15,7 @@
 </CsOptions>
 <CsInstruments>
 
-sr = 48000
+sr = 44100
 ksmps = 128
 nchnls = 2
 0dbfs = 1.0
@@ -37,10 +37,9 @@ zakinit 50,50
 ; p7 : panning (0 - 1)
 
 ; TABLES
-gisine   ftgen 1, 0, 4096, 10, 1 ; Sine wave
+gisine   ftgen 1, 0, 4096, 10, 1                        ; Sine wave
 gisquare ftgen 2, 0, 4096, 7, 1, 2048, 1, 0, 0, 2048, 0 ; Square wave
-iwave ftgen 3, 0, 16384, 7, 1, 16384, -1 ; Waveform for the string-pad
-
+giHamming ftgen 3, 0, 4096, 20, 1, 1	                    ; Hamming window
 
 
 
@@ -104,9 +103,9 @@ endop
 
 instr 1 ; Sampler
 
-inchs filenchnls p9
+inchs = filenchnls(p9)
 
-if inchs = 1 then
+if inchs == 1 then
 
 aLeft diskin2 p9, p10
 aL =  aLeft*p4* sqrt(1-p7)
@@ -147,14 +146,50 @@ endif
 
 endin
 
-instr 2 ; Karplus - Strong
+instr 2 ; Stutter
 
-kpitch = expseg:k(cpsmidinn(p9), p3, 432)
+i_dur = p3 
+i_vol = p4
+i_rev = p5
+i_del = p6
+i_pan = p7
+i_chor = p8
 
-asig = pluck(1, cpsmidinn(p9), 432, 0, 4, p10, (49*p11)+1); p8 = roughness p9 = stretch
+i_divisor = p10
+i_pick = p11
+i_repeat = p12
+Sname = p9
 
-aL = asig*p4* sqrt(1-p7)
-aR =  asig*p4* sqrt(p7)
+inchs = filenchnls(Sname)
+ilength = filelen(Sname)
+isr = filesr(Sname)
+isamlen = ilength * isr
+isamdur = i_dur * sr
+isamsplit = isamlen / i_divisor
+islice = i_dur / i_repeat
+isamslice = isamdur / i_repeat
+istartpos = i_pick * isamsplit
+isize = isamlen
+ipos = istartpos
+
+andx =  phasor(1/islice) * isamslice + ipos
+
+if inchs == 1 then 
+isam ftgen 0, 0, isize, -1, Sname, 0, 0, 1
+aL table3 andx, isam, 0
+aL  =  declick(aL)
+aL =  aL*i_vol* sqrt(1-i_pan)
+aR =  aL*i_vol* sqrt(i_pan)
+else 
+iLeft ftgen 0, 0, isize, -1, Sname, 0, 0, 1
+iRight ftgen 0, 0,isize, -1, Sname, 0, 0, 2
+aL table3 andx, iLeft, 0
+aR table3 andx, iRight, 0
+aL = declick(aL)
+aR = declick(aR)
+aL = aL*i_vol* sqrt(1-i_pan)  
+aR = aR*i_vol* sqrt(i_pan) 
+endif
 
 zawm aL, 1
 zawm aR, 2
@@ -236,8 +271,6 @@ zawm p8 * aL, 11
 zawm p8 * aR, 12
 
 endin
-
-
 
 instr 5 ; HiHats 808
 
@@ -368,6 +401,29 @@ asig = butterlp(asig, (p4 * 127 - 60)*40+600)
 
 aL = asig*sqrt(p7);
 aR = asig*sqrt(1-p7);
+
+zawm aL, 1
+zawm aR, 2
+
+zawm p5 * aL, 3
+zawm p5 * aR, 4
+
+zawm p6 * aL, 7
+zawm p6 * aR, 8
+
+zawm p8 * aL, 11
+zawm p8 * aR, 12
+
+endin
+
+instr 9 ; Karplus - Strong
+
+kpitch = expseg:k(cpsmidinn(p9), p3, 432)
+
+asig = pluck(1, cpsmidinn(p9), 432, 0, 4, p10, (49*p11)+1); p8 = roughness p9 = stretch
+
+aL = asig*p4* sqrt(1-p7)
+aR =  asig*p4* sqrt(p7)
 
 zawm aL, 1
 zawm aR, 2

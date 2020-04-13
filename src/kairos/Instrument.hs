@@ -1,6 +1,7 @@
 module Kairos.Instrument where
 
 import Kairos.Base
+import Kairos.Clock
 import Kairos.Utilities
 import Control.Concurrent
 import Control.Concurrent.STM
@@ -19,9 +20,23 @@ toPfD :: [Double] -> [Pfield]
 toPfD (x:xs) = (Pd x) : toPfD xs
 toPfD []     = []
 
+pfD :: Double -> Pfield
+pfD x = Pd x
+
 toPfS :: [String] -> [Pfield]
 toPfS (x:xs) = (Ps x) : toPfS xs
 toPfS []     = []
+
+pfS :: String -> Pfield
+pfS x = Ps x
+
+withTimeSignature :: Performance -> [Pfield] -> IO [Pfield]
+withTimeSignature perf l = do
+  ts <- currentTS $ clock perf
+  let oneSecond = 60/(bpm ts)
+  let oneBarSecond = (beatInMsr ts) * oneSecond
+  let beatsInSeconds = map (*oneBarSecond) (stringToDouble $ map show l)
+  return $ toPfD beatsInSeconds
 
 -- default instruments
 
@@ -84,7 +99,7 @@ karp :: IO Instr
 karp = do
   pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 0.5),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8, Pd 0),(9,Pd 48),(10,Pd 0.1),(11,Pd 0.1)]
   emptyPat <- newTVarIO M.empty
-  return $ I { insN   = 2
+  return $ I { insN   = 9
              , pf     = pfields
              , toPlay = Nothing
              , status = Inactive
@@ -126,6 +141,22 @@ stringPad = do
   pfields <- newTVarIO $ M.fromList [(3, Pd 1), (4, Pd 1), (5, Pd 0), (6, Pd 0), (7,Pd 0.5),(8, Pd 0),(9, Pd 60)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 8
+             , pf     = pfields
+             , toPlay = Nothing
+             , status = Inactive
+             , timeF  = ""
+             , pats   = emptyPat
+             , kind   = Csound
+             }
+
+stutter :: String -> IO Instr
+stutter path = do
+  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1)
+                                    ,(5,Pd 0),(6, Pd 0)
+                                    ,(7,Pd 0.5),(8, Pd 0)
+                                    ,(9,Ps path),(10,Pd 8),(11,Pd 0),(12,Pd 1)] -- sample path, divisor, pick, repeat
+  emptyPat <- newTVarIO M.empty
+  return $ I { insN   = 2
              , pf     = pfields
              , toPlay = Nothing
              , status = Inactive
