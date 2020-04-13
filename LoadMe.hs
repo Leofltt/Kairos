@@ -202,6 +202,12 @@ addI "alzir" $ stutter alzir
 addI "back" $ stutter back
 addI "bad" $ stutter bad
 addI "blue" $ stutter blue
+addI "boo" $ stutter boo
+addI "booWorm" $ stutter booWorm
+addI "bMe" $ stutter bringingMe
+addI "bdoze" $ stutter bulldozer
+addI "bdoze2" $ stutter bulldozer2
+addI "control" $ stutter control 
 fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
 csv1 = markPath "/Test.csv"
 csv2 = markPath "/Test2.csv"

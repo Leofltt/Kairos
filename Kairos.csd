@@ -148,7 +148,7 @@ endin
 
 instr 2 ; Stutter
 
-i_dur = p3 
+i_dur = p3
 i_vol = p4
 i_rev = p5
 i_del = p6
@@ -173,21 +173,23 @@ isize = isamlen
 ipos = istartpos
 
 andx =  phasor(1/islice) * isamslice + ipos
+aindx = phasor(1/islice)
+aenv table3 aindx * 4096, giHamming
 
-if inchs == 1 then 
+if inchs == 1 then
 isam ftgen 0, 0, isize, -1, Sname, 0, 0, 1
 aL table3 andx, isam, 0
 aL  =  declick(aL)
 aL =  aL*i_vol* sqrt(1-i_pan)
 aR =  aL*i_vol* sqrt(i_pan)
-else 
+else
 iLeft ftgen 0, 0, isize, -1, Sname, 0, 0, 1
 iRight ftgen 0, 0,isize, -1, Sname, 0, 0, 2
 aL table3 andx, iLeft, 0
 aR table3 andx, iRight, 0
 aL = declick(aL)
 aR = declick(aR)
-aL = aL*i_vol* sqrt(1-i_pan)  
+aL = aL*i_vol* sqrt(1-i_pan)
 aR = aR*i_vol* sqrt(i_pan) 
 endif
 
@@ -445,16 +447,16 @@ adelLr zar 7
 adelRr zar 8
 
 kporttime	linseg		0, .001, 1, 1, 1
-kdlt		portk		(gkdtdel/1000.0), kporttime	
+kdlt		portk		(gkdtdel/1000.0), kporttime
 adlt		interp		kdlt
-							
-abufferL	delayr 	5		
-adelL 	deltap3	adlt									
-		delayw	 adelLr + (adelL * gkfbdel)	
 
-abufferR	delayr	 5							
-adelR 	deltap3	adlt									
-		delayw	 adelRr + (adelR * gkfbdel)	
+abufferL	delayr 	5
+adelL 	deltap3	adlt
+		delayw	 adelLr + (adelL * gkfbdel)
+
+abufferR	delayr	 5
+adelR 	deltap3	adlt
+		delayw	 adelRr + (adelR * gkfbdel)
 
 zawm adelL * gkvoldel, 9
 zawm adelR * gkvoldel, 10
