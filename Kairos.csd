@@ -6,17 +6,17 @@
 
 <CsoundSynthesizer>
 <CsOptions>
--odac
+-odac3
 --port=11000
 -d
--B 128
--b 64
+-B 256
+-b 128
 
 </CsOptions>
 <CsInstruments>
 
 sr = 44100
-ksmps = 128
+ksmps = 32
 nchnls = 2
 0dbfs = 1.0
 
@@ -91,7 +91,7 @@ gkvolMaster chnexport "m_vol", 1, 2, 1, 0, 1
 ;taken from Steven Yi livecode.orc
 opcode declick, a, a
 ain xin
-aenv = linseg:a(0, 0.01, 1, p3 - 0.02, 1, 0.01, 0)
+aenv = linseg:a(0, 0.001, 0.99, p3 - 0.002, 1, 0.001, 0)
 xout ain * aenv
 endop
 
@@ -190,7 +190,7 @@ aR table3 andx, iRight, 0
 aL = declick(aL)
 aR = declick(aR)
 aL = aL*i_vol* sqrt(1-i_pan)
-aR = aR*i_vol* sqrt(i_pan) 
+aR = aR*i_vol* sqrt(i_pan)
 endif
 
 zawm aL, 1
