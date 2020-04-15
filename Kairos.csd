@@ -39,7 +39,7 @@ zakinit 50,50
 ; TABLES
 gisine   ftgen 1, 0, 4096, 10, 1                        ; Sine wave
 gisquare ftgen 2, 0, 4096, 7, 1, 2048, 1, 0, 0, 2048, 0 ; Square wave
-giHamming ftgen 3, 0, 4096, 20, 1, 1	                    ; Hamming window
+
 
 
 
@@ -104,24 +104,14 @@ endop
 instr 1 ; Sampler
 
 inchs = filenchnls(p9)
+kthreshold = p11
+iratio = p12
 
 if inchs == 1 then
 
 aLeft diskin2 p9, p10
 aL =  aLeft*p4* sqrt(1-p7)
 aR = aLeft*p4* sqrt(p7)
-
-zawm aL, 1
-zawm aR, 2
-
-zawm p5 * aL, 3
-zawm p5 * aR, 4
-
-zawm p6 * aL, 7
-zawm p6 * aR, 8
-
-zawm p8 * aL, 11
-zawm p8 * aR, 12
 
 else
 
@@ -130,6 +120,14 @@ aLeft, aRight diskin2 p9, p10
 aL =  aLeft*p4* sqrt(1-p7)
 aR = aRight*p4* sqrt(p7)
 
+endif
+
+icomp1 = 1/iratio
+irtime = 0.01
+iftime = 0.5
+aL dam aL, kthreshold, icomp1, 1, irtime, iftime
+aR dam aR, kthreshold, icomp1, 1, irtime, iftime
+
 zawm aL, 1
 zawm aR, 2
 
@@ -142,7 +140,6 @@ zawm p6 * aR, 8
 zawm p8 * aL, 11
 zawm p8 * aR, 12
 
-endif
 
 endin
 
@@ -154,11 +151,16 @@ i_rev = p5
 i_del = p6
 i_pan = p7
 i_chor = p8
+Sname = p9
+
+kthreshold = p11
+iratio = p12
 
 i_divisor = p10
-i_pick = p11
-i_repeat = p12
-Sname = p9
+i_pick = p13
+i_repeat = p14 == 0 ? 1 : p14
+
+
 
 inchs = filenchnls(Sname)
 ilength = filelen(Sname)
@@ -173,8 +175,6 @@ isize = isamlen
 ipos = istartpos
 
 andx =  phasor(1/islice) * isamslice + ipos
-aindx = phasor(1/islice)
-aenv table3 aindx * 4096, giHamming
 
 if inchs == 1 then
 isam ftgen 0, 0, isize, -1, Sname, 0, 0, 1
@@ -192,6 +192,12 @@ aR = declick(aR)
 aL = aL*i_vol* sqrt(1-i_pan)
 aR = aR*i_vol* sqrt(i_pan)
 endif
+
+icomp1 = 1/iratio
+irtime = 0.01
+iftime = 0.5
+aL dam aL, kthreshold, icomp1, 1, irtime, iftime
+aR dam aR, kthreshold, icomp1, 1, irtime, iftime
 
 zawm aL, 1
 zawm aR, 2

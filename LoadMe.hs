@@ -193,11 +193,22 @@ bringingMe = defPath "/breaks/BringingMe.wav"
 bulldozer = defPath "/breaks/Bulldozer.wav"
 bulldozer2 = defPath "/breaks/Bulldozer2.wav"
 control = defPath "/breaks/Control.wav"
-dPercussion = defPath "/breaks/DetroitPercussion.wav"
+dperc = defPath "/breaks/DetroitPercussion.wav"
 essential = defPath "/breaks/Essential.wav"
 heaven = defPath "/breaks/Heaven.wav"
 hurtuso = defPath "/breaks/HurtUSo.wav"
 johnny = defPath "/breaks/Johnny.wav"
+liberty = defPath "/breaks/Liberty.wav"
+massive = defPath "/breaks/Massive.wav"
+peacesign = defPath "/breaks/PeaceSign.wav"
+pressin = defPath "/breaks/Pressin.wav"
+ricochet = defPath "/breaks/Ricochet.wav"
+rise = defPath "/breaks/Rise.wav"
+ror = defPath "/breaks/RollOnRoll.wav"
+sovreign = defPath "/breaks/Sovreign.wav"
+tear = defPath "/breaks/Tear.wav"
+terrorist = defPath "/breaks/Terrorist.wav"
+walk = defPath "/breaks/Walk.wav"
 addI "alzir" $ stutter alzir
 addI "back" $ stutter back
 addI "bad" $ stutter bad
@@ -207,7 +218,23 @@ addI "booWorm" $ stutter booWorm
 addI "bMe" $ stutter bringingMe
 addI "bdoze" $ stutter bulldozer
 addI "bdoze2" $ stutter bulldozer2
-addI "control" $ stutter control 
+addI "control" $ stutter control
+addI "dperc" $ stutter dperc
+addI "essential" $ stutter essential
+addI "heaven" $ stutter heaven
+addI "hus" $ stutter hurtuso
+addI "johnny" $ stutter johnny
+addI "tear" $ stutter tear
+addI "liberty" $ stutter liberty
+addI "massive" $ stutter massive
+addI "peacesign" $ stutter peacesign
+addI "pressin" $ stutter pressin
+addI "ricochet" $ stutter ricochet
+addI "rise" $ stutter rise
+addI "ror" $ stutter ror
+addI "sovreign" $ stutter sovreign
+addI "terrorist" $ stutter terrorist
+addI "walk" $ stutter walk
 fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
 csv1 = markPath "/Test.csv"
 csv2 = markPath "/Test2.csv"

@@ -21,7 +21,7 @@ addPf' = addPfPath' perf
 addPf i pfnum list fun = addPf' i pfnum =<< createPfPat pfnum list fun
 dur i list fun = addPf i 3 list fun      -- global
 d' i fun list = dur i list fun
-durTS i list fun = d' i fun  =<< withTimeSignature perf list 
+durTS i list fun = d' i fun  =<< withTimeSignature perf list
 vol i list fun = addPf i 4 list fun
 rev i list fun = addPf i 5 list fun
 del i list fun = addPf i 6 list fun
@@ -40,9 +40,11 @@ adRatio i list fun = addPf i 12 list fun -- lpFM, hoover
 dist i list fun = addPf i 13 list fun    -- lpFM
 fmIndx i list fun = addPf i 15 list fun  -- lpFM
 fmDepth i list fun = addPf i 14 list fun -- lpFM
+tresh i list fun = addPf i 11 list fun -- sampler, stutter
+ratio i list fun = addPf i 12 list fun -- sampler, stutter 
 divs i list fun = addPf i 10 list fun  -- stutter
-pick i list fun = addPf i 11 list fun  -- stutter
-stuts i list fun = addPf i 12 list fun -- stutter
+pick i list fun = addPf i 13 list fun  -- stutter
+stuts i list fun = addPf i 14 list fun -- stutter
 silence = stopAll perf
 playA = playAll perf
 playFx = playEffect perf

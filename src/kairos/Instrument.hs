@@ -58,7 +58,7 @@ sampler path = do
   pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1)
                                     ,(5,Pd 0),(6, Pd 0)
                                     ,(7,Pd 0.5),(8, Pd 0)
-                                    ,(9,Ps path),(10,Pd 1)] -- p9 : Sample path, p10 : pitch
+                                    ,(9,Ps path),(10,Pd 1),(11,Pd 0.9),(12,Pd 2)] -- p9 : Sample path, p10 : pitch
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 1
              , pf     = pfields
@@ -154,7 +154,7 @@ stutter path = do
   pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1)
                                     ,(5,Pd 0),(6, Pd 0)
                                     ,(7,Pd 0.5),(8, Pd 0)
-                                    ,(9,Ps path),(10,Pd 8),(11,Pd 0),(12,Pd 1)] -- sample path, divisor, pick, repeat
+                                    ,(9,Ps path),(10,Pd 8),(11,Pd 0.9),(12,Pd 2),(13,Pd 0),(14,Pd 1)] -- sample path, divisor, pick, repeat
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 2
              , pf     = pfields
