@@ -9,8 +9,8 @@
 -odac3
 --port=11000
 -d
--B 256
--b 128
+-B 128
+-b 64
 
 </CsOptions>
 <CsInstruments>
@@ -35,6 +35,7 @@ zakinit 50,50
 ; p5 : reverb send (0 - 1)
 ; p6 : delay send (0 - 1)
 ; p7 : panning (0 - 1)
+; p8 : chorus
 
 ; TABLES
 gisine   ftgen 1, 0, 4096, 10, 1                        ; Sine wave
@@ -63,12 +64,6 @@ gkvolrev init 1
 gkfbrev chnexport "fbrev", 1, 2, 0.4, 0, 0.99
 gkcfrev chnexport "cfrev", 1, 2, 15000, 0, 20000
 gkvolrev chnexport "volrev", 1, 2, 1, 0, 1
-
-; Parallel Compressor
-
-gkvolcomp init 1
-
-gkvolcomp chnexport "volcomp", 1, 2, 1, 0, 1
 
 ; Chorus
 
@@ -167,19 +162,18 @@ ilength = filelen(Sname)
 isr = filesr(Sname)
 isamlen = ilength * isr
 isamdur = i_dur * sr
-isamsplit = isamlen / i_divisor
+isamsplit = ceil(isamlen / i_divisor)
 islice = i_dur / i_repeat
-isamslice = isamdur / i_repeat
+isamslice =  ceil(isamdur / i_repeat)
 istartpos = i_pick * isamsplit
 isize = isamlen
 ipos = istartpos
 
-andx =  phasor(1/islice) * isamslice + ipos
+andx =  phasor(sr/isamslice) * isamslice + ipos
 
 if inchs == 1 then
 isam ftgen 0, 0, isize, -1, Sname, 0, 0, 1
 aL table3 andx, isam, 0
-aL  =  declick(aL)
 aL =  aL*i_vol* sqrt(1-i_pan)
 aR =  aL*i_vol* sqrt(i_pan)
 else
@@ -187,11 +181,12 @@ iLeft ftgen 0, 0, isize, -1, Sname, 0, 0, 1
 iRight ftgen 0, 0,isize, -1, Sname, 0, 0, 2
 aL table3 andx, iLeft, 0
 aR table3 andx, iRight, 0
-aL = declick(aL)
-aR = declick(aR)
 aL = aL*i_vol* sqrt(1-i_pan)
 aR = aR*i_vol* sqrt(i_pan)
 endif
+
+aL = declick(aL)
+aR = declick(aR)
 
 icomp1 = 1/iratio
 irtime = 0.01
@@ -349,7 +344,10 @@ instr 7 ; SuperSaw
 
 ;adapted from Steven Yi Livecode.orc
 
-iad = p11
+icf = p10
+ires = p11
+iad = p12
+iwidth = p13
 
 aenv  = linseg(0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0)
 
@@ -367,8 +365,8 @@ asig += vco2(1,  cpsmidinn(p9) * cent(2400))
 
 asig *= 0.1
 
-asig = zdf_ladder(asig, expseg(800 + p10, p3 - 0.05, p10 + 5000, 0.05, 250), 0.5)
-asig = K35_hpf(asig, p10, p11)
+asig = zdf_ladder(asig, iwidth+icf,1)
+asig = K35_hpf(asig, icf, ires)
 asig = declick(asig)
 
 aL = asig * p4 * sqrt(1-p7) * aenv
@@ -393,16 +391,15 @@ instr 8	;String pad from Bay at Night, Diaz
 ihz= cpsmidinn(p9)
 iamp = p4
 
-  ; Slow attack and release
+
 kctrl = linseg(0, p3*.3, iamp, p3*.3, iamp, p3*.4, 0)
 anoise = rand(kctrl)
 anoise = butterlp(anoise, 5*ihz)
   ; Sligth chorus effect
-afund = oscil(kctrl, ihz, 3)           ; audio oscillator
-acel1 = oscil(kctrl, ihz - .1, 3)        ; audio oscillator - flat
-acel2 = oscil(kctrl, ihz + .1, 3)        ; audio oscillator - sharp
+afund = oscil(kctrl, ihz, 3)           
+acel1 = oscil(kctrl, ihz - .1, 3)     
+acel2 = oscil(kctrl, ihz + .1, 3)      
 asig = afund + acel1 + acel2
-  ; Cut-off high frequencies depending on midi-velocity
   ; (larger velocity implies more brighter sound)
 asig = asig + .2*anoise
 asig = butterlp(asig, (p4 * 127 - 60)*40+600)
@@ -508,15 +505,6 @@ instr 552	;Chorus
 
 endin
 
-;instr 660 ; Parallel Compressor
-;
-;aoutL compress gacompL, gacompL, kthresh, kloknee, khiknee, kratio, katt, krel, ilook
-;aoutR compress gacompR, gacompR, kthresh, kloknee, khiknee, kratio, katt, krel, ilook
-;outs aoutL * gkvolcomp, aoutR * gkvolcomp
-;
-;clear gacompL, gacompR
-;
-;endin
 
 instr 999 ; Mixer / Master out
 
