@@ -150,7 +150,7 @@ addI "sn808noi" $ sampler sn808noi
 sn808cl = defPath "/808/808_snare_9_TL.wav"
 addI "sn808cl" $ sampler sn808cl
 sn808d = defPath "/808/808_snare_34_TL.wav"
-addI "sn808d" $ sampler sn808hi
+addI "sn808d" $ sampler sn808d
 ride626 = defPath "/626/ride.wav"
 shkr626 = defPath "/626/shaker.wav"
 sn1626 = defPath "/626/snare1.wav"
@@ -163,6 +163,8 @@ colo626 = defPath "/626/conga-lo.wav"
 comi626 = defPath "/626/conga-m.wav"
 k1626 = defPath "/626/bd1.wav"
 k2626 = defPath "/626/bd2.wav"
+h626 = defPath "/626/hihat.wav"
+ri626 = defPath "/626/ride.wav"
 ri707 = defPath "/cym/707_Ride.wav"
 kc1 = defPath "/kicks/kickCarlo1.wav"
 kc2 = defPath "/kicks/kickCarlo2.wav"
@@ -179,6 +181,8 @@ addI "colo626" $ sampler colo626
 addI "comi626" $ sampler comi626
 addI "k1626" $ sampler k1626
 addI "k2626" $ sampler k2626
+addI "h626" $ sampler h626
+addI "ri626" $ sampler ri626
 addI "ri707" $ sampler ri707
 addI "kc1" $ sampler kc1
 addI "kc2" $ sampler kc2
@@ -251,10 +255,6 @@ fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
 csv1 = markPath "/Test.csv"
 csv2 = markPath "/Test2.csv"
 csv3 = markPath "/Test3.csv"
-adk = toTP [0, 1, 2,2.5,3,4,5,5.5,6,7,8,8.5,9,10,11,11.5]
-addP "adk" adk
-adb = toTP [0,1,2,3,4.5,5,6,7,8,9.5,10]
-addP "adb" adb
 params "lpFM" [ (keep, vol, [Pd 0.7]),(keep, rev, [Pd 0.5]),((percentNext 73), pitch, toPfD [53, 56, 58, 53, 48]),(keep, fmIndx, [Pd 12.3]), (keep, fmDepth, [Pd 987.23]), (keep, dist, [Pd 1.15]),(keep,cf,[Pd 3880]),( keep, rev, [Pd 0.6]),(keep, adRatio,[Pd 0.7]),(randomize,pan,toPfD[0.4,0.6,0.75,0.35])]
 params "303" [ (keep,dur,toPfD[ 0.25]),(keep,res,[Pd 4]),(keep, vol, [Pd 0.5]),(keep, cf, [Pd 3500]),((runMarkov csv3), pitch, toPfD (withScale 41 dorian)),(keep, rev, [Pd 0.4])]
 params "hov" [ (keep,dur,toPfD[ 1.2]),(keep, vol, [Pd 0.3]),(keep, cf, [Pd 800]),((runMarkov csv3), pitch, toPfD (withScale 41 dorian)),(keep, rev, [Pd 0.7])]

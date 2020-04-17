@@ -38,7 +38,7 @@ playInstr instr = do
       sendEvent pfds
     else do
       let pfds = "/" ++ (show (insN instr)) ++ "/" ++ pfieldList
-      sendOther pfds 
+      sendOther pfds
 
 playOne :: Performance -> Instr -> TimePoint -> IO ()
 playOne perf i tp = do
@@ -175,6 +175,10 @@ kpanc = toTP [0,0.25,1.5,1.75,2,2.25,3.5,3.75,4,4.5,4.75,5.25,5.5,6,7.5]
 kpanbox = toTP [0,1.5,2,3.5,4,4.5,4.75,5.25,5.5,6,7.5]
 b2 = toTP [0,0.75,1,2,2.5]
 bou2 = toTP [0,1.5,2,3.5,4,5.5,6,7.75]
+fwk1 = toTP [0,0.75,1.5,2,2.75,3.5]
+fwk2 = toTP [0,0.75,1.25,1.75,2,2.75]
+adk = toTP [0, 1, 2,2.5,3,4,5,5.5,6,7,8,8.5,9,10,11,11.5]
+adb = toTP [0,1,2,3,4.5,5,6,7,8,9.5,10]
 
 displayTPat :: Performance -> IO String
 displayTPat perf = do
@@ -192,7 +196,7 @@ defaultTPMap = do
                                   ,("stdbkk",stdbkk),("stdbks",stdbks),("ir1k",ir1k),("bouncyk",bouncyk)
                                   ,("ukgch",ukgch),("ukgrs",ukgrs),("jgs",jgs),("jgk",jgk)
                                   ,("kpanb",kpanb),("kpanc",kpanc),("kpanbox",kpanbox),("b2",b2)
-                                  ,("bou2",bou2)
+                                  ,("bou2",bou2),("fwk1",fwk1),("fwk2",fwk2),("adb",adb),("adk",adk)
                                   ]
   return $ tpMap
 
