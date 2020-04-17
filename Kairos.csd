@@ -6,7 +6,7 @@
 
 <CsoundSynthesizer>
 <CsOptions>
--odac3
+-odac4
 --port=11000
 -d
 -B 128
@@ -51,7 +51,7 @@ gkfbdel  init 0.5
 gkdtdel  init 375
 gkvoldel init 1
 
-gkfbdel chnexport "fbdel", 1, 2, 0.9, 0, 0.99
+gkfbdel chnexport "fbdel", 1, 2, 0.4, 0, 0.99
 gkdtdel chnexport "dtdel", 1, 2, 375, 1, 5000
 gkvoldel chnexport "voldel", 1, 2, 1, 0, 1
 
@@ -86,7 +86,7 @@ gkvolMaster chnexport "m_vol", 1, 2, 1, 0, 1
 ;taken from Steven Yi livecode.orc
 opcode declick, a, a
 ain xin
-aenv = linseg:a(0, 0.001, 0.99, p3 - 0.002, 1, 0.001, 0)
+aenv = linseg:a(0, 0.01, 1, p3 - 0.02, 1, 0.01, 0)
 xout ain * aenv
 endop
 
@@ -119,7 +119,7 @@ endif
 
 icomp1 = 1/iratio
 irtime = 0.01
-iftime = 0.5
+iftime = 0.05
 aL dam aL, kthreshold, icomp1, 1, irtime, iftime
 aR dam aR, kthreshold, icomp1, 1, irtime, iftime
 
@@ -147,27 +147,21 @@ i_del = p6
 i_pan = p7
 i_chor = p8
 Sname = p9
-
+itune = p10  ; to be implemented
 kthreshold = p11
 iratio = p12
 
-i_divisor = p10
-i_pick = p13
-i_repeat = p14 == 0 ? 1 : p14
-
-
+i_divisor = p13
+i_pick = p14
+i_repeat = (p15 == 0) ? 1 : p15
 
 inchs = filenchnls(Sname)
 ilength = filelen(Sname)
 isr = filesr(Sname)
-isamlen = ilength * isr
+isize = ilength * isr
 isamdur = i_dur * sr
-isamsplit = ceil(isamlen / i_divisor)
-islice = i_dur / i_repeat
 isamslice =  ceil(isamdur / i_repeat)
-istartpos = i_pick * isamsplit
-isize = isamlen
-ipos = istartpos
+ipos = i_pick / i_divisor * isize
 
 andx =  phasor(sr/isamslice) * isamslice + ipos
 
@@ -190,7 +184,7 @@ aR = declick(aR)
 
 icomp1 = 1/iratio
 irtime = 0.01
-iftime = 0.5
+iftime = 0.05
 aL dam aL, kthreshold, icomp1, 1, irtime, iftime
 aR dam aR, kthreshold, icomp1, 1, irtime, iftime
 
