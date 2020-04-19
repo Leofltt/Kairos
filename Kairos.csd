@@ -6,7 +6,7 @@
 
 <CsoundSynthesizer>
 <CsOptions>
--odac4
+-odac3
 --port=11000
 -d
 -B 128
@@ -304,18 +304,18 @@ endin
 instr 6 ; Simple subtractive-FM
 
 kindx = p15
+kcar = p13
 kfilt = p10
 kdpth = p14
 iad = p12
 kres = p11
-kdist = p13
 aenv = linseg:a(0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0)
 
 
-amod = poscil(kdpth, cpsmidinn(p9)* kindx, gisine)
-acar = poscil(1, cpsmidinn(p9) + amod, gisine)
+amod = poscil(1, cpsmidinn(p9) * kindx, gisine)
+acar = poscil(1, cpsmidinn(p9) + amod * kdpth * sr/4, gisine)
 
-audio = diode_ladder(acar, kfilt, kres , 1, kdist)
+audio = diode_ladder(acar, kfilt, kres , 1, 1.5)
 
 aL = audio * p4 * sqrt(1-p7) * aenv
 aR = audio * p4 * sqrt(p7) * aenv
@@ -419,7 +419,7 @@ instr 9 ; Karplus - Strong
 
 kpitch = expseg:k(cpsmidinn(p9), p3, 432)
 
-asig = pluck(1, cpsmidinn(p9), 432, 0, 4, p10, (49*p11)+1); p8 = roughness p9 = stretch
+asig = pluck(1, cpsmidinn(p9), 432, 0, 4, p10, (49*p11)+1) 
 
 aL = asig*p4* sqrt(1-p7)
 aR =  asig*p4* sqrt(p7)

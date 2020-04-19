@@ -16,9 +16,9 @@ To get started you'll need to download:
 
 `cd` into the repository folder
 
-`stack build`
+`cabal install` (or build with stack if so you prefer)
 
-run `csound kairos.csd` from within a terminal window or from within CsoundQt
+run `csound kairos.csd` from a terminal window or from your favorite editor
 
 while csound is running, open another terminal window in the same folder and run `ghci`
 

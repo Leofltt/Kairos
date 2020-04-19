@@ -183,7 +183,7 @@ adb = toTP [0,1,2,3,4.5,5,6,7,8,9.5,10]
 displayTPat :: Performance -> IO String
 displayTPat perf = do
    tpats <- readTVarIO (timePs perf)
-   return $ unwords $ interleave ( M.keys tpats)  ( map show (map fromTP (M.elems tpats)))
+   return $ unwords $ interleave' ( M.keys tpats)  ( map show (map fromTP (M.elems tpats)))
 
 
 
