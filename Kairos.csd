@@ -6,7 +6,7 @@
 
 <CsoundSynthesizer>
 <CsOptions>
--odac3
+-odac
 --port=11000
 -d
 -B 128
@@ -38,9 +38,9 @@ zakinit 50,50
 ; p8 : chorus
 
 ; TABLES
-gisine   ftgen 1, 0, 4096, 10, 1                        ; Sine wave
-gisquare ftgen 2, 0, 4096, 7, 1, 2048, 1, 0, 0, 2048, 0 ; Square wave
-
+gisine   ftgen 1, 0, 4096, 10, 1                           ; Sine wave
+gisquare ftgen 2, 0, 4096, 7, -1, 2048, -1, 0, 1, 2048, 1  ; Square wave
+gisaw    ftgen 3, 0, 4096, 7, 0, 2048, -1, 0, 1, 2048, 0   ; Saw wave  
 
 
 
@@ -435,6 +435,82 @@ zawm p6 * aR, 8
 
 zawm p8 * aL, 11
 zawm p8 * aR, 12
+
+endin
+
+instr 10 ; phaserSynth thingy
+
+idur = p3
+i_vol = p4
+i_rev = p5
+i_del = p6
+i_pan = p7
+i_chor = p8
+
+inote = cpsmidinn(p9)
+
+icf = p10
+ires = p11
+iad = 12
+iadp1 = p13
+isim = p14
+iadp2 = abs(isim -iad)
+itable = p15
+itable2 = p16
+iwmix = p17
+itune = p18
+isep = p19
+imode = p20
+ienv_amp = p21
+ifb = p22
+
+aenv = linseg:a(0, (idur -0.02)*iad+0.01, 1,   (idur -0.02)*(1-iad)+0.01, 0)
+kep1 = linseg:k(0, idur*iadp1, ienv_amp, idur*(1-iadp1), 0)
+kep2 = linseg:k(0, idur*iadp2, ienv_amp, idur*(1-iadp2), 0)
+
+kep1 += (1 -ienv_amp)
+kep2 += (1 -ienv_amp)
+
+aosc1 = poscil:a(1, inote, itable)
+aosc2 = poscil:a(1, inote, itable2)
+ 
+inote2 = inote * itune
+ 
+aosc3 = poscil:a(1, inote2, itable)
+aosc4 = poscil:a(1, inote2, itable2)
+
+a1 = aosc1 * (1 - iwmix) + aosc2 * (iwmix)
+a2 = aosc3 * (1 - iwmix) + aosc4 * (iwmix)
+
+a3 = a1 + a2 
+
+ap1 phaser2 a3, kep1 * (icf - 10) + 10, ires, 6, imode, kep1*isep, ifb
+ap2 phaser2 a3 + ap1, kep2 * (icf - 10) + 10, ires, 6, imode, kep2*isep, ifb
+
+ap2 *= aenv 
+ap1 *= aenv
+a3 *= aenv 
+ap2 += a3
+
+
+ap2 = declick(ap2)
+
+ap2 dam ap2, 0.8, 0.8, 2, 0.01, 0.3 
+
+aL = ap2 * sqrt(1- i_pan) * i_vol
+aR = ap2 * sqrt(i_pan) * i_vol
+
+zawm aL, 1
+zawm aR, 2
+
+zawm i_rev * aL, 3
+zawm i_rev * aR, 4
+
+zawm i_del * aL, 7
+zawm i_del * aR, 8
+
+zawm i_chor * aL, 11
+zawm i_chor * aR, 12
 
 endin
 

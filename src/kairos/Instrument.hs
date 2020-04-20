@@ -166,6 +166,29 @@ stutter path = do
              , kind   = Csound
              }
 
+phax :: IO Instr
+phax = do
+  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1)
+                                    ,(5,Pd 0),(6,Pd 0)
+                                    ,(7,Pd 0.5),(8,Pd 0)
+                                    ,(9,Pd 48),(10,Pd 1100)
+                                    ,(11,Pd 0.8),(12,Pd 0.33)
+                                    ,(13,Pd 0),(14,Pd 1)
+                                    ,(15,Pd 3),(16,Pd 2)
+                                    ,(17,Pd 0.5),(18, Pd 0.5)
+                                    ,(19, Pd 0.91),(20, Pd 1)
+                                    ,(21, Pd 0.5),(22, Pd 0.9)
+                                    ]
+  emptyPat <- newTVarIO M.empty
+  return $ I { insN = 10
+             , pf = pfields
+             , toPlay = Nothing
+             , status = Inactive
+             , timeF  = ""
+             , pats   = emptyPat
+             , kind   = Csound
+             }
+             
 -- default effects
 
 reverb :: IO Instr
@@ -220,6 +243,7 @@ master = do
              , kind   = Csound
              }
 
+-------------- NOT WORKING YET ! ---------
 other :: Int -> [(Int,Pfield)] -> IO Instr
 other i_n pfields = do
   pfieldss <- newTVarIO $ M.fromList pfields
@@ -231,7 +255,7 @@ other i_n pfields = do
              , pats = emptyPat
              , kind = Other
              }
-
+---------------------------------------------
 -- default Orchestra
 
 defaultOrc :: IO Orchestra
@@ -246,15 +270,17 @@ defaultOrc = do
   lpFM <- fmSub
   sSaw <- superSaw
   strPad <- stringPad
+  phaxo <- phax
   chorus <- chorus
   mix <- master
   ot <- other 666 [(1,Pd 0.8),(2,Ps "Test")]
   orc  <- atomically $ newTVar $ M.fromList [("OH808",ohh),("CH808",chh)
                                             ,("303",a303),("hov",hov)
                                             ,("rev",rev),("del",del)
-                                            ,("karp",karpS), ("lpFM",lpFM)
-                                            ,("sSaw", sSaw), ("strPad",strPad)
-                                            ,("mix",mix),("chorus",chorus),("test",ot)
+                                            ,("karp",karpS),("lpFM",lpFM)
+                                            ,("sSaw", sSaw),("strPad",strPad)
+                                            ,("mix",mix),("chorus",chorus)
+                                            ,("phax",phaxo),("test",ot)
                                             ]
   return $ orc
 
