@@ -548,13 +548,14 @@ zawm aoutR * gkvolrev, 6
 
 endin
 
-instr 552	;Chorus
+instr 552	;Spectral Chorus
 
  a1 zar 11
  a2 zar 12
 
  kdlyml = gkdelchorus ;delay in milliseconds
-
+ kblurtime = gkdelchorus / 1000
+ 
  k1 = oscili:k(kdlyml/gkdivchorus, 1, 2)
  ar1l = vdelay3(a1, kdlyml/5+k1, 900)
  ar1r = vdelay3(a2, kdlyml/5+k1, 900)
@@ -567,11 +568,22 @@ instr 552	;Chorus
  k4 = oscili:k(kdlyml/gkdivchorus, 1, 2)
  ar4l = vdelay3(a1, kdlyml/5+k4, 900)
  ar4r = vdelay3(a2, kdlyml/5+k4, 900)
- aoutl = (a1+ar1l+ar2l+ar3l+ar4l)*.5 * gkvolchorus
- aoutr = (a2+ar1r+ar2r+ar3r+ar4r)*.5 * gkvolchorus
+ aoutl = (ar1l+ar2l+ar3l+ar4l)*.5
+ aoutr = (ar1r+ar2r+ar3r+ar4r)*.5
+ 
+ fsigl pvsanal aoutl, 512, 128, 1024, 0  
+ fsiglBlur pvsblur fsigl, kblurtime, 5
+ aBlurL pvsynth fsiglBlur
+ 
+ fsigr pvsanal aoutl, 512, 128, 1024, 0  
+ fsigrBlur pvsblur fsigr, kblurtime, 5
+ aBlurR pvsynth fsigrBlur
 
- zawm aoutl, 13
- zawm aoutr, 14
+aL = aBlurL * gkvolchorus
+aR = aBlurR * gkvolchorus
+
+ zawm aL, 13
+ zawm aR, 14
 
 endin
 
