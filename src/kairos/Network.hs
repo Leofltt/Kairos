@@ -4,6 +4,7 @@ module Kairos.Network where
 
 import Kairos.Base
 import Kairos.Instrument
+import Kairos.Utilities
 import Network.Socket hiding (recv)
 import Network.Socket.ByteString (recv, sendAll,send)
 import qualified Data.ByteString.Char8 as C
@@ -50,7 +51,7 @@ sendMsgOSC m n = do
   close sock
 
 pfieldToOSCDatum :: Pfield -> OSCDatum
-pfieldToOSCDatum (Pd x) = OSC_D x
+pfieldToOSCDatum (Pd x) = OSC_F $ doubleToFloat x
 pfieldToOSCDatum (Ps x) = OSC_S $ B.packChars x
 
 pfieldsToOSCs :: [Pfield] -> [OSCDatum]

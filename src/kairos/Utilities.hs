@@ -146,3 +146,6 @@ numSeqFromText t = reverse $ filter (/=0) (binToNormSum $ textToBinary t)
 
 numSeqFromBin :: Double -> [Double]
 numSeqFromBin d = reverse $ filter (/=0) (binToNormSum $ numToBinary d)
+
+doubleToFloat :: Double -> Float
+doubleToFloat = realToFrac

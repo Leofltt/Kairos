@@ -244,7 +244,7 @@ master = do
              , kind   = Csound
              }
 
--------------- NOT WORKING YET ! ---------
+-------------- NOW WORKING ! ---------
 other :: Int -> [(Int,Pfield)] -> IO Instr
 other i_n pfields = do
   pfieldss <- newTVarIO $ M.fromList pfields
@@ -252,6 +252,7 @@ other i_n pfields = do
   return $ I { insN = i_n
              , pf = pfieldss
              , toPlay = Nothing
+             , status = Inactive
              , timeF = ""
              , pats = emptyPat
              , kind = OSC
@@ -274,7 +275,7 @@ defaultOrc = do
   phaxo <- phax
   chorus <- chorus
   mix <- master
-  ot <- other 666 [(1,Pd 0.8),(2,Ps "Test")]
+  ot <- other 666 [(3, Pd 0.8),(2,Ps "Test")]
   orc  <- atomically $ newTVar $ M.fromList [("OH808",ohh),("CH808",chh)
                                             ,("303",a303),("hov",hov)
                                             ,("rev",rev),("del",del)
