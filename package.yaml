@@ -27,6 +27,7 @@ dependencies:
 - containers
 - transformers
 - csv
+- vivid-osc 
 library:
   source-dirs: src
 

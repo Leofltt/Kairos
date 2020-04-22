@@ -47,7 +47,7 @@ data Instr = I { insN :: Int
 data Status = Init | Active | Inactive | Stopping deriving (Show)
 
 -- where are we sending the data
-data MessageTo = Csound | Other deriving (Show,Eq)
+data MessageTo = Csound | OSC deriving (Show,Eq)
 
 -- Map of Pfields
 type PfMap = M.Map Int Pfield

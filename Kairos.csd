@@ -6,7 +6,7 @@
 
 <CsoundSynthesizer>
 <CsOptions>
--odac
+-odac3
 --port=11000
 -d
 -B 128
@@ -438,7 +438,7 @@ zawm p8 * aR, 12
 
 endin
 
-instr 10 ; phaserSynth thingy
+instr 10 ; phaserSynth 
 
 idur = p3
 i_vol = p4
@@ -454,7 +454,7 @@ ires = p11
 iad = 12
 iadp1 = p13
 isim = p14
-iadp2 = abs(isim -iad)
+iadp2 = abs(abs(isim) - abs(iadp1))
 itable = p15
 itable2 = p16
 iwmix = p17
@@ -465,8 +465,21 @@ ienv_amp = p21
 ifb = p22
 
 aenv = linseg:a(0, (idur -0.02)*iad+0.01, 1,   (idur -0.02)*(1-iad)+0.01, 0)
+
+if (iadp1 >= 0 && isim >= 0) then
 kep1 = linseg:k(0, idur*iadp1, ienv_amp, idur*(1-iadp1), 0)
 kep2 = linseg:k(0, idur*iadp2, ienv_amp, idur*(1-iadp2), 0)
+elseif (iadp1 < 0 && isim >= 0) then
+kep1 = linseg:k(ienv_amp, idur*iadp1, 0, idur*(1-iadp1), ienv_amp)
+kep2 = linseg:k(ienv_amp, idur*iadp2, 0, idur*(1-iadp2), ienv_amp)
+elseif (iadp1 >= 0 && isim < 0) then
+kep1 = linseg:k(0, idur*iadp1, ienv_amp, idur*(1-iadp1), 0)
+kep2 = linseg:k(ienv_amp, idur*iadp2, 0, idur*(1-iadp2), ienv_amp)
+elseif (iadp1 < 0 && isim < 0) then
+kep1 = linseg:k(ienv_amp, idur*iadp1, 0, idur*(1-iadp1), ienv_amp)
+kep2 = linseg:k(0, idur*iadp2, ienv_amp, idur*(1-iadp2), 0)
+endif
+
 
 kep1 += (1 -ienv_amp)
 kep2 += (1 -ienv_amp)

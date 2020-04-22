@@ -8,6 +8,7 @@ import Control.Concurrent.STM
 import qualified Data.Map.Strict as M
 
 
+
 pfToString :: [Pfield] -> String
 pfToString ps = unwords $ map show ps
 
@@ -188,7 +189,7 @@ phax = do
              , pats   = emptyPat
              , kind   = Csound
              }
-             
+
 -- default effects
 
 reverb :: IO Instr
@@ -253,7 +254,7 @@ other i_n pfields = do
              , toPlay = Nothing
              , timeF = ""
              , pats = emptyPat
-             , kind = Other
+             , kind = OSC
              }
 ---------------------------------------------
 -- default Orchestra

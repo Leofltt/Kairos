@@ -31,14 +31,13 @@ playInstr :: Instr -> IO ()
 playInstr instr = do
   pfields <- readTVarIO $ pf instr
   let pfs = M.elems pfields
-  let pfieldList = pfToString pfs
   if (kind instr == Csound)
     then do
+      let pfieldList = pfToString pfs
       let pfds = "i" ++ (show (insN instr)) ++ " 0 " ++ pfieldList
       sendEvent pfds
     else do
-      let pfds = "/" ++ (show (insN instr)) ++ "/" ++ pfieldList
-      sendOther pfds
+      sendOSC (insN instr) pfs
 
 playOne :: Performance -> Instr -> TimePoint -> IO ()
 playOne perf i tp = do

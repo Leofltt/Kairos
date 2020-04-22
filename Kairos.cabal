@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6d37c957ed26f6ad790824a1778ad2819604fab98381a6379373efde6fcb5668
+-- hash: 22eac2ad2e2cea4e019c868257ae3090dff34d0337556bbd3bec8828e2646a4c
 
 cabal-version:  >= 1.10
 name:           Kairos
@@ -53,6 +53,7 @@ library
     , stm
     , time
     , transformers
+    , vivid-osc
   default-language: Haskell2010
 
 test-suite Kairos-test
@@ -74,4 +75,5 @@ test-suite Kairos-test
     , stm
     , time
     , transformers
+    , vivid-osc
   default-language: Haskell2010
