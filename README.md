@@ -36,6 +36,7 @@ This tutorial will serve as an overview of the operational principles of the lib
 
 When run, the script `BootKairos.hs` will instantiate a default performance named `perf`.
 The performance is a data structure  that holds informations  about timing (time Signature, bpm, bar length), the instruments and the patterns they use.
+By default this performance sends Csound score to port 11000 and OSC messages to port 11100.
 
 To display the names of all the instruments currently loaded, run
 
@@ -116,7 +117,7 @@ Here is a list of the currently implemented update functions:
 - `percentNext int` : given an int probability (0-100), returns the next value with int % probability, otherwise keeps current value
 - `runMarkov csv-file` : given a csv file with a table of probabilities, picks the next value appropriately
 
-#### Adding your own Csound Csound Instruments
+#### Adding your own Csound or OSC Instruments
 
 To add your own Csound instruments to the `Kairos.csd` file
 you need to keep in mind the following criteria:
@@ -143,7 +144,7 @@ you need to keep in mind the following criteria:
    - should use channels instead of pfields to control parameters
    - should have `p3 = -1`(play forever) and be played with the `playFx` function
 
-
+To add instruments controlled by OSC, just create an instance of the instrument named `other` giving it a name string and a list of tuples `[(pfield #, value)]` and add that instance to the orchestra. You can follow the example of the `"test"` instrument present in the default orchestra found in the file `Instrument.hs`.
 
 Leonardo Foletto, 2019
 
