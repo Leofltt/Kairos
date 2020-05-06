@@ -240,12 +240,16 @@ addI "sovreign" $ stutter sovreign
 addI "terrorist" $ stutter terrorist
 addI "walk" $ stutter walk
 er1k = defPath "/ER1/kick04.wav"
+er1k2 = defPath "/ER1/kick03.wav"
+er1kl = defPath "/ER1/kick08.wav"
 er1mhh = defPath "/ER1/MicroHat.wav"
 er1cr1 = defPath "/ER1/CrashCymbal1.wav"
 er1cr2 = defPath "/ER1/CrashCymbal2.wav"
 er1r = defPath "/ER1/rim01.wav"
 er1kd = defPath "/ER1/kick14.wav"
 addI "er1k" $ sampler er1k
+addI "er1k2" $ sampler er1k2
+addI "er1kl" $ sampler er1kl
 addI "er1mhh" $ sampler er1mhh
 addI "er1cr1" $ sampler er1cr1
 addI "er1cr2" $ sampler er1cr2
@@ -255,7 +259,7 @@ fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
 csv1 = markPath "/Test.csv"
 csv2 = markPath "/Test2.csv"
 csv3 = markPath "/Test3.csv"
-params "lpFM" [ (keep, vol, [Pd 0.7]),(keep, rev, [Pd 0.5]),((percentNext 73), pitch, toPfD [53, 56, 58, 53, 48]),(keep, fmIndx, [Pd 12.3]), (keep, fmDepth, [Pd 987.23]), (keep, dist, [Pd 1.15]),(keep,cf,[Pd 3880]),( keep, rev, [Pd 0.6]),(keep, adRatio,[Pd 0.7]),(randomize,pan,toPfD[0.4,0.6,0.75,0.35])]
+params "lpFM" [ (keep, vol, [Pd 0.7]),(keep, rev, [Pd 0.5]),((percentNext 73), pitch, toPfD [53, 56, 58, 53, 48]),(keep, fmIndx, [Pd 12.3]), (keep, fmDepth, [Pd 987.23]),(keep,cf,[Pd 3880]),( keep, rev, [Pd 0.6]),(keep, adRatio,[Pd 0.7]),(randomize,pan,toPfD[0.4,0.6,0.75,0.35])]
 params "303" [ (keep,dur,toPfD[ 0.25]),(keep,res,[Pd 4]),(keep, vol, [Pd 0.5]),(keep, cf, [Pd 3500]),((runMarkov csv3), pitch, toPfD (withScale 41 dorian)),(keep, rev, [Pd 0.4])]
 params "hov" [ (keep,dur,toPfD[ 1.2]),(keep, vol, [Pd 0.3]),(keep, cf, [Pd 800]),((runMarkov csv3), pitch, toPfD (withScale 41 dorian)),(keep, rev, [Pd 0.7])]
 let plucky = cf "303" [Pd 5000] keep >> res "303" [Pd 6] keep >> dur "303" [Pd 0.17] keep

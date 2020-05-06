@@ -151,6 +151,7 @@ notEffect = filter (/= "rev") . filter (/= "del") . filter (/= "mix") . filter (
 -- a few time patterns in 4/4
 downB = [(TP 1),(TP 3)]
 dbk = toTP [0,2.5]
+dbk2 = toTP [0, 1.75, 2.5]
 upFour = toTP $ takeWhile (< 4) [0.5,1.5..]
 fourFloor = toTP $ takeWhile (< 4) [0,1..]
 eightN = toTP $ takeWhile (< 4) [0,0.5..]
@@ -196,6 +197,7 @@ defaultTPMap = do
                                   ,("ukgch",ukgch),("ukgrs",ukgrs),("jgs",jgs),("jgk",jgk)
                                   ,("kpanb",kpanb),("kpanc",kpanc),("kpanbox",kpanbox),("b2",b2)
                                   ,("bou2",bou2),("fwk1",fwk1),("fwk2",fwk2),("adb",adb),("adk",adk)
+                                  ,("dbk2",dbk2)
                                   ]
   return $ tpMap
 

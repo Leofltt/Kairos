@@ -527,6 +527,18 @@ zawm i_chor * aR, 12
 
 endin
 
+instr 550 ; ReverbSC
+
+arvbL zar 3
+arvbR zar 4
+
+aoutL, aoutR reverbsc arvbL, arvbR, gkfbrev, gkcfrev
+
+zawm aoutL * gkvolrev, 5
+zawm aoutR * gkvolrev, 6
+
+endin
+
 instr 551 ; Delay
 
 adelLr zar 7
@@ -546,18 +558,6 @@ adelR 	deltap3	adlt
 
 zawm adelL * gkvoldel, 9
 zawm adelR * gkvoldel, 10
-
-endin
-
-instr 550 ; ReverbSC
-
-arvbL zar 3
-arvbR zar 4
-
-aoutL, aoutR reverbsc arvbL, arvbR, gkfbrev, gkcfrev
-
-zawm aoutL * gkvolrev, 5
-zawm aoutR * gkvolrev, 6
 
 endin
 
