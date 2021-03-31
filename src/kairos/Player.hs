@@ -59,6 +59,7 @@ playOne perf i tp = do
            else do
                    return ()
 
+-- play an instrument once immediately
 playNow :: Performance -> String -> IO ()
 playNow perf i = do
   tp <- beatInBar (clock perf)
@@ -183,10 +184,10 @@ adb = toTP [0,1,2,3,4.5,5,6,7,8,9.5,10]
 displayTPat :: Performance -> IO String
 displayTPat perf = do
    tpats <- readTVarIO (timePs perf)
-   return $ unwords $ inter' ( M.keys tpats)  ( map show (map fromTP (M.elems tpats)))
+   return $ unwords $ M.keys tpats-- $ inter' ( M.keys tpats)  ( map show (map fromTP (M.elems tpats)))
 
 
-
+-- default map of named patterns of timepoints  
 defaultTPMap :: IO (TVar (M.Map [Char] [TimePoint]))
 defaultTPMap = do
   tpMap <- newTVarIO $ M.fromList [("upFour", upFour),("downB", downB),("eightN",eightN)
@@ -211,7 +212,6 @@ updatePfields i = do
    pfields <- readTVarIO (pf i)
    pfpats <- readTVarIO (pats i)
    mapM_ (updateonepfield (pf i)) (M.elems pfpats)
-
 
 updateonepfield :: TVar PfMap -> PfPat -> IO ()
 updateonepfield pfmap pats = do
@@ -252,5 +252,6 @@ nextBeat b xs | filter (b <) xs == [] = head xs
               | otherwise = head $ filter (b <) xs
 
 
+-- add a named pattern of timepoints to a performance
 addTPf :: Performance -> String -> [TimePoint] -> IO ()
 addTPf e n ts = addToMap (timePs e) (n,ts)

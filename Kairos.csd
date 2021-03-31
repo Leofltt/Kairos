@@ -6,11 +6,12 @@
 
 <CsoundSynthesizer>
 <CsOptions>
--odac3
+-odac5
 --port=11000
 -d
 -B 128
 -b 64
+-Q0
 
 </CsOptions>
 <CsInstruments>
@@ -39,8 +40,8 @@ zakinit 50,50
 
 ; TABLES
 gisine   ftgen 1, 0, 4096, 10, 1                           ; Sine wave
-gisquare ftgen 2, 0, 4096, 7, -1, 2048, -1, 0, 1, 2048, 1  ; Square wave
-gisaw    ftgen 3, 0, 4096, 7, 0, 2048, -1, 0, 1, 2048, 0   ; Saw wave  
+gisquare ftgen 2, 0, 4096, 7, 1, 2048, 1, 0, -1, 2048, -1  ; Square wave
+gisaw    ftgen 3, 0, 4096, 7, 0, 2048, 1, 0, -1, 2048, 0   ; Saw wave  
 
 
 
@@ -137,6 +138,7 @@ zawm p8 * aR, 12
 
 
 endin
+
 
 instr 2 ; Stutter
 
@@ -470,12 +472,14 @@ if (iadp1 >= 0 && isim >= 0) then
 kep1 = linseg:k(0, idur*iadp1, ienv_amp, idur*(1-iadp1), 0)
 kep2 = linseg:k(0, idur*iadp2, ienv_amp, idur*(1-iadp2), 0)
 elseif (iadp1 < 0 && isim >= 0) then
+iadp1 = abs(iadp1)
 kep1 = linseg:k(ienv_amp, idur*iadp1, 0, idur*(1-iadp1), ienv_amp)
 kep2 = linseg:k(ienv_amp, idur*iadp2, 0, idur*(1-iadp2), ienv_amp)
 elseif (iadp1 >= 0 && isim < 0) then
 kep1 = linseg:k(0, idur*iadp1, ienv_amp, idur*(1-iadp1), 0)
 kep2 = linseg:k(ienv_amp, idur*iadp2, 0, idur*(1-iadp2), ienv_amp)
 elseif (iadp1 < 0 && isim < 0) then
+iadp1 = abs(iadp1)
 kep1 = linseg:k(ienv_amp, idur*iadp1, 0, idur*(1-iadp1), ienv_amp)
 kep2 = linseg:k(0, idur*iadp2, ienv_amp, idur*(1-iadp2), 0)
 endif
@@ -497,8 +501,8 @@ a2 = aosc3 * (1 - iwmix) + aosc4 * (iwmix)
 
 a3 = a1 + a2 
 
-ap1 phaser2 a3, kep1 * (icf - 10) + 10, ires, 6, imode, kep1*isep, ifb
-ap2 phaser2 a3 + ap1, kep2 * (icf - 10) + 10, ires, 6, imode, kep2*isep, ifb
+ap1 phaser2 a3, kep1 * (sr/2 - icf) + icf, ires, 6, imode, kep1*isep, ifb
+ap2 phaser2 a3 + ap1, kep2 * (sr/2 - icf) + icf, ires, 6, imode, kep2*isep, ifb
 
 ap2 *= aenv 
 ap1 *= aenv
@@ -560,6 +564,45 @@ zawm adelL * gkvoldel, 9
 zawm adelR * gkvoldel, 10
 
 endin
+
+instr 100 ; Model:Cycles MIDI Out
+
+ivol = p4
+irev = p5
+idel = p6
+ipan = p7
+ichan = p8
+inote = p9
+ivel =  p10
+ipitch = p11
+idecay = p12
+icolor = p13
+ishape = p14
+isweep = p15
+icontour = p16
+;ilfospeed = p17
+;iswing = p18
+;ichance = p19
+;imachine = p20
+;ipunch = p21
+;igate = p22
+
+;midiout_i 176, ichan, 7, ivol
+;midiout_i 176, ichan, 65, ipitch
+;midiout_i 176, ichan, 80, idecay
+;midiout_i 176, ichan, 10, ipan
+;
+;midiout_i 176, ichan, 12, idel
+;midiout_i 176, ichan, 13, irev
+;
+;midiout_i 176, ichan, 16, icolor
+;midiout_i 176, ichan, 17, ishape
+;midiout_i 176, ichan, 18, isweep
+;midiout_i 176, ichan, 19, icontour
+
+midion ichan, inote, ivel
+
+endin 
 
 instr 552	;Spectral Chorus
 

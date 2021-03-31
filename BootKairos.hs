@@ -57,6 +57,16 @@ modeP i list fun =  addPf i 20 list fun   -- phax
 edP i list fun =  addPf i 21 list fun     -- phax
 fbP i list fun =  addPf i 22 list fun     -- phax
 
+chan i list fun = addPf i 8 list fun      -- model:cycles
+note i list fun = addPf i 9 list fun      -- model:cycles
+vel i list fun = addPf i 10 list fun      -- model:cycles
+mc_pitch i list fun = addPf i 11 list fun -- model:cycles
+decay i list fun = addPf i 12 list fun    -- model:cycles
+color i list fun = addPf i 13 list fun    -- model:cycles
+shape i list fun = addPf i 14 list fun    -- model:cycles
+sweep i list fun = addPf i 15 list fun    -- model:cycles
+contour i list fun =  addPf i 16 list fun -- model:cycles
+
 silence = stopAll perf
 playA = playAll perf
 playFx = playEffect perf

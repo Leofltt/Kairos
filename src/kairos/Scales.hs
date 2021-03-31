@@ -37,3 +37,5 @@ wholeTone :: Scale
 wholeTone = [0,2,4,6,8,10]
 triTone :: Scale
 triTone = [0,1,4,6,7,10]
+phryDom :: Scale
+phryDom = [0,1,4,5,7,8,10,11]

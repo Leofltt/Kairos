@@ -190,6 +190,26 @@ phax = do
              , kind   = Csound
              }
 
+modelcycles :: Double -> IO Instr
+modelcycles chan = do
+  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 90)
+                                    ,(5,Pd 0),(6,Pd 0)
+                                    ,(7,Pd 64),(8,Pd chan)
+                                    ,(9,Pd 60),(10,Pd 115)
+                                    ,(11,Pd 0),(12,Pd 20)
+                                    ,(13,Pd 50),(14,Pd 50)
+                                    ,(15,Pd 20),(16,Pd 20)
+                                    ]
+  emptyPat <- newTVarIO M.empty
+  return $ I { insN = 100
+             , pf = pfields
+             , toPlay = Nothing
+             , status = Inactive
+             , timeF  = ""
+             , pats   = emptyPat
+             , kind   = Csound
+             }
+
 -- default effects
 
 reverb :: IO Instr
@@ -273,6 +293,7 @@ defaultOrc = do
   sSaw <- superSaw
   strPad <- stringPad
   phaxo <- phax
+  cycles1 <- modelcycles 1
   chorus <- chorus
   mix <- master
   ot <- other 666 [(3, Pd 0.8),(2,Ps "Test")]
@@ -283,6 +304,7 @@ defaultOrc = do
                                             ,("sSaw", sSaw),("strPad",strPad)
                                             ,("mix",mix),("chorus",chorus)
                                             ,("phax",phaxo),("test",ot)
+                                            ,("mc",cycles1)
                                             ]
   return $ orc
 

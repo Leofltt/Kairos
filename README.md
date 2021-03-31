@@ -146,7 +146,7 @@ you need to keep in mind the following criteria:
 
 To add instruments controlled by OSC, just create an instance of the instrument named `other` giving it a name string and a list of tuples `[(pfield #, value)]` and add that instance to the orchestra. You can follow the example of the `"test"` instrument present in the default orchestra found in the file `Instrument.hs`.
 
-Leonardo Foletto, 2019-2020
+Leonardo Foletto, 2019-2021
 
 [the Haskell platform]: https://www.haskell.org/downloads/
 [Csound]: https://csound.com/download.html

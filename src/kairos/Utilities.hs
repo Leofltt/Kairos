@@ -95,12 +95,12 @@ interleave l1 l2 = sort $ inter' l1 $ filterEqualsList l1 l2
 interleave' l1 l2 = inter' l1 l2
 
 inter' :: Ord a => [a] -> [a] -> [a]
-inter' (a:as) (b:bs) = a : b : (interleave as bs)
 inter' (x:[])  y     = x:y
-inter' (x:xs) (y:[]) = x:y:xs
 inter'  []     y     = y
 inter'  x      []    = x
-inter'  _      _     = []
+inter' (a:as) (b:bs) = a : b : (interleave as bs)
+-- inter' (x:xs) (y:[]) = x:y:xs
+-- inter'  _      _     = []
 
 offset :: Num a => a ->  [a] -> [a]
 offset i = map (+ i)

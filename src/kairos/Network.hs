@@ -5,7 +5,7 @@ module Kairos.Network where
 import Kairos.Base
 import Kairos.Instrument
 import Kairos.Utilities
-import Network.Socket hiding (recv)
+import Network.Socket hiding (recv, send)
 import Network.Socket.ByteString (recv, sendAll,send)
 import qualified Data.ByteString.Char8 as C
 import Data.ByteString.Internal as B
