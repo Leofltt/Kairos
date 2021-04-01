@@ -82,3 +82,40 @@ interp2 :: Double -> [Double] -> [Double]
 interp2 tot (x:y:[]) = [((x+y)/2)]
 interp2 tot (x:[]) = [(x + tot)/2]
 interp2 tot (x:y:xs) = ((x+y)/2):(interp2 tot xs)
+
+
+
+--- default Patterns ----------------------------------------
+
+
+-- a few time patterns in 4/4
+downB = [(TP 1.0),(TP 3.0)]
+dbk = toTP [0,2.5]
+dbk2 = toTP [0, 1.75, 2.5]
+upFour = toTP $ takeWhile (< 4) [0.5,1.5..]
+fourFloor = toTP $ takeWhile (< 4) [0,1..]
+eightN = toTP $ takeWhile (< 4) [0,0.5..]
+sixteenN = toTP $ takeWhile (< 4) [0,0.25..]
+dubb = toTP [2.25,2.75]
+jGhost = toTP [1.75,2.25,5.75]
+jGhost1 = toTP [1.75,2.25,5.75,6.25,7.75]
+sixBar = tupleForBar 4 6
+jgk = toTP [0, 0.5, 2.5, 4.5,4.75,6.5]
+jgs = toTP [1,1.75,2.25,3.5,4.25,5,5.75,6.25,7.5]
+ukgrs = toTP [0.25,1.75,3.25,5.75,7.25]
+ukgch = toTP [0.5,0.75, 1.5, 2.5,3.5,3.75,4.5,5.5,6.5,7.5]
+bouncyk = toTP [0,0.5,2,2.5,4,4.25,6,6.5]
+ir1k = toTP [0,0.5,0.75,1.5,2.5,4,4.5,5.75,6.5]
+stdbkk = toTP [0,0.5,1.5,2.5]
+stdbks = toTP [1,1.75,2.5,3]
+irsn = toTP [1,1.75,3,3.75,5,7,7.75]
+uno = [TP 0.0]
+kpanb = toTP [0, 0.75,1.5,2.5,3]
+kpanc = toTP [0,0.25,1.5,1.75,2,2.25,3.5,3.75,4,4.5,4.75,5.25,5.5,6,7.5]
+kpanbox = toTP [0,1.5,2,3.5,4,4.5,4.75,5.25,5.5,6,7.5]
+b2 = toTP [0,0.75,1,2,2.5]
+bou2 = toTP [0,1.5,2,3.5,4,5.5,6,7.75]
+fwk1 = toTP [0,0.75,1.5,2,2.75,3.5]
+fwk2 = toTP [0,0.75,1.25,1.75,2,2.75]
+adk = toTP [0, 1, 2,2.5,3,4,5,5.5,6,7,8,8.5,9,10,11,11.5]
+adb = toTP [0,1,2,3,4.5,5,6,7,8,9.5,10]
