@@ -81,26 +81,17 @@ genNRandomValues n seed = take n $ (randomRs (0, 100) generator) where
 filterEqualsList :: Ord a => [a] -> [a] -> [a]
 filterEqualsList (x:xs) ys     | elem x ys == False = filterEqualsList xs ys
                                | otherwise = filterEqualsList xs (filter (/= x) ys)
-filterEqualsList (x:xs) (y:[]) | elem x [y] == False = filterEqualsList xs [y]
-                               | otherwise = []
-filterEqualsList (x:[]) ys     | elem x ys == False = ys
-                               | otherwise = (filter (/= x) ys)
-filterEqualsList (x:[]) (y:[]) | elem x [y] == False = [y]
-                               | otherwise = []
 filterEqualsList _ [] = []
 filterEqualsList [] y = y
 
 
-interleave l1 l2 = sort $ inter' l1 $ filterEqualsList l1 l2
-interleave' l1 l2 = inter' l1 l2
+interleave l1 l2 = sort $ inter l1 $ filterEqualsList l1 l2
 
-inter' :: Ord a => [a] -> [a] -> [a]
-inter' (x:[])  y     = x:y
-inter'  []     y     = y
-inter'  x      []    = x
-inter' (a:as) (b:bs) = a : b : (interleave as bs)
--- inter' (x:xs) (y:[]) = x:y:xs
--- inter'  _      _     = []
+inter :: Ord a => [a] -> [a] -> [a]
+inter (x:[])  y     = x:y
+inter  []     y     = y
+inter  x      []    = x
+inter (a:as) (b:bs) = a : b : (inter as bs)
 
 offset :: Num a => a ->  [a] -> [a]
 offset i = map (+ i)

@@ -181,10 +181,10 @@ fwk2 = toTP [0,0.75,1.25,1.75,2,2.75]
 adk = toTP [0, 1, 2,2.5,3,4,5,5.5,6,7,8,8.5,9,10,11,11.5]
 adb = toTP [0,1,2,3,4.5,5,6,7,8,9.5,10]
 
-displayTPat :: Performance -> IO String
+displayTPat :: Performance -> IO [String]
 displayTPat perf = do
    tpats <- readTVarIO (timePs perf)
-   return $ unwords $ M.keys tpats-- $ inter' ( M.keys tpats)  ( map show (map fromTP (M.elems tpats)))
+   return $ inter ( M.keys tpats)  ( map show (map fromTP (M.elems tpats)))
 
 
 -- default map of named patterns of timepoints  
