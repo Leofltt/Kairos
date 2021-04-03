@@ -212,12 +212,7 @@ closertoNow e k ts = do
 updateToPlay :: Performance -> String -> Maybe TimePoint -> IO ()
 updateToPlay e k newTP = updateInstrument e k (\x -> x { toPlay = newTP })
 
-
 nextBeat :: TimePoint -> [TimePoint] -> TimePoint
 nextBeat b xs | filter (b <) xs == [] = head xs
               | otherwise = head $ filter (b <) xs
 
-
--- add a named pattern of timepoints to a performance
-addTPf :: Performance -> String -> [TimePoint] -> IO ()
-addTPf e n ts = addToMap (timePs e) (n,ts)

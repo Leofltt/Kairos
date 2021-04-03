@@ -46,13 +46,18 @@ fromTP [] = []
 tupleForBar b t = toTP $ takeWhile (<b) $ Prelude.map (+(b/(t*b))) [(0/t*b), (1/t*b) ..]
 
 -- Given total length in beats, the beat subdivision wanted and the % of beats, generate a time pattern
-patternWithDensity :: Double -> Double -> Int  -> IO [TimePoint]
+patternWithDensity :: Double -> Double -> Int  -> IO (Maybe [TimePoint])
 patternWithDensity b sub dens = do
   seed <- (round . (* 1000)) <$> getPOSIXTime
   let bar = tupleForBar b sub
   let vals = genNRandomValues (length bar) seed ::[Int]
   let newBar = tempF bar vals dens
-  return $ newBar
+  return $ notEmpty newBar
+
+-- return Nothing if list is Empty, otherwise Just list
+notEmpty :: [a] -> Maybe [a]
+notEmpty [] = Nothing 
+notEmpty l  = Just l 
 
 tempF :: [TimePoint] -> [Int] -> Int -> [TimePoint]
 tempF (x:[]) (v:vs) d | v <= d = [x]
@@ -83,7 +88,15 @@ interp2 tot (x:y:[]) = [((x+y)/2)]
 interp2 tot (x:[]) = [(x + tot)/2]
 interp2 tot (x:y:xs) = ((x+y)/2):(interp2 tot xs)
 
+-- add a named pattern of timepoints to a performance
 
+addTPf :: Performance -> String -> [TimePoint] -> IO ()
+addTPf e n ts = addToMap (timePs e) (n,ts)
+
+
+maybeAddTPf :: Performance -> String -> Maybe [TimePoint] -> IO ()
+maybeAddTPf e n ts | ts == Nothing = return ()
+                   | otherwise = addTPf e n $ fromJust ts
 
 --- default Patterns ----------------------------------------
 
