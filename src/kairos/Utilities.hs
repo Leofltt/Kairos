@@ -142,10 +142,10 @@ binToSum x | (last x) == 0 = 0 : (binToSum $ init x)
            | (last x) == 1 = (length x) : (binToSum $ init x)
 
 numSeqFromText :: String -> [Double]
-numSeqFromText t = reverse $ filter (/=0) (binToNormSum $ textToBinary t)
+numSeqFromText t = reverse . filter (/=0) $ binToNormSum $ textToBinary t
 
 numSeqFromBin :: Double -> [Double]
-numSeqFromBin d = reverse $ filter (/=0) (binToNormSum $ numToBinary d)
+numSeqFromBin d = reverse . filter (/=0) $ binToNormSum $ numToBinary d
 
 doubleToFloat :: Double -> Float
 doubleToFloat = realToFrac
