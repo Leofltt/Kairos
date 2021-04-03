@@ -90,6 +90,8 @@ Some functions that generate a `[TimePoint]` :
 
 `evolve genN ruleFunction TPPattern`
 
+Generate `Maybe [TimePoint]` :
+
 `=<< patternWithDensity totNumBeats numBeatsToGen density`
 
 Some examples can be seen in the file `Test.hs`

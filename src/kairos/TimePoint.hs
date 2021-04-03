@@ -95,7 +95,7 @@ addTPf e n ts = addToMap (timePs e) (n,ts)
 
 
 maybeAddTPf :: Performance -> String -> Maybe [TimePoint] -> IO ()
-maybeAddTPf e n ts | ts == Nothing = return ()
+maybeAddTPf e n ts | ts == Nothing = putStrLn $ "Pattern is empty"
                    | otherwise = addTPf e n $ fromJust ts
 
 --- default Patterns ----------------------------------------
