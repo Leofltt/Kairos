@@ -5,7 +5,8 @@ import Control.Concurrent
 import Control.Concurrent.STM
 import qualified Data.Map.Strict as M
 import Data.List (sort, elem)
-import System.Random (getStdRandom,randomR, mkStdGen, randomRs)
+import System.Random (getStdRandom,randomR, mkStdGen, randomRs, randomRIO)
+import System.IO.Unsafe
 
 
 -- Map Utilities
@@ -59,8 +60,17 @@ percentNext i n = do
   let result = checkPercentNext val i p
   atomically $ writeTVar (pat n) result
   return $ head result
+  
 
 -- Misc Utilities
+
+shuffle x = if length x < 2 then return x else do
+  i <- randomRIO (0, length(x)-1)
+  r <- shuffle (Prelude.take i x ++ Prelude.drop (i+1) x)
+  return (x!!i : r)
+
+{-# NOINLINE scramble #-}
+scramble x = unsafePerformIO $ shuffle x
 
 randI :: Int -> IO Int
 randI i = getStdRandom $ randomR (0, i)
@@ -83,7 +93,6 @@ filterEqualsList (x:xs) ys     | elem x ys == False = filterEqualsList xs ys
                                | otherwise = filterEqualsList xs (filter (/= x) ys)
 filterEqualsList _ [] = []
 filterEqualsList [] y = y
-
 
 interleave l1 l2 = sort $ inter l1 $ filterEqualsList l1 l2
 
