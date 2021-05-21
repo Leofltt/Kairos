@@ -9,8 +9,8 @@ import Control.Applicative (liftA2)
 import Data.Time.Clock.POSIX (getPOSIXTime)
 
 instance Applicative TimePointf where
-  pure t = TP t
-  (<*>)(TP f)(TP second) = TP (f second)
+  pure = TP
+  (TP f) <*> (TP second) = TP (f second)
 
 instance (Num a) => Num (TimePointf a) where
   (+) = liftA2 (+)
