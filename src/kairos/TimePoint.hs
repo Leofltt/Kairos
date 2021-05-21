@@ -37,7 +37,7 @@ getTimePoint perf s = do
   return $ t
 
 fromTP :: [TimePoint] -> [Double]
-fromTP (x:xs) = (start x):(fromTP xs)
+fromTP (x:xs) = (time x):(fromTP xs)
 fromTP [] = []
 
 -- functions to create TimePoint patterns -------------------------------
@@ -99,7 +99,6 @@ maybeAddTPf e n ts | ts == Nothing = putStrLn $ "Pattern is empty"
                    | otherwise = addTPf e n $ fromJust ts
 
 --- default Patterns ----------------------------------------
-
 
 -- a few time patterns in 4/4
 downB = [(TP 1.0),(TP 3.0)]

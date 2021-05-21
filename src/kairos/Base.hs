@@ -66,9 +66,8 @@ instance Show Pfield where
   show (Ps s) = show s
   show (Pd d) = show d
 
--- a point in the Bar
-data TimePointf a = TP { start :: a
+-- a point in time
+data TimePointf a = TP { time :: a
                        } deriving (Eq, Ord, Functor, Show)
-
 
 type TimePoint = TimePointf Beats
