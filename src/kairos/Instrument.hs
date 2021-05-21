@@ -7,8 +7,6 @@ import Control.Concurrent
 import Control.Concurrent.STM
 import qualified Data.Map.Strict as M
 
-
-
 pfToString :: [Pfield] -> String
 pfToString ps = unwords $ map show ps
 
@@ -264,8 +262,8 @@ master = do
              , kind   = Csound
              }
 
--------------- NOW WORKING ! ---------
-other :: Int -> [(Int,Pfield)] -> IO Instr
+-------------- Create OSC Instrument ---------
+other :: InstrumentID -> [(Int,Pfield)] -> IO Instr
 other i_n pfields = do
   pfieldss <- newTVarIO $ M.fromList pfields
   emptyPat <- newTVarIO M.empty
@@ -318,6 +316,8 @@ displayInstruments perf = do
 addInstrument :: Performance -> String -> Instr -> IO ()
 addInstrument perf name instr = addToMap (orc perf) (name,instr)
 
+-- returns all instruments that are not effects
+notEffect = filter (/= "rev") . filter (/= "del") . filter (/= "mix") . filter ( /= "chorus")
 
 -- function to create a PfPat
 createPfPat :: Int -> [Pfield] -> (PfPat -> IO Pfield) -> IO PfPat

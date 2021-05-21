@@ -34,28 +34,31 @@ type Beats = Double
 type Orchestra = TVar (M.Map [Char] Instr)
 
 -- Instrument
-data Instr = I { insN :: Int
-               , pf :: TVar PfMap
+data Instr = I { insN :: InstrumentID 
+               , pf :: TVar PfMap 
                , status :: Status
                , toPlay :: Maybe TimePoint
-               , pats :: TVar (M.Map Int PfPat)
-               , timeF :: String
-               , kind :: MessageTo
+               , pats :: TVar (M.Map Int PfPat) -- Patterns of Parameters
+               , timeF :: String                -- Name of the time function to refer to
+               , kind :: MessageTo  
                }
+
+-- Instrument Name: an integer number
+type InstrumentID = Int
 
 -- is the instrument Active ?
 data Status = Init | Active | Inactive | Stopping deriving (Show)
 
 -- where are we sending the data
-data MessageTo = Csound | OSC deriving (Show,Eq)
+data MessageTo = Csound | OSC deriving (Show, Eq)
 
--- Map of Pfields
+-- Map of Pfields and their IDs
 type PfMap = M.Map Int Pfield
 
 -- pattern of pfields and related update function
-data PfPat = PfPat { pfNum :: Int                           -- id of the pfield
-                   , pat  :: TVar [Pfield]                  -- the string of possible values (or only value, depends on what the replacer needs)
-                   , updater :: PfPat -> IO Pfield          -- the function that decides which value to take
+data PfPat = PfPat { pfNum :: Int                  -- id of the pfield
+                   , pat  :: TVar [Pfield]         -- the string of possible values (or only value, depends on what the updater needs)
+                   , updater :: PfPat -> IO Pfield -- the function that decides which value to take
                    }
 
 -- a single Pfield

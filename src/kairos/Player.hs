@@ -104,7 +104,6 @@ playLoop perf pn Active = do
               Just p' <- lookupMap (orc perf) pn
               playLoop perf pn $ status p'
 
-
 playLoop perf p Inactive = do
   changeStatus perf p Init
   playLoop perf p Init
@@ -137,14 +136,15 @@ stop perf i = do
   changeStatus perf i Stopping
   return ()
 
-
+-- stop all instruments that are not effects
 stopAll perf = (mapM_ (stop perf)) .  notEffect . M.keys =<< readTVarIO (orc perf)
 
+-- plays all instruments that are not effects
 playAll perf = (mapM_ (play perf)) .  notEffect . M.keys =<< readTVarIO (orc perf)
 
+-- solo an instrument
 soloIns perf i = (mapM_ (stop perf)) . filter (/=i) . notEffect . M.keys =<< readTVarIO (orc perf)
 
-notEffect = filter (/= "rev") . filter (/= "del") . filter (/= "mix") . filter ( /= "chorus")
 
 -- display all Time Patterns names and their content
 displayTPat :: Performance -> IO [String]
