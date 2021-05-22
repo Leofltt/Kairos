@@ -10,7 +10,7 @@ import Data.Typeable
 -- the Performance is the scope of the composition
 data Performance = P { orc :: Orchestra
                      , clock :: Clock
-                     , timePs :: TVar (M.Map [Char] [TimePoint])
+                     , timePs :: TVar (M.Map [Char] [TimePoint]) -- a map of time patterns with their names
                      }
 
 -- clock
@@ -38,9 +38,10 @@ data Instr = I { insN :: InstrumentID
                , pf :: TVar PfMap 
                , status :: Status
                , toPlay :: Maybe TimePoint
-               , pats :: TVar (M.Map Int PfPat) -- Patterns of Parameters
+               , pats :: TVar (M.Map Int PfPat) -- Patterns of Parameters and their IDs
                , timeF :: String                -- Name of the time function to refer to
-               , kind :: MessageTo  
+               , kind :: MessageTo
+               , itype :: InstrType
                }
 
 -- Instrument Name: an integer number
@@ -51,6 +52,9 @@ data Status = Init | Active | Inactive | Stopping deriving (Show)
 
 -- where are we sending the data
 data MessageTo = Csound | OSC deriving (Show, Eq)
+
+-- instrument or effect ?
+data InstrType = Instrument | Effect deriving (Show, Eq)
 
 -- Map of Pfields and their IDs
 type PfMap = M.Map Int Pfield

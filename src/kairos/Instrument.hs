@@ -50,6 +50,7 @@ hihat oc = do
              , timeF  = ""
              , pats   = emptyPat
              , kind   = Csound
+             , itype  = Instrument
              }
 
 sampler :: String -> IO Instr
@@ -66,6 +67,7 @@ sampler path = do
              , timeF  = ""
              , pats   = emptyPat
              , kind   = Csound
+             , itype  = Instrument
              }
 
 acidBass :: IO Instr
@@ -79,6 +81,7 @@ acidBass = do
              , timeF  = ""
              , pats   = emptyPat
              , kind   = Csound
+             , itype  = Instrument
              }
 
 hoover :: IO Instr
@@ -92,6 +95,7 @@ hoover = do
              , timeF  = ""
              , pats   = emptyPat
              , kind   = Csound
+             , itype  = Instrument
              }
 
 karp :: IO Instr
@@ -105,6 +109,7 @@ karp = do
              , timeF  = ""
              , pats   = emptyPat
              , kind   = Csound
+             , itype  = Instrument
              }
 
 fmSub :: IO Instr
@@ -119,6 +124,7 @@ fmSub = do
              , timeF  = ""
              , pats   = emptyPat
              , kind   = Csound
+             , itype  = Instrument
              }
 
 superSaw :: IO Instr
@@ -133,6 +139,7 @@ superSaw = do
              , timeF  = ""
              , pats   = emptyPat
              , kind   = Csound
+             , itype  = Instrument
              }
 
 stringPad :: IO Instr
@@ -146,6 +153,7 @@ stringPad = do
              , timeF  = ""
              , pats   = emptyPat
              , kind   = Csound
+             , itype  = Instrument
              }
 
 stutter :: String -> IO Instr
@@ -163,6 +171,7 @@ stutter path = do
              , timeF  = ""
              , pats   = emptyPat
              , kind   = Csound
+             , itype  = Instrument
              }
 
 phax :: IO Instr
@@ -186,6 +195,7 @@ phax = do
              , timeF  = ""
              , pats   = emptyPat
              , kind   = Csound
+             , itype  = Instrument
              }
 
 modelcycles :: Double -> IO Instr
@@ -206,6 +216,7 @@ modelcycles chan = do
              , timeF  = ""
              , pats   = emptyPat
              , kind   = Csound
+             , itype  = Instrument
              }
 
 -- default effects
@@ -221,6 +232,7 @@ reverb = do
              , timeF  = ""
              , pats   = emptyPat
              , kind   = Csound
+             , itype  = Effect
              }
 
 delay :: IO Instr
@@ -234,6 +246,7 @@ delay = do
              , timeF  = ""
              , pats   = emptyPat
              , kind   = Csound
+             , itype  = Effect
              }
 
 chorus :: IO Instr
@@ -247,6 +260,7 @@ chorus = do
               , timeF  = ""
               , pats   = emptyPat
               , kind   = Csound
+              , itype  = Effect
               }
 
 master :: IO Instr
@@ -260,6 +274,7 @@ master = do
              , timeF  = ""
              , pats   = emptyPat
              , kind   = Csound
+             , itype  = Effect
              }
 
 -------------- Create OSC Instrument ---------
@@ -267,13 +282,14 @@ other :: InstrumentID -> [(Int,Pfield)] -> IO Instr
 other i_n pfields = do
   pfieldss <- newTVarIO $ M.fromList pfields
   emptyPat <- newTVarIO M.empty
-  return $ I { insN = i_n
-             , pf = pfieldss
+  return $ I { insN   = i_n
+             , pf     = pfieldss
              , toPlay = Nothing
              , status = Inactive
-             , timeF = ""
-             , pats = emptyPat
-             , kind = OSC
+             , timeF  = ""
+             , pats   = emptyPat
+             , kind   = OSC
+             , itype  = Instrument 
              }
 ---------------------------------------------
 -- default Orchestra
@@ -305,7 +321,6 @@ defaultOrc = do
                                             ,("mc",cycles1)
                                             ]
   return $ orc
-
 
 displayInstruments :: Performance -> IO String
 displayInstruments perf = do
