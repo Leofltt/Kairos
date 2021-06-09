@@ -42,6 +42,7 @@ library:
   - Kairos.Utilities
   - Kairos.Scales
   - Kairos.Markov
+  - Kairos.Euclidean
 
 #  other-modules:
 
