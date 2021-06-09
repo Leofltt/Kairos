@@ -278,8 +278,8 @@ master = do
              }
 
 -------------- Create OSC Instrument ---------
-other :: InstrumentID -> [(Int,Pfield)] -> IO Instr
-other i_n pfields = do
+oscInstr :: InstrumentID -> [(Int,Pfield)] -> IO Instr
+oscInstr i_n pfields = do
   pfieldss <- newTVarIO $ M.fromList pfields
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = i_n
@@ -310,7 +310,7 @@ defaultOrc = do
   cycles1 <- modelcycles 1
   chorus <- chorus
   mix <- master
-  ot <- other 666 [(3, Pd 0.8),(2,Ps "Test")]
+  ot <- oscInstr 666 [(3, Pd 0.8),(2,Ps "Test")]
   orc  <- atomically $ newTVar $ M.fromList [("OH808",ohh),("CH808",chh)
                                             ,("303",a303),("hov",hov)
                                             ,("rev",rev),("del",del)
