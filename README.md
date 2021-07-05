@@ -16,13 +16,25 @@ To get started you'll need to download:
 
 `cd` into the repository folder
 
-`cabal install` (or build with stack if so you prefer)
+### Installing with Cabal
+
+`cabal install`
+
+`cabal repl` to start an interactive interpreter loading Kairos
+
+### Installing with Stack
+
+`stack install`
+
+`stack ghci` to start an interactive interpreter loading Kairos
+
+### Starting an interactive session
 
 run `csound kairos.csd` from a terminal window or from your favorite editor
 
-while csound is running, open another terminal window in the same folder and run `ghci`
+while csound is running, open another terminal window in the same folder and run `ghci` according to the instructions provided based on your chosen installation method (stack or cabl)
 
-within ghci run `:script BootKairos.hs`
+within this ghci instance run `:script BootKairos.hs`
 
 All the modules should be loaded and ready to play with!
 
