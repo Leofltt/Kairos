@@ -10,4 +10,4 @@ The documentation for the library is available within [Getting Started].
 
 Leonardo Foletto, 2019-2021
 
-[Getting Started]: https://github.com/Leofltt/Kairos/blob/documentation/Getting%20Started/README.md
+[Getting Started]: https://github.com/Leofltt/Kairos/blob/master/Getting%20Started/README.md
