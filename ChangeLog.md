@@ -6,4 +6,6 @@
 
 0.3.2 Implemented euclidean rhythms
 
+0.3.3 Fixed annoying bug with wrong stopping behavior, changed bootkairos.hs and csd hs (now fxs in csound are run by the csound file)
+
 ## Unreleased changes
