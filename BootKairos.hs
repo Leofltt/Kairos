@@ -83,7 +83,7 @@ volchorus = setChannel "volchorus"
 delchorus = setChannel "delchorus"
 divchorus = setChannel "divchorus"
 m_vol = setChannel "m_vol"
-mapM_ playFx ["rev","del","chorus","mix"]
+-- mapM_ playFx ["rev","del","chorus","mix"]
 techno1 k s h = cPat "fourFloor" k >> cPat "downB" s >> cPat "upFour" h
 dnb1 k s h = cPat "dbk" k >> cPat "downB" s >> cPat "eightN" h
 runPfield i (a,b,c) = b i c a

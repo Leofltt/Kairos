@@ -48,7 +48,7 @@ data Instr = I { insN :: InstrumentID
 type InstrumentID = Int
 
 -- is the instrument Active ?
-data Status = Init | Active | Inactive | Stopping deriving (Show)
+data Status = Init | Active | Inactive | Stopping deriving (Show, Eq)
 
 -- where are we sending the data
 data MessageTo = Csound | OSC deriving (Show, Eq)
