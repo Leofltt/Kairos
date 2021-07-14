@@ -8,6 +8,9 @@ The main goal of this software is to be able to perform and compose electronic m
 
 The documentation for the library is available within [Getting Started].
 
+To see the latest changes to the library refer to [ChangeLog.md]
+
 Leonardo Foletto, 2019-2021
 
 [Getting Started]: https://github.com/Leofltt/Kairos/blob/master/Getting%20Started/README.md
+[ChangeLog.md]: https://github.com/Leofltt/Kairos/blob/master/ChangeLog.md
