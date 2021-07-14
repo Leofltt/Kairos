@@ -1,4 +1,4 @@
-# Official Kairos Documentation
+# Kairos Documentation
 
 # Installing the required tools
 
