@@ -11,7 +11,10 @@ import Data.Time.Clock.POSIX (getPOSIXTime)
 
 instance Applicative TimePointf where
   pure = TP
-  (TP f) <*> (TP second) = TP (f second)
+  TP f <*> x = fmap f x 
+
+instance Monad TimePointf where 
+  TP x >>= f = f x 
 
 instance (Num a) => Num (TimePointf a) where
   (+) = liftA2 (+)
