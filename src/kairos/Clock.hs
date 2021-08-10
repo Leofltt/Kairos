@@ -7,7 +7,7 @@ import Control.Concurrent.STM
 import Data.Time.Clock.POSIX
 import Control.Monad.IO.Class
 
-
+displayClock :: Clock -> IO [Char]
 displayClock c = do
   ts   <- currentTS c
   cb   <- currentBeat c
@@ -30,6 +30,7 @@ waitUntil c t = waitT . (t -) =<< (timeD c)
 waitT :: (MonadIO m, RealFrac a) => a -> m ()
 waitT t = when (t > 0) (liftIO (threadDelay(floor (t * 1000000))))
 
+defaultClock :: IO Clock 
 defaultClock  = do
   s <- getNow
   let timesig = TS { bpm = 120
@@ -84,7 +85,7 @@ possible :: [TimeSignature] -> Time -> [TimeSignature]
 possible (t:ts) now
   | ((startTime t) == (head $ filter (<= now) (starts (t:ts)))) = t : (possible ts now)
   | otherwise = possible ts now
-possible [] now = []
+possible [] _ = []
 
 starts :: [TimeSignature] -> [Time]
 starts ts = map startTime ts

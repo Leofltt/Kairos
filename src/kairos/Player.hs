@@ -66,6 +66,7 @@ playNow perf i = do
   Just p <- lookupMap (orc perf) i
   playOne perf p (pure tp)
 
+playEffect :: Performance -> String -> IO () 
 playEffect = playNow
 
 -- inspired by Conductive, R. Bell https://lac.linuxaudio.org/2011/papers/35.pdf

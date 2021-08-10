@@ -43,7 +43,7 @@ pickProb4Index perc (x:xs) | x >= perc = x
                            | (x <= perc) && ((head xs > perc)) =  head xs
                            | (x <= perc) && ((head xs) <= perc) = pickProb4Index perc (xs++[x])
                            
-
+pickIndex :: Double -> [Double] -> Maybe Int
 pickIndex val list = elemIndex (pickProb4Index val list) list
 
 listFromIndex :: [Pfield] -> Int -> [Pfield]
@@ -59,4 +59,5 @@ pickRow indx prepFile = (!!) prepFile indx
 
 removeNewLine list = (init list) ++ [filter removeNL (last list)]
 
+removeNL :: Char -> Bool
 removeNL c = (isNumber c) || (isSymbol c)

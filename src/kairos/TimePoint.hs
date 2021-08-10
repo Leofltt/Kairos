@@ -4,7 +4,6 @@ import Kairos.Base
 import Kairos.Utilities
 import Kairos.Euclidean
 import Data.Maybe
-import Control.Concurrent.STM
 import Control.Applicative (liftA2)
 import Data.Time.Clock.POSIX (getPOSIXTime)
 
@@ -26,6 +25,7 @@ instance (Num a) => Num (TimePointf a) where
 wrapBar :: TimeSignature -> TimePoint -> TimePoint
 wrapBar ts tp = fmap (doubleRem (beatInMsr ts)) tp
 
+doubleRem :: RealFrac a => a -> a -> a 
 doubleRem bar beat = beat - (bar * (fromIntegral $ floor (beat/bar)))
 
 toTP :: [Double] -> [TimePoint]
@@ -46,6 +46,7 @@ fromTP [] = []
 -- functions to create TimePoint patterns -------------------------------
 
 -- create tuples of t elements to fill up b number of beats
+tupleForBar :: Double -> Double -> [TimePoint]
 tupleForBar b t = toTP $ takeWhile (<b) $ Prelude.map (+(b/(t*b))) [(0/t*b), (1/t*b) ..]
 
 -- Given total length in beats, the beat subdivision wanted and the % of beats, generate a time pattern
@@ -93,7 +94,7 @@ interp1 total (x:[]) = (x:[((x + total)/2)])
 interp1 total (x:y:xs) = x:((x+y)/2):(interp1 total (y:xs))
 
 interp2 :: Double -> [Double] -> [Double]
-interp2 tot (x:y:[]) = [((x+y)/2)]
+interp2 _ (x:y:[]) = [((x+y)/2)]
 interp2 tot (x:[]) = [(x + tot)/2]
 interp2 tot (x:y:xs) = ((x+y)/2):(interp2 tot xs)
 

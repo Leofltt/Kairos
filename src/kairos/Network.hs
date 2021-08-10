@@ -4,7 +4,7 @@ module Kairos.Network where
 
 import Kairos.Base
 import Kairos.Utilities
-import Network.Socket hiding (send)
+import Network.Socket
 import Network.Socket.ByteString (sendAll,send)
 import qualified Data.ByteString.Char8 as C
 import Data.ByteString.Internal as B
@@ -22,6 +22,7 @@ sendMsg m n = do
   sendAll sock $ C.pack n
   close sock
 
+sendCsound :: String -> IO ()
 sendCsound = sendMsg "11000"
 
 sendScore :: String -> IO ()
@@ -37,6 +38,7 @@ setChan n = let m = "@" ++ n in
   sendCsound m
 
 -- send an OSC messagge to port 11100
+sendOSC :: Int -> [Pfield] -> IO ()
 sendOSC i l = sendMsgOSC "11100" $ createOSC i l
 
 sendMsgOSC :: String -> OSC -> IO ()

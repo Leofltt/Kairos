@@ -3,7 +3,7 @@ module Kairos.Utilities where
 import Kairos.Base
 import Control.Concurrent.STM
 import qualified Data.Map.Strict as M
-import Data.List (sort, elem)
+import Data.List (sort)
 import System.Random (getStdRandom,randomR, mkStdGen, randomRs, randomRIO)
 import System.IO.Unsafe
 
@@ -69,6 +69,7 @@ shuffle x = if length x < 2 then return x else do
   return (x!!i : r)
 
 {-# NOINLINE scramble #-}
+scramble :: [a] -> [a]
 scramble x = unsafePerformIO $ shuffle x
 
 randI :: Int -> IO Int
@@ -93,6 +94,7 @@ filterEqualsList (x:xs) ys     | elem x ys == False = filterEqualsList xs ys
 filterEqualsList _ [] = []
 filterEqualsList [] y = y
 
+interleave :: Ord a => [a] -> [a] -> [a]
 interleave l1 l2 = sort $ inter l1 $ filterEqualsList l1 l2
 
 inter :: Ord a => [a] -> [a] -> [a]
@@ -136,6 +138,7 @@ intToDouble = fromIntegral
 binToNormSum :: [Double] -> [Double]
 binToNormSum x =  map (/ (intToDouble $ length x)) $ map intToDouble $ binToSum x
 
+binToSum :: [Double] -> [Int]
 binToSum [] = []
 binToSum x | (last x) == 0 = 0 : (binToSum $ init x)
            | (last x) == 1 = (length x) : (binToSum $ init x)
