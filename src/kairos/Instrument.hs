@@ -2,8 +2,8 @@ module Kairos.Instrument where
 
 import Kairos.Base
 import Kairos.Clock
+import Kairos.Pfield
 import Kairos.Utilities
-import Control.Concurrent
 import Control.Concurrent.STM
 import qualified Data.Map.Strict as M
 
@@ -15,27 +15,13 @@ getPfields i = do
   pf <- readTVarIO $ pf i
   return $ pf
 
-toPfD :: [Double] -> [Pfield]
-toPfD (x:xs) = (Pd x) : toPfD xs
-toPfD []     = []
-
-pfD :: Double -> Pfield
-pfD x = Pd x
-
-toPfS :: [String] -> [Pfield]
-toPfS (x:xs) = (Ps x) : toPfS xs
-toPfS []     = []
-
-pfS :: String -> Pfield
-pfS x = Ps x
-
 withTimeSignature :: Performance -> [Pfield] -> IO [Pfield]
 withTimeSignature perf l = do
   ts <- currentTS $ clock perf
   let oneSecond = 60/(bpm ts)
   let oneBarSecond = (beatInMsr ts) * oneSecond
   let beatsInSeconds = map (*oneBarSecond) (stringToDouble $ map show l)
-  return $ toPfD beatsInSeconds
+  return $ toPfs beatsInSeconds
 
 -- default instruments
 

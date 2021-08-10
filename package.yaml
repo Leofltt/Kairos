@@ -1,7 +1,7 @@
 name:                Kairos
-version:             0.3.3
+version:             0.3.4
 github:              "leofltt/Kairos"
-license:             BSD3
+license:             MIT
 author:              "Leo Foletto"
 maintainer:          "flttleonardo@gmail.com"
 copyright:           "2018, Leonardo Foletto"
@@ -36,6 +36,7 @@ library:
   - Kairos.Base
   - Kairos.Clock
   - Kairos.TimePoint
+  - Kairos.Pfield
   - Kairos.Instrument
   - Kairos.Network
   - Kairos.Player

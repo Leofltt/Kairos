@@ -1,7 +1,6 @@
 module Kairos.Markov where
 
 import Kairos.Base
-import Kairos.Instrument
 import Kairos.Utilities
 import Text.CSV
 import Data.Char

@@ -1,7 +1,6 @@
 module Kairos.Utilities where
 
 import Kairos.Base
-import Control.Concurrent
 import Control.Concurrent.STM
 import qualified Data.Map.Strict as M
 import Data.List (sort, elem)

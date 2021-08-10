@@ -97,7 +97,7 @@ playLoop perf pn Active = do
               let nextToPlay | (time nb) > (time tp) = ((time  (wrapBar ts nb))/(beatInMsr ts)) + (thisBar cb) + ((fromIntegral $ floor $ (time  nb)/(beatInMsr ts)) - (fromIntegral $ floor $ (time  tp)/(beatInMsr ts)))
                              | (time nb) <= (time tp) = ((time nb)/(beatInMsr ts)) + (nextBar cb)
               nextTime <- timeAtBeat (clock perf) (nextToPlay)
-              forkIO $ playOne perf p (wrapBar ts tp)
+              _ <- forkIO $ playOne perf p (wrapBar ts tp)
               updateToPlay perf pn (Just nb)
               let toWait = (realToFrac $ floor ((nextTime - now) * 10000))/ 10000
               waitT (toWait)

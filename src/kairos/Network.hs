@@ -3,13 +3,11 @@
 module Kairos.Network where
 
 import Kairos.Base
-import Kairos.Instrument
 import Kairos.Utilities
-import Network.Socket hiding (recv, send)
-import Network.Socket.ByteString (recv, sendAll,send)
+import Network.Socket hiding (send)
+import Network.Socket.ByteString (sendAll,send)
 import qualified Data.ByteString.Char8 as C
 import Data.ByteString.Internal as B
-import Control.Concurrent
 import Vivid.OSC as V
 
 
@@ -47,7 +45,7 @@ sendMsgOSC m n = do
   let serveraddr = head addrinfos
   sock <- socket (addrFamily serveraddr) Datagram defaultProtocol
   connect sock (addrAddress serveraddr)
-  send sock $ V.encodeOSC $ n
+  _ <- send sock $ V.encodeOSC $ n
   close sock
 
 pfieldToOSCDatum :: Pfield -> OSCDatum

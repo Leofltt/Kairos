@@ -2,7 +2,6 @@
 
 module Kairos.Base where
 
-import Control.Concurrent
 import Control.Concurrent.STM
 import qualified Data.Map.Strict as M
 import Data.Typeable
@@ -68,10 +67,6 @@ data PfPat = PfPat { pfNum :: Int                  -- id of the pfield
 -- a single Pfield
 data Pfield  = Ps { pString :: String }
              | Pd { pDouble :: Double } deriving (Eq, Ord, Typeable)
-
-instance Show Pfield where
-  show (Ps s) = show s
-  show (Pd d) = show d
 
 -- a point in time
 data TimePointf a = TP { time :: a

@@ -1,12 +1,7 @@
--- This file has been generated from package.yaml by hpack version 0.28.2.
---
--- see: https://github.com/sol/hpack
---
--- hash: 36f61d8f4f6516e19a4bade5bfa319986551ed8e81094ea3d299154eacc1771a
+cabal-version: 3.0
 
-cabal-version:  >= 1.10
 name:           Kairos
-version:        0.3.3
+version:        0.3.4
 synopsis:       Live coding library
 description:    Please see the README on GitHub at <https://github.com/leofltt/Kairos#readme>
 category:       Sound
@@ -15,13 +10,13 @@ bug-reports:    https://github.com/leofltt/Kairos/issues
 author:         Leo Foletto
 maintainer:     flttleonardo@gmail.com
 copyright:      2018, Leonardo Foletto
-license:        BSD3
+license:        MIT 
 license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
+    README.md
     ChangeLog.md
     Kairos.csd
-    README.md
 
 source-repository head
   type: git
@@ -33,6 +28,7 @@ library
       Kairos.Base
       Kairos.Clock
       Kairos.TimePoint
+      Kairos.Pfield
       Kairos.Instrument
       Kairos.Network
       Kairos.Player

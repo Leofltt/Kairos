@@ -3,7 +3,6 @@ module Kairos.TimePoint where
 import Kairos.Base
 import Kairos.Utilities
 import Kairos.Euclidean
-import Data.Map.Strict as M
 import Data.Maybe
 import Control.Concurrent.STM
 import Control.Applicative (liftA2)
