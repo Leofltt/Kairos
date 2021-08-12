@@ -31,9 +31,6 @@ resolver:
 #   - wai
 packages:
 - .
-- dist-newstyle/tmp/src-63494/cereal-0.5.8.1
-- dist-newstyle/tmp/src-63496/hsc2hs-0.68.7
-- dist-newstyle/tmp/src-63495/random-1.2.0
 # Dependency packages to be pulled from upstream that are not in the resolver.
 # These entries can reference officially published versions as well as
 # forks / in-progress versions pinned to a git hash. For example:
