@@ -8,6 +8,6 @@
 
 0.3.3 Fixed annoying bug with wrong stopping behavior, changed bootkairos.hs and csd hs (now fxs in csound are run by the csound file)
 
-0.3.4 Initial work for new Pfield data type, updated stack and cabal versions
+0.3.4 Initial work for new Pfield data type, updated stack and cabal versions, big refactor of file dependencies
 
 ## Unreleased changes
