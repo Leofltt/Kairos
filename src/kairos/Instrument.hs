@@ -1,11 +1,10 @@
 module Kairos.Instrument where
 
-import Kairos.Clock
 import Kairos.TimePoint ( TimePoint )
 import Kairos.Pfield
 import Kairos.Utilities ( lookupMap )
 import Control.Concurrent.STM
-    ( atomically, newTVar, newTVarIO, readTVarIO, writeTVar, TVar )
+    ( atomically, newTVarIO, readTVarIO, writeTVar, TVar )
 import qualified Data.Map.Strict as M
 
 -- Orchestra
