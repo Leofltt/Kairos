@@ -4,14 +4,11 @@ module Kairos.TimePoint where
 
 import Kairos.Clock ( TimeSignature(beatInMsr), Beats ) 
 import Kairos.Utilities
-    ( addToMap,
-      lookupMap,
-      genNRandomValues,
+    ( genNRandomValues,
       intToDouble,
       numSeqFromText,
       numSeqFromBin )
 import Kairos.Euclidean ( euclidean )
-import Data.Maybe ( fromJust )
 import Control.Applicative (liftA2)
 import Data.Time.Clock.POSIX (getPOSIXTime)
 

@@ -140,12 +140,15 @@ stop perf i = do
     else return ()
 
 -- stop all instruments that are not effects
+stopAll :: Performance -> IO ()
 stopAll perf = (mapM_ (stop perf)) .  notEffect . M.keys =<< readTVarIO (orc perf)
 
 -- plays all instruments that are not effects
+playAll :: Performance -> IO ()
 playAll perf = (mapM_ (play perf)) .  notEffect . M.keys =<< readTVarIO (orc perf)
 
 -- solo an instrument
+soloIns :: Performance -> String -> IO ()
 soloIns perf i = (mapM_ (stop perf)) . filter (/=i) . notEffect . M.keys =<< readTVarIO (orc perf)
 
 

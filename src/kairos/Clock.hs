@@ -6,7 +6,6 @@ import Control.Concurrent.STM
     ( atomically, newTVarIO, readTVarIO, writeTVar, TVar )
 import Data.Time.Clock.POSIX ( getPOSIXTime )
 import Control.Monad.IO.Class ( MonadIO(..) )
-import GHC.Conc (TVar(TVar))
 
 -- clock
 data Clock = Clock { startAt :: Time
