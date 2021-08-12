@@ -21,7 +21,7 @@ runMarkovSimple table pat = do
   prob <- randF
   let list = scanl1 (+) (pickRow note table)
   let newList = listFromIndex pat $ fromJust $ pickIndex prob list
-  return $ newList
+  return newList
 
 runMarkovCSV :: String -> PfPat -> IO Pfield
 runMarkovCSV file n = do

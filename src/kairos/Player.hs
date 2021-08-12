@@ -73,9 +73,9 @@ playEffect = playNow
 -- inspired by Conductive, R. Bell https://lac.linuxaudio.org/2011/papers/35.pdf
 play :: Performance -> String -> IO ()
 play perf pn = let
-  checkStatus i Inactive  = void ( forkIO $ playLoop perf pn $ Inactive)
-  checkStatus i Stopping = void ( playLoop perf pn $ Stopping)
-  checkStatus i Init = void ( playLoop perf pn $ Init)
+  checkStatus i Inactive  = void ( forkIO $ playLoop perf pn Inactive)
+  checkStatus i Stopping = void ( playLoop perf pn Stopping)
+  checkStatus i Init = void ( playLoop perf pn Init)
   checkStatus i Active  = putStrLn $ "the instrument " ++ pn ++ " is already Active!"
   in do Just i <- lookupMap (orc perf) pn
         checkStatus i $ status i
@@ -96,8 +96,8 @@ playLoop perf pn Active = do
      else do  let tp = fromJust pb
               Just timeString <- lookupMap (timePs perf) (timeF p)
               let nb = nextBeat tp timeString
-              let nextToPlay | (whenTP nb) > (whenTP tp) = ((whenTP  (wrapBar ts nb))/(beatInMsr ts)) + (thisBar cb) + ((fromIntegral $ floor $ (whenTP  nb)/(beatInMsr ts)) - (fromIntegral $ floor $ (whenTP  tp)/(beatInMsr ts)))
-                             | (whenTP nb) <= (whenTP tp) = ((whenTP nb)/(beatInMsr ts)) + (nextBar cb)
+              let nextToPlay | whenTP nb > whenTP tp = (whenTP  (wrapBar ts nb)/beatInMsr ts) + thisBar cb + ((fromIntegral $ floor $ whenTP  nb/(beatInMsr ts)) - (fromIntegral $ floor $ whenTP  tp/beatInMsr ts))
+                             | whenTP nb <= whenTP tp = (whenTP nb/beatInMsr ts) + nextBar cb
               nextTime <- timeAtBeat (clock perf) nextToPlay
               _ <- forkIO $ playOne perf p (wrapBar ts tp)
               updateToPlay perf pn (Just nb)
@@ -209,7 +209,7 @@ closertoNow e k ts = do
                    | otherwise = head ts
             return $ tp
     else do now <- beatInBar (clock e)
-            let tp | takeWhile (<= (TP now)) ts /= [] = last $ takeWhile (<= TP now) ts
+            let tp | takeWhile (<= TP now) ts /= [] = last $ takeWhile (<= TP now) ts
                    | otherwise = head ts
             return $ tp
 

@@ -53,7 +53,7 @@ addInstrument perf name instr = addToMap (orc perf) (name,instr)
 getTimePoint :: Performance -> String -> IO [TimePoint]
 getTimePoint perf s = do
   Just t <- lookupMap (timePs perf) s
-  return $ t
+  return t
 
 -- add a named pattern of timepoints to a performance
 

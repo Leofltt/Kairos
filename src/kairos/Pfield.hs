@@ -1,6 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 
-module Kairos.Pfield where 
+module Kairos.Pfield where
 
 import Data.Typeable ( Typeable )
 import Control.Concurrent.STM ( TVar )
@@ -14,20 +14,20 @@ instance Show Pfield where
   show (Ps s) = show s
   show (Pd d) = show d
 
-class PfAble a where 
-    toPf :: a -> Pfield 
-    fromPf :: Pfield -> a 
+class PfAble a where
+    toPf :: a -> Pfield
+    fromPf :: Pfield -> a
 
-instance PfAble Double where 
-    toPf = Pd 
-    fromPf (Pd x) = x 
+instance PfAble Double where
+    toPf = Pd
+    fromPf (Pd x) = x
 
-instance PfAble String where 
-    toPf = Ps 
-    fromPf (Ps x) = x 
+instance PfAble String where
+    toPf = Ps
+    fromPf (Ps x) = x
 
 toPfs :: PfAble a => [a] -> [Pfield]
-toPfs x = map toPf x
+toPfs = map toPf
 
 -- pattern of pfields and related update function
 data PfPat = PfPat { pfNum :: Int                  -- id of the pfield

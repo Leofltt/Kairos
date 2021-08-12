@@ -76,7 +76,7 @@ tempF (x:xs) (v:vs) d | v <= d = x:tempF xs (vs++[v]) d
 
 -- Given a tuple, a rotation shift and a number of beats returns an euclidean rhythm TP
 euclid :: (Int,Int) -> Int -> Double -> [TimePoint]
-euclid (x,y) shift maxbeats = toTP $ Prelude.map (*(maxbeats/(intToDouble y))) $ Prelude.map (+ (-1)) $ Prelude.filter (/=0) $ zipWith (*) (Prelude.map intToDouble $ euclidean (x,y) shift) [1,2..]
+euclid (x,y) shift maxbeats = toTP $ Prelude.map (*(maxbeats/intToDouble y)) $ Prelude.map (+ (-1)) $ Prelude.filter (/=0) $ zipWith (*) (Prelude.map intToDouble $ euclidean (x,y) shift) [1,2..]
 
 
 

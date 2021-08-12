@@ -55,7 +55,7 @@ sendMsgOSC m n = do
   let serveraddr = head addrinfos
   sock <- socket (addrFamily serveraddr) Datagram defaultProtocol
   connect sock (addrAddress serveraddr)
-  _ <- send sock $ V.encodeOSC $ n
+  _ <- send sock $ V.encodeOSC n
   close sock
 
 pfieldToOSCDatum :: Pfield -> OSCDatum

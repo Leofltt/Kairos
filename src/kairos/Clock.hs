@@ -54,7 +54,7 @@ defaultClock  = do
                    ,  beatInMsr = 4
                    ,  startTime = 0 -- this is actually the time delta from s to now, in Doubles
                    }
-  ts <-  newTVarIO $ [timesig]
+  ts <-  newTVarIO [timesig]
   return $ Clock { startAt = s
                  , timeSig = ts
                  }
