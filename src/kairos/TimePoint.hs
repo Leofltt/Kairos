@@ -2,7 +2,7 @@
 
 module Kairos.TimePoint where
 
-import Kairos.Clock ( TimeSignature(beatInMsr), Beats ) 
+import Kairos.Clock ( TimeSignature(beatInMsr), Beats )
 import Kairos.Utilities
     ( genNRandomValues,
       intToDouble,
@@ -20,10 +20,10 @@ type TimePoint = TimePointf Beats
 
 instance Applicative TimePointf where
   pure = TP
-  TP f <*> x = fmap f x 
+  TP f <*> x = fmap f x
 
-instance Monad TimePointf where 
-  TP x >>= f = f x 
+instance Monad TimePointf where
+  TP x >>= f = f x
 
 instance (Num a) => Num (TimePointf a) where
   (+) = liftA2 (+)
@@ -34,20 +34,19 @@ instance (Num a) => Num (TimePointf a) where
   negate = fmap negate
 
 wrapBar :: TimeSignature -> TimePoint -> TimePoint
-wrapBar ts tp = fmap (doubleRem (beatInMsr ts)) tp
+wrapBar ts = fmap (doubleRem (beatInMsr ts))
 
-doubleRem :: RealFrac a => a -> a -> a 
-doubleRem bar beat = beat - (bar * (fromIntegral $ floor (beat/bar)))
+doubleRem :: RealFrac a => a -> a -> a
+doubleRem bar beat = beat - (bar * fromIntegral (floor (beat/bar)))
 
 toTP :: [Double] -> [TimePoint]
-toTP times = Prelude.map pure times
+toTP = Prelude.map pure
 
 tpD :: Double -> TimePoint
 tpD = pure
 
 fromTP :: [TimePoint] -> [Double]
-fromTP (x:xs) = (whenTP x):(fromTP xs)
-fromTP [] = []
+fromTP = map whenTP
 
 -- functions to create TimePoint patterns -------------------------------
 
@@ -58,7 +57,7 @@ tupleForBar b t = toTP $ takeWhile (<b) $ Prelude.map (+(b/(t*b))) [(0/t*b), (1/
 -- Given total length in beats, the beat subdivision wanted and the % of beats, generate a time pattern
 patternWithDensity :: Double -> Double -> Int  -> IO (Maybe [TimePoint])
 patternWithDensity b sub dens = do
-  seed <- (round . (* 1000)) <$> getPOSIXTime
+  seed <- round . (* 1000) <$> getPOSIXTime
   let bar = tupleForBar b sub
   let vals = genNRandomValues (length bar) seed ::[Int]
   let newBar = tempF bar vals dens
@@ -66,13 +65,13 @@ patternWithDensity b sub dens = do
 
 -- return Nothing if list is Empty, otherwise Just list
 notEmpty :: [a] -> Maybe [a]
-notEmpty [] = Nothing 
-notEmpty l  = Just l 
+notEmpty [] = Nothing
+notEmpty l  = Just l
 
 tempF :: [TimePoint] -> [Int] -> Int -> [TimePoint]
-tempF (x:[]) (v:vs) d | v <= d = [x]
+tempF [x] (v:vs) d | v <= d = [x]
                       | otherwise = []
-tempF (x:xs) (v:vs) d | v <= d = x:(tempF xs (vs++[v]) d)
+tempF (x:xs) (v:vs) d | v <= d = x:tempF xs (vs++[v]) d
                       | otherwise = tempF xs (vs++[v]) d
 
 -- Given a tuple, a rotation shift and a number of beats returns an euclidean rhythm TP
@@ -96,18 +95,18 @@ evolve n rule xs  | n <= 0 = xs | otherwise = evolve (n-1) rule (toTP $ rule $ f
 -- rules :: [Double] -> [Double]
 
 interp1 :: Double -> [Double] -> [Double]
-interp1 total (x:[]) = (x:[((x + total)/2)])
-interp1 total (x:y:xs) = x:((x+y)/2):(interp1 total (y:xs))
+interp1 total [x] = x:[(x + total)/2]
+interp1 total (x:y:xs) = x:((x+y)/2):interp1 total (y:xs)
 
 interp2 :: Double -> [Double] -> [Double]
-interp2 _ (x:y:[]) = [((x+y)/2)]
-interp2 tot (x:[]) = [(x + tot)/2]
-interp2 tot (x:y:xs) = ((x+y)/2):(interp2 tot xs)
+interp2 _ [x, y] = [(x+y)/2]
+interp2 tot [x] = [(x + tot)/2]
+interp2 tot (x:y:xs) = ((x+y)/2):interp2 tot xs
 
 --- default Patterns ----------------------------------------
 
 -- a few time patterns in 4/4
-downB = [(TP 1.0),(TP 3.0)]
+downB = [TP 1.0,TP 3.0]
 dbk = toTP [0,2.5]
 dbk2 = toTP [0, 1.75, 2.5]
 upFour = toTP $ takeWhile (< 4) [0.5,1.5..]

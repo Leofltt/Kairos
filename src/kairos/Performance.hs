@@ -7,7 +7,7 @@ import Kairos.Pfield
 import Kairos.Utilities
 import Control.Concurrent.STM
 import qualified Data.Map.Strict as M
-import Data.Maybe (fromJust)
+import Data.Maybe (fromJust, isNothing)
 
 -- the Performance is the scope of the composition
 data Performance = P { orc :: Orchestra
@@ -41,8 +41,8 @@ displayInstruments perf = do
 withTimeSignature :: Performance -> [Pfield] -> IO [Pfield]
 withTimeSignature perf l = do
   ts <- currentTS $ clock perf
-  let oneSecond = 60/(bpm ts)
-  let oneBarSecond = (beatInMsr ts) * oneSecond
+  let oneSecond = 60/bpm ts
+  let oneBarSecond = beatInMsr ts * oneSecond
   let beatsInSeconds = map (*oneBarSecond) (stringToDouble $ map show l)
   return $ toPfs beatsInSeconds
 
@@ -62,5 +62,5 @@ addTPf e n ts = addToMap (timePs e) (n,ts)
 
 
 maybeAddTPf :: Performance -> String -> Maybe [TimePoint] -> IO ()
-maybeAddTPf e n ts | ts == Nothing = putStrLn $ "Pattern is empty"
+maybeAddTPf e n ts | isNothing ts = putStrLn "Pattern is empty"
                    | otherwise = addTPf e n $ fromJust ts

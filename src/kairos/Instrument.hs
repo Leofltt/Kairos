@@ -12,8 +12,8 @@ import qualified Data.Map.Strict as M
 type Orchestra = TVar (M.Map [Char] Instr)
 
 -- Instrument
-data Instr = I { insN :: InstrumentID 
-               , pf :: TVar PfMap 
+data Instr = I { insN :: InstrumentID
+               , pf :: TVar PfMap
                , status :: Status
                , toPlay :: Maybe TimePoint
                , pats :: TVar (M.Map Int PfPat) -- Patterns of Parameters and their IDs
@@ -36,8 +36,7 @@ data InstrType = Instrument | Effect deriving (Show, Eq)
 
 getPfields :: Instr -> IO (PfMap)
 getPfields i = do
-  pf <- readTVarIO $ pf i
-  return $ pf
+  readTVarIO $ pf i
 
 -- default instruments
 
@@ -291,7 +290,7 @@ oscInstr i_n pfields = do
              , timeF  = ""
              , pats   = emptyPat
              , kind   = OSC
-             , itype  = Instrument 
+             , itype  = Instrument
              }
 ---------------------------------------------
 -- default Orchestra
@@ -313,7 +312,7 @@ defaultOrc = do
   chorus <- chorus
   mix <- master
   ot <- oscInstr 666 [(3, Pd 0.8),(2,Ps "Test")]
-  orc  <- atomically $ newTVar $ M.fromList [("OH808",ohh),("CH808",chh)
+  newTVarIO (M.fromList [("OH808",ohh),("CH808",chh)
                                             ,("303",a303),("hov",hov)
                                             ,("rev",rev),("del",del)
                                             ,("karp",karpS),("lpFM",lpFM)
@@ -321,8 +320,7 @@ defaultOrc = do
                                             ,("mix",mix),("chorus",chorus)
                                             ,("phax",phaxo),("test",ot)
                                             ,("mc",cycles1)
-                                            ]
-  return $ orc
+                                            ])
 
 -- returns all instruments that are not effects
 notEffect = filter (/= "rev") . filter (/= "del") . filter (/= "mix") . filter ( /= "chorus")

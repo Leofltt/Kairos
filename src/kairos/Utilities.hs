@@ -36,21 +36,21 @@ keep n = do
 nextVal :: PfPat -> IO Pfield
 nextVal n = do
   patrn <- readTVarIO (pat n)
-  let pat' = (tail patrn)++[head patrn]
+  let pat' = tail patrn++[head patrn]
   atomically $ writeTVar (pat n) pat'
   return $ head pat'
 
 retrograde :: PfPat -> IO Pfield
 retrograde n = do
   patrn <- readTVarIO (pat n)
-  let pat' = (last patrn):(init patrn)
+  let pat' = last patrn:init patrn
   atomically $ writeTVar (pat n) pat'
   return $ head pat'
 
 randomize :: PfPat -> IO Pfield
 randomize n = do
   p <- readTVarIO (pat n)
-  let l = (length p) - 1
+  let l = length p - 1
   ran <- randI l
   return $ (!!) p ran
 
@@ -61,13 +61,13 @@ percentNext i n = do
   let result = checkPercentNext val i p
   atomically $ writeTVar (pat n) result
   return $ head result
-  
+
 
 -- Misc Utilities
 
 shuffle :: Control.Monad.IO.Class.MonadIO m => [a] -> m [a]
 shuffle x = if length x < 2 then return x else do
-  i <- randomRIO (0, length(x)-1)
+  i <- randomRIO (0, length x-1)
   r <- shuffle (Prelude.take i x ++ Prelude.drop (i+1) x)
   return (x!!i : r)
 
@@ -81,18 +81,18 @@ randI i = getStdRandom $ randomR (0, i)
 randF :: IO Double
 randF = do
   x <- randI 100
-  return $ (fromIntegral x) / 100
+  return $ fromIntegral x / 100
 
 checkPercentNext :: Int -> Int -> [a] -> [a]
-checkPercentNext v i p | v <= i = (tail p)++[head p]
+checkPercentNext v i p | v <= i = tail p++[head p]
                        | otherwise = p
 
 genNRandomValues :: Int -> Int -> [Int]
-genNRandomValues n seed = take n $ (randomRs (0, 100) generator) where
+genNRandomValues n seed = take n $ randomRs (0, 100) generator where
     generator = mkStdGen seed
 
 filterEqualsList :: Ord a => [a] -> [a] -> [a]
-filterEqualsList (x:xs) ys     | elem x ys == False = filterEqualsList xs ys
+filterEqualsList (x:xs) ys     | x `notElem` ys = filterEqualsList xs ys
                                | otherwise = filterEqualsList xs (filter (/= x) ys)
 filterEqualsList _ [] = []
 filterEqualsList [] y = y
@@ -101,10 +101,10 @@ interleave :: Ord a => [a] -> [a] -> [a]
 interleave l1 l2 = sort $ inter l1 $ filterEqualsList l1 l2
 
 inter :: Ord a => [a] -> [a] -> [a]
-inter (x:[])  y     = x:y
+inter [x]  y     = x:y
 inter  []     y     = y
 inter  x      []    = x
-inter (a:as) (b:bs) = a : b : (inter as bs)
+inter (a:as) (b:bs) = a : b : inter as bs
 
 offset :: Num a => a ->  [a] -> [a]
 offset i = map (+ i)
@@ -120,14 +120,13 @@ binaryDigit 0 = 0
 binaryDigit x = 10 * binaryDigit (x `div` 2) + x `mod` 2
 
 stringToBinary :: String -> [Integer]
-stringToBinary s = (map binaryDigit) $ map toInteger $ map fromEnum s
+stringToBinary = map ((binaryDigit . toInteger) . fromEnum)
 
 binaryToBinString :: Show a => [a] -> String
 binaryToBinString s = foldl1 (++) $ map show s
 
 binStringToList :: [a] -> [[a]]
-binStringToList [] = []
-binStringToList (b:bs) = [b] : binStringToList bs
+binStringToList = map (: [])
 
 numToBinary :: Double -> [Double]
 numToBinary n = stringToDouble $ binStringToList $ binaryToBinString [binaryDigit $ floor n]
@@ -139,12 +138,12 @@ intToDouble :: Int -> Double
 intToDouble = fromIntegral
 
 binToNormSum :: [Double] -> [Double]
-binToNormSum x =  map (/ (intToDouble $ length x)) $ map intToDouble $ binToSum x
+binToNormSum x =  map ((/ (intToDouble $ length x)) . intToDouble) (binToSum x)
 
 binToSum :: [Double] -> [Int]
 binToSum [] = []
-binToSum x | (last x) == 0 = 0 : (binToSum $ init x)
-           | (last x) == 1 = (length x) : (binToSum $ init x)
+binToSum x | last x == 0 = 0 : binToSum (init x)
+           | last x == 1 = length x : binToSum (init x)
 
 numSeqFromText :: String -> [Double]
 numSeqFromText t = reverse . filter (/=0) $ binToNormSum $ textToBinary t

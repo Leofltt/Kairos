@@ -29,7 +29,7 @@ displayClock c = do
   ts   <- currentTS c
   cb   <- currentBeat c
   beat <- beatInBar c
-  return $ "clock's bar: " ++ (show $ thisBar cb) ++ ", beat: " ++ (take 4 $ show $ beat) ++ ", at tempo: " ++ (show $ bpm ts) ++" bpm."
+  return $ "clock's bar: " ++ show (thisBar cb) ++ ", beat: " ++ (take 4 $ show $ beat) ++ ", at tempo: " ++ show (bpm ts) ++" bpm."
 
 getNow :: MonadIO m => m Time
 getNow = liftIO $ fmap realToFrac getPOSIXTime
@@ -42,12 +42,12 @@ timeD clock = let
   return (x - s)
 
 waitUntil :: MonadIO m => Clock -> Time -> m ()
-waitUntil c t = waitT . (t -) =<< (timeD c)
+waitUntil c t = waitT . (t -) =<< timeD c
 
 waitT :: (MonadIO m, RealFrac a) => a -> m ()
 waitT t = when (t > 0) (liftIO (threadDelay(floor (t * 1000000))))
 
-defaultClock :: IO Clock 
+defaultClock :: IO Clock
 defaultClock  = do
   s <- getNow
   let timesig = TS { bpm = 120
@@ -86,8 +86,7 @@ addTS c t = do
   curTS <- currentTS c
   beatCurTs <- beatAt c (startTime curTS)
   atomically $ writeTVar (timeSig c) ((newTS (bpm t) (beatInMsr t) ((max ((beatToTime ((thisBar curBeat) - beatCurTs) (bpm curTS) (beatInMsr curTS)) + (startTime curTS)) (startTime $ head ts)) + (beatToTime (startTime t) (bpm t) (beatInMsr t)))):ts)
-  tim <- readTVarIO $ timeSig c
-  return $ tim
+  readTVarIO $ timeSig c
 
 currentTS :: Clock -> IO TimeSignature
 currentTS c = do
@@ -100,24 +99,23 @@ checkTimeSig now tms = head $ possible tms now
 
 possible :: [TimeSignature] -> Time -> [TimeSignature]
 possible (t:ts) now
-  | ((startTime t) == (head $ filter (<= now) (starts (t:ts)))) = t : (possible ts now)
+  | startTime t == head (filter (<= now) (starts (t:ts))) = t : possible ts now
   | otherwise = possible ts now
 possible [] _ = []
 
 starts :: [TimeSignature] -> [Time]
-starts ts = map startTime ts
+starts = map startTime
 
 -- display the time in Measure.CurrPhase
 currentBeat :: Clock -> IO Beats
 currentBeat c = do
   now <- timeD c
-  result <- beatAt c now
-  return $ result
+  beatAt c now
 
 beatAt :: Clock -> Time -> IO Beats
 beatAt c time = do
   tms <- readTVarIO $ timeSig c
-  return $ timeDelta (possible tms time) (time:(starts (possible tms time)))
+  return $ timeDelta (possible tms time) (time:starts (possible tms time))
 
 -- return the bar number from Beats
 thisBar :: Beats -> Beats
@@ -132,10 +130,10 @@ beatToTime x bpm beatPerMeasure = (x * beatPerMeasure) * (60.00 / bpm)
 
 -- given a time delta and a TS, return the amount of beats in that timesignature
 timeToBeat :: Time -> TimeSignature -> Beats
-timeToBeat delta ts = delta * ((bpm ts)/ 60.00) / (beatInMsr ts)
+timeToBeat delta ts = delta * (bpm ts/ 60.00) / beatInMsr ts
 
 timeDelta :: [TimeSignature] -> [Double] -> Double
-timeDelta (x:xs) (now:sts) = (timeToBeat (now  - (head sts)) x) + (timeDelta xs sts)
+timeDelta (x:xs) (now:sts) = timeToBeat (now  - head sts) x + timeDelta xs sts
 timeDelta [] _ = 0
 
 -- elapsedSinceTSC
@@ -144,14 +142,14 @@ beatInBar :: Clock -> IO Double
 beatInBar c = do
   cb <- currentBeat c
   ts <- currentTS c
-  return $ (cb - (thisBar cb)) * (beatInMsr ts)
+  return $ (cb - thisBar cb) * beatInMsr ts
 
 timeAtBeat :: Clock -> Beats -> IO Time
 timeAtBeat c b = do
   ts <- currentTS c
   ob <- beatAt c (startTime ts)
-  return $ (startTime ts) + (beatToTime (b-ob) (bpm ts) (beatInMsr ts))
+  return $ startTime ts + beatToTime (b-ob) (bpm ts) (beatInMsr ts)
 
 -- return the current phase (current beat in the bar 0 - 1) in the bar where the beast happens
 deltaBeats :: Beats -> Beats
-deltaBeats b = b - (thisBar b)
+deltaBeats b = b - thisBar b
