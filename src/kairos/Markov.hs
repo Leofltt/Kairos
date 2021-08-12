@@ -1,12 +1,12 @@
 module Kairos.Markov where
 
-import Kairos.Base
-import Kairos.Utilities
-import Text.CSV
-import Data.Char
-import Data.List
-import Data.Maybe
-import Control.Concurrent.STM
+import Kairos.Pfield ( Pfield, PfPat(pat) )
+import Kairos.Utilities ( randF, stringToDouble )
+import Text.CSV ( parseCSVFromFile )
+import Data.Char ( isNumber, isSymbol )
+import Data.List ( elemIndex )
+import Data.Maybe ( fromJust )
+import Control.Concurrent.STM ( atomically, readTVarIO, writeTVar )
 
 
 runMarkovSimpleCSV :: String -> [Pfield] ->  IO [Pfield]

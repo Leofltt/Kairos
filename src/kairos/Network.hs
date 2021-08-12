@@ -2,13 +2,21 @@
 
 module Kairos.Network where
 
-import Kairos.Base
-import Kairos.Utilities
+import Kairos.Pfield ( Pfield(Ps, Pd) )
+import Kairos.Utilities ( doubleToFloat )
 import Network.Socket
+    ( getAddrInfo,
+      connect,
+      socket,
+      close,
+      defaultProtocol,
+      AddrInfo(addrFamily, addrAddress),
+      SocketType(Datagram) )
 import Network.Socket.ByteString (sendAll,send)
 import qualified Data.ByteString.Char8 as C
-import Data.ByteString.Internal as B
+import Data.ByteString.Internal as B ( packChars )
 import Vivid.OSC as V
+    ( encodeOSC, OSC(..), OSCDatum(OSC_S, OSC_F) )
 
 
 -- UDP network to connect to Csound on port 11000

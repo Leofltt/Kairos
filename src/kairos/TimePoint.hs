@@ -1,11 +1,25 @@
+{-# LANGUAGE DeriveFunctor #-}
+
 module Kairos.TimePoint where
 
-import Kairos.Base
+import Kairos.Clock ( TimeSignature(beatInMsr), Beats ) 
 import Kairos.Utilities
-import Kairos.Euclidean
-import Data.Maybe
+    ( addToMap,
+      lookupMap,
+      genNRandomValues,
+      intToDouble,
+      numSeqFromText,
+      numSeqFromBin )
+import Kairos.Euclidean ( euclidean )
+import Data.Maybe ( fromJust )
 import Control.Applicative (liftA2)
 import Data.Time.Clock.POSIX (getPOSIXTime)
+
+-- a point in time
+newtype TimePointf a = TP { whenTP :: a
+                       } deriving (Eq, Ord, Functor, Show)
+
+type TimePoint = TimePointf Beats
 
 instance Applicative TimePointf where
   pure = TP
@@ -33,11 +47,6 @@ toTP times = Prelude.map pure times
 
 tpD :: Double -> TimePoint
 tpD = pure
-
-getTimePoint :: Performance -> String -> IO [TimePoint]
-getTimePoint perf s = do
-  Just t <- lookupMap (timePs perf) s
-  return $ t
 
 fromTP :: [TimePoint] -> [Double]
 fromTP (x:xs) = (whenTP x):(fromTP xs)
@@ -97,16 +106,6 @@ interp2 :: Double -> [Double] -> [Double]
 interp2 _ (x:y:[]) = [((x+y)/2)]
 interp2 tot (x:[]) = [(x + tot)/2]
 interp2 tot (x:y:xs) = ((x+y)/2):(interp2 tot xs)
-
--- add a named pattern of timepoints to a performance
-
-addTPf :: Performance -> String -> [TimePoint] -> IO ()
-addTPf e n ts = addToMap (timePs e) (n,ts)
-
-
-maybeAddTPf :: Performance -> String -> Maybe [TimePoint] -> IO ()
-maybeAddTPf e n ts | ts == Nothing = putStrLn $ "Pattern is empty"
-                   | otherwise = addTPf e n $ fromJust ts
 
 --- default Patterns ----------------------------------------
 

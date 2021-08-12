@@ -1,27 +1,43 @@
 module Kairos.Instrument where
 
-import Kairos.Base
 import Kairos.Clock
+import Kairos.TimePoint ( TimePoint )
 import Kairos.Pfield
-import Kairos.Utilities
+import Kairos.Utilities ( lookupMap )
 import Control.Concurrent.STM
+    ( atomically, newTVar, newTVarIO, readTVarIO, writeTVar, TVar )
 import qualified Data.Map.Strict as M
 
-pfToString :: [Pfield] -> String
-pfToString ps = unwords $ map show ps
+-- Orchestra
+type Orchestra = TVar (M.Map [Char] Instr)
+
+-- Instrument
+data Instr = I { insN :: InstrumentID 
+               , pf :: TVar PfMap 
+               , status :: Status
+               , toPlay :: Maybe TimePoint
+               , pats :: TVar (M.Map Int PfPat) -- Patterns of Parameters and their IDs
+               , timeF :: String                -- Name of the time function to refer to
+               , kind :: MessageTo
+               , itype :: InstrType
+               }
+
+-- Instrument Name: an integer number
+type InstrumentID = Int
+
+-- is the instrument Active ?
+data Status = Init | Active | Inactive | Stopping deriving (Show, Eq)
+
+-- where are we sending the data
+data MessageTo = Csound | OSC deriving (Show, Eq)
+
+-- instrument or effect ?
+data InstrType = Instrument | Effect deriving (Show, Eq)
 
 getPfields :: Instr -> IO (PfMap)
 getPfields i = do
   pf <- readTVarIO $ pf i
   return $ pf
-
-withTimeSignature :: Performance -> [Pfield] -> IO [Pfield]
-withTimeSignature perf l = do
-  ts <- currentTS $ clock perf
-  let oneSecond = 60/(bpm ts)
-  let oneBarSecond = (beatInMsr ts) * oneSecond
-  let beatsInSeconds = map (*oneBarSecond) (stringToDouble $ map show l)
-  return $ toPfs beatsInSeconds
 
 -- default instruments
 
@@ -308,40 +324,11 @@ defaultOrc = do
                                             ]
   return $ orc
 
-displayInstruments :: Performance -> IO String
-displayInstruments perf = do
-   ins <- readTVarIO (orc perf)
-   return $ unwords $ M.keys ins
-
--- to add instruments
-addInstrument :: Performance -> String -> Instr -> IO ()
-addInstrument perf name instr = addToMap (orc perf) (name,instr)
-
 -- returns all instruments that are not effects
 notEffect = filter (/= "rev") . filter (/= "del") . filter (/= "mix") . filter ( /= "chorus")
-
--- function to create a PfPat
-createPfPat :: Int -> [Pfield] -> (PfPat -> IO Pfield) -> IO PfPat
-createPfPat num pfields updtr = do
-  ptrn <- newTVarIO pfields
-  return $ PfPat { pfNum = num
-                 , pat = ptrn
-                 , updater = updtr
-                 }
-
 
 -- function to default a pattern to the value of the pfield
 defaultPfpat :: Instr -> PfPat -> IO ()
 defaultPfpat i pfp = do
   Just pf <- lookupMap (pf i) (pfNum pfp)
   atomically $ writeTVar (pat pfp) [pf]
-  return ()
-
-
-addPfPath :: Instr -> Int -> PfPat -> IO ()
-addPfPath i num pfPat = addToMap (pats i) (num,pfPat)
-
-addPfPath' :: Performance -> [Char] -> Int -> PfPat -> IO ()
-addPfPath' e insname num pfPat = do
-  Just i <- lookupMap (orc e) insname
-  addPfPath i num pfPat

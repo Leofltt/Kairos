@@ -1,14 +1,15 @@
 module Kairos.Player where
 
-import Kairos.Base
+import Kairos.Performance ( Performance(..) )
+import Kairos.Pfield ( PfPat(updater, pfNum), pfToString, PfMap )
 import Kairos.TimePoint
 import Kairos.Clock
 import Kairos.Instrument
-import Kairos.Network
-import Kairos.Utilities
-import Control.Concurrent
-import Control.Concurrent.STM
-import Data.Maybe
+import Kairos.Network ( sendEvent, setChan, sendOSC )
+import Kairos.Utilities ( addToMap, lookupMap, inter )
+import Control.Concurrent ( forkIO )
+import Control.Concurrent.STM ( newTVarIO, readTVarIO, TVar )
+import Data.Maybe ( fromJust )
 import qualified Data.Map.Strict as M
 
 defaultPerformance :: IO Performance
@@ -55,7 +56,6 @@ playOne perf i tp = do
            then do
                    updatePfields i
                    playInstr i
-                   return ()
            else do
                    return ()
 

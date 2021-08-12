@@ -33,7 +33,7 @@ library:
 
   exposed-modules:
   - Kairos.Lib
-  - Kairos.Base
+  - Kairos.Performance
   - Kairos.Clock
   - Kairos.TimePoint
   - Kairos.Pfield

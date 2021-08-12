@@ -1,11 +1,13 @@
 module Kairos.Utilities where
 
-import Kairos.Base
+import Kairos.Pfield ( Pfield, PfPat(pat) )
 import Control.Concurrent.STM
+    ( atomically, readTVarIO, writeTVar, modifyTVar', TVar )
 import qualified Data.Map.Strict as M
 import Data.List (sort)
 import System.Random (getStdRandom,randomR, mkStdGen, randomRs, randomRIO)
-import System.IO.Unsafe
+import System.IO.Unsafe ( unsafePerformIO )
+import Control.Monad.IO.Class ( MonadIO )
 
 
 -- Map Utilities
@@ -63,6 +65,7 @@ percentNext i n = do
 
 -- Misc Utilities
 
+shuffle :: Control.Monad.IO.Class.MonadIO m => [a] -> m [a]
 shuffle x = if length x < 2 then return x else do
   i <- randomRIO (0, length(x)-1)
   r <- shuffle (Prelude.take i x ++ Prelude.drop (i+1) x)

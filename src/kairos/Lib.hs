@@ -1,6 +1,6 @@
 module Kairos.Lib (module K) where
 
-import Kairos.Base as K
+import Kairos.Performance as K
 import Kairos.Network as K
 import Kairos.Clock as K
 import Kairos.TimePoint as K

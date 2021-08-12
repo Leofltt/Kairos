@@ -2,8 +2,13 @@
 
 module Kairos.Pfield where 
 
-import Kairos.Base
+import Data.Typeable ( Typeable )
+import Control.Concurrent.STM ( TVar )
+import qualified Data.Map.Strict as M
 
+-- a single Pfield
+data Pfield  = Ps { pString :: String }
+             | Pd { pDouble :: Double } deriving (Eq, Ord, Typeable)
 
 instance Show Pfield where
   show (Ps s) = show s
@@ -23,3 +28,16 @@ instance PfAble String where
 
 toPfs :: PfAble a => [a] -> [Pfield]
 toPfs x = map toPf x
+
+-- pattern of pfields and related update function
+data PfPat = PfPat { pfNum :: Int                  -- id of the pfield
+                   , pat  :: TVar [Pfield]         -- the string of possible values (or only value, depends on what the updater needs)
+                   , updater :: PfPat -> IO Pfield -- the function that decides which value to take
+                   }
+
+-- Map of Pfields and their IDs
+type PfMap = M.Map Int Pfield
+
+pfToString :: [Pfield] -> String
+pfToString ps = unwords $ map show ps
+

@@ -1,11 +1,29 @@
 module Kairos.Clock where
 
-import Kairos.Base
-import Control.Monad
-import Control.Concurrent
+import Control.Monad ( when )
+import Control.Concurrent ( threadDelay )
 import Control.Concurrent.STM
-import Data.Time.Clock.POSIX
-import Control.Monad.IO.Class
+    ( atomically, newTVarIO, readTVarIO, writeTVar, TVar )
+import Data.Time.Clock.POSIX ( getPOSIXTime )
+import Control.Monad.IO.Class ( MonadIO(..) )
+import GHC.Conc (TVar(TVar))
+
+-- clock
+data Clock = Clock { startAt :: Time
+                   , timeSig :: TVar [TimeSignature]
+                   }
+
+-- time signature
+data TimeSignature = TS { beatInMsr :: Double
+                        , bpm :: Double
+                        , startTime :: Time
+                        } deriving (Show,Eq)
+
+-- Performance seconds
+type Time = Double
+
+-- measureNumber.currPhase ( ex. 4.1 == measure 4 beat 2 )
+type Beats = Double
 
 displayClock :: Clock -> IO [Char]
 displayClock c = do
