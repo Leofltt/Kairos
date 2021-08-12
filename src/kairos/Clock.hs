@@ -29,7 +29,7 @@ displayClock c = do
   ts   <- currentTS c
   cb   <- currentBeat c
   beat <- beatInBar c
-  return $ "clock's bar: " ++ show (thisBar cb) ++ ", beat: " ++ (take 4 $ show $ beat) ++ ", at tempo: " ++ show (bpm ts) ++" bpm."
+  return $ "clock's bar: " ++ show (thisBar cb) ++ ", beat: " ++ take 4 (show beat) ++ ", at tempo: " ++ show (bpm ts) ++" bpm."
 
 getNow :: MonadIO m => m Time
 getNow = liftIO $ fmap realToFrac getPOSIXTime
@@ -70,7 +70,7 @@ newTS tmp msr strt =
 currentTempo :: Clock -> IO Double
 currentTempo c = do
   cts <- currentTS c
-  return $ bpm $ cts
+  return $ bpm cts
 
 changeTempo :: Clock -> Double -> IO ()
 changeTempo c t = do
@@ -85,7 +85,7 @@ addTS c t = do
   curBeat <- currentBeat c
   curTS <- currentTS c
   beatCurTs <- beatAt c (startTime curTS)
-  atomically $ writeTVar (timeSig c) ((newTS (bpm t) (beatInMsr t) ((max ((beatToTime ((thisBar curBeat) - beatCurTs) (bpm curTS) (beatInMsr curTS)) + (startTime curTS)) (startTime $ head ts)) + (beatToTime (startTime t) (bpm t) (beatInMsr t)))):ts)
+  atomically $ writeTVar (timeSig c) (newTS (bpm t) (beatInMsr t) (max (beatToTime (thisBar curBeat - beatCurTs) (bpm curTS) (beatInMsr curTS) + startTime curTS) (startTime $ head ts) + beatToTime (startTime t) (bpm t) (beatInMsr t)):ts)
   readTVarIO $ timeSig c
 
 currentTS :: Clock -> IO TimeSignature

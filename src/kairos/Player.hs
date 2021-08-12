@@ -96,7 +96,7 @@ playLoop perf pn Active = do
      else do  let tp = fromJust pb
               Just timeString <- lookupMap (timePs perf) (timeF p)
               let nb = nextBeat tp timeString
-              let nextToPlay | whenTP nb > whenTP tp = (whenTP  (wrapBar ts nb)/beatInMsr ts) + thisBar cb + ((fromIntegral $ floor $ whenTP  nb/(beatInMsr ts)) - (fromIntegral $ floor $ whenTP  tp/beatInMsr ts))
+              let nextToPlay | whenTP nb > whenTP tp = (whenTP  (wrapBar ts nb)/beatInMsr ts) + thisBar cb + ((fromIntegral $ floor $ whenTP  nb/beatInMsr ts) - (fromIntegral $ floor $ whenTP  tp/beatInMsr ts))
                              | whenTP nb <= whenTP tp = (whenTP nb/beatInMsr ts) + nextBar cb
               nextTime <- timeAtBeat (clock perf) nextToPlay
               _ <- forkIO $ playOne perf p (wrapBar ts tp)
@@ -207,11 +207,11 @@ closertoNow e k ts = do
     then do let toP = fromJust (toPlay pl)
             let tp | takeWhile (<= toP) ts /= [] = last $ takeWhile (<= toP) ts
                    | otherwise = head ts
-            return $ tp
+            return tp
     else do now <- beatInBar (clock e)
             let tp | takeWhile (<= TP now) ts /= [] = last $ takeWhile (<= TP now) ts
                    | otherwise = head ts
-            return $ tp
+            return tp
 
 updateToPlay :: Performance -> String -> Maybe TimePoint -> IO ()
 updateToPlay e k newTP = updateInstrument e k (\x -> x { toPlay = newTP })
