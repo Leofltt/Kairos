@@ -40,7 +40,7 @@ getTimePoint perf s = do
   return $ t
 
 fromTP :: [TimePoint] -> [Double]
-fromTP (x:xs) = (time x):(fromTP xs)
+fromTP (x:xs) = (whenTP x):(fromTP xs)
 fromTP [] = []
 
 -- functions to create TimePoint patterns -------------------------------

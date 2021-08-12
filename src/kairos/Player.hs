@@ -44,7 +44,7 @@ playOne perf i tp = do
    ts <- currentTS (clock perf)
    cb <- currentBeat (clock perf)
    now <- timeD (clock perf)
-   let toBePlayed = ((time (tp))/(beatInMsr ts)) + (thisBar cb)
+   let toBePlayed = ((whenTP (tp))/(beatInMsr ts)) + (thisBar cb)
    if ((toBePlayed ) > cb)
       then do
               nextT <- timeAtBeat (clock perf) (toBePlayed)
@@ -95,8 +95,8 @@ playLoop perf pn Active = do
      else do  let tp = fromJust pb
               Just timeString <- lookupMap (timePs perf) (timeF p)
               let nb = nextBeat tp timeString
-              let nextToPlay | (time nb) > (time tp) = ((time  (wrapBar ts nb))/(beatInMsr ts)) + (thisBar cb) + ((fromIntegral $ floor $ (time  nb)/(beatInMsr ts)) - (fromIntegral $ floor $ (time  tp)/(beatInMsr ts)))
-                             | (time nb) <= (time tp) = ((time nb)/(beatInMsr ts)) + (nextBar cb)
+              let nextToPlay | (whenTP nb) > (whenTP tp) = ((whenTP  (wrapBar ts nb))/(beatInMsr ts)) + (thisBar cb) + ((fromIntegral $ floor $ (whenTP  nb)/(beatInMsr ts)) - (fromIntegral $ floor $ (whenTP  tp)/(beatInMsr ts)))
+                             | (whenTP nb) <= (whenTP tp) = ((whenTP nb)/(beatInMsr ts)) + (nextBar cb)
               nextTime <- timeAtBeat (clock perf) (nextToPlay)
               _ <- forkIO $ playOne perf p (wrapBar ts tp)
               updateToPlay perf pn (Just nb)

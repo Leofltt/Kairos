@@ -69,7 +69,7 @@ data Pfield  = Ps { pString :: String }
              | Pd { pDouble :: Double } deriving (Eq, Ord, Typeable)
 
 -- a point in time
-data TimePointf a = TP { time :: a
+data TimePointf a = TP { whenTP :: a
                        } deriving (Eq, Ord, Functor, Show)
 
 type TimePoint = TimePointf Beats
