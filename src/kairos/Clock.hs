@@ -75,7 +75,7 @@ currentTempo c = do
 changeTempo :: Clock -> Double -> IO ()
 changeTempo c t = do
   cts <- currentTS c
-  tss <- addTS c $ newTS t (beatInMsr cts) 0
+  tss <- addTS c $ newTS t (beatInMsr cts) 1 -- 1: tempo is changed on the next bar
   putStrLn $ "Current bpm: " ++ show (bpm $ head tss)
 
 -- given a clock and a TS, prepends the TS to the list of current ts in the clock, correcting the start time appropriately
@@ -132,17 +132,16 @@ beatToTime x bpm beatPerMeasure = (x * beatPerMeasure) * (60.00 / bpm)
 timeToBeat :: Time -> TimeSignature -> Beats
 timeToBeat delta ts = delta * (bpm ts/ 60.00) / beatInMsr ts
 
-timeDelta :: [TimeSignature] -> [Double] -> Double
+timeDelta :: [TimeSignature] -> [Time] -> Time
 timeDelta (x:xs) (now:sts) = timeToBeat (now  - head sts) x + timeDelta xs sts
 timeDelta [] _ = 0
 
--- elapsedSinceTSC
 -- return the current beat in a bar
 beatInBar :: Clock -> IO Double
 beatInBar c = do
   cb <- currentBeat c
   ts <- currentTS c
-  return $ (cb - thisBar cb) * beatInMsr ts
+  return $ deltaBeats cb * beatInMsr ts
 
 timeAtBeat :: Clock -> Beats -> IO Time
 timeAtBeat c b = do

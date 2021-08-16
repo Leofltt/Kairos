@@ -1,7 +1,7 @@
 module Kairos.Instrument where
 
 import Kairos.TimePoint ( TimePoint )
-import Kairos.Pfield
+import Kairos.Pfield ( PfMap, PfPat(pfNum, pat), Pfield(Ps, Pd) )
 import Kairos.Utilities ( lookupMap )
 import Control.Concurrent.STM
     ( atomically, newTVarIO, readTVarIO, writeTVar, TVar )
@@ -33,7 +33,7 @@ data MessageTo = Csound | OSC deriving (Show, Eq)
 -- instrument or effect ?
 data InstrType = Instrument | Effect deriving (Show, Eq)
 
-getPfields :: Instr -> IO (PfMap)
+getPfields :: Instr -> IO PfMap
 getPfields i = do
   readTVarIO $ pf i
 

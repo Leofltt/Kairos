@@ -23,7 +23,6 @@ defaultPerformance = do
              , timePs = t
              }
 
-
 setChannel :: String -> Double -> IO ()
 setChannel chanName val = do
   let m = chanName ++ " " ++ show val
@@ -96,7 +95,7 @@ playLoop perf pn Active = do
      else do  let tp = fromJust pb
               Just timeString <- lookupMap (timePs perf) (timeF p)
               let nb = nextBeat tp timeString
-              let nextToPlay | whenTP nb > whenTP tp = (whenTP  (wrapBar ts nb)/beatInMsr ts) + thisBar cb + ((fromIntegral $ floor $ whenTP  nb/beatInMsr ts) - (fromIntegral $ floor $ whenTP  tp/beatInMsr ts))
+              let nextToPlay | whenTP nb > whenTP tp = (whenTP  (wrapBar ts nb)/beatInMsr ts) + thisBar cb + (fromIntegral . floor $ whenTP  nb/beatInMsr ts - whenTP tp/beatInMsr ts)
                              | whenTP nb <= whenTP tp = (whenTP nb/beatInMsr ts) + nextBar cb
               nextTime <- timeAtBeat (clock perf) nextToPlay
               _ <- forkIO $ playOne perf p (wrapBar ts tp)
@@ -194,11 +193,18 @@ changeStatus e k newS = updateInstrument e k (\x -> x { status = newS })
 
 changeTimeF :: Performance -> String -> String -> IO ()
 changeTimeF e k newF = do
-  Just pl <- lookupMap (orc e) k
-  Just ts <- lookupMap (timePs e) newF
-  val <- closertoNow e k ts
-  updateToPlay e k (Just val)
-  updateInstrument e k (\x -> x { timeF = newF })
+  pl <- lookupMap (orc e) k
+  if isNothing pl
+    then putStrLn "Instrument not found"
+    else do
+      tp <- lookupMap (timePs e) newF
+      if isNothing  tp
+        then putStrLn "Time Pattern not found"
+        else do
+          let Just ts = tp
+          val <- closertoNow e k ts
+          updateToPlay e k (Just val)
+          updateInstrument e k (\x -> x { timeF = newF })
 
 closertoNow :: Performance -> String -> [TimePoint] -> IO TimePoint
 closertoNow e k ts = do
