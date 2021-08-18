@@ -1,11 +1,11 @@
 module Kairos.Performance where
 
-import Kairos.Instrument
+import Kairos.Instrument ( Instr(pats), Orchestra )
 import Kairos.Clock
-import Kairos.TimePoint
+import Kairos.TimePoint ( TimePoint )
 import Kairos.Pfield
-import Kairos.Utilities
-import Control.Concurrent.STM
+import Kairos.Utilities ( addToMap, lookupMap, stringToDouble )
+import Control.Concurrent.STM ( newTVarIO, readTVarIO, TVar )
 import qualified Data.Map.Strict as M
 import Data.Maybe (fromJust, isNothing)
 
@@ -23,7 +23,6 @@ createPfPat num pfields updtr = do
                  , pat = ptrn
                  , updater = updtr
                  }
-
 
 addPfPath :: Instr -> Int -> PfPat -> IO ()
 addPfPath i num pfPat = addToMap (pats i) (num,pfPat)
@@ -59,7 +58,6 @@ getTimePoint perf s = do
 
 addTPf :: Performance -> String -> [TimePoint] -> IO ()
 addTPf e n ts = addToMap (timePs e) (n,ts)
-
 
 maybeAddTPf :: Performance -> String -> Maybe [TimePoint] -> IO ()
 maybeAddTPf e n ts | isNothing ts = putStrLn "Pattern is empty"

@@ -69,7 +69,7 @@ notEmpty [] = Nothing
 notEmpty l  = Just l
 
 tempF :: [TimePoint] -> [Int] -> Int -> [TimePoint]
-tempF [x] (v:vs) d | v <= d = [x]
+tempF [x] (v:_) d     | v <= d = [x]
                       | otherwise = []
 tempF (x:xs) (v:vs) d | v <= d = x:tempF xs (vs++[v]) d
                       | otherwise = tempF xs (vs++[v]) d
@@ -77,9 +77,6 @@ tempF (x:xs) (v:vs) d | v <= d = x:tempF xs (vs++[v]) d
 -- Given a tuple, a rotation shift and a number of beats returns an euclidean rhythm TP
 euclid :: (Int,Int) -> Int -> Double -> [TimePoint]
 euclid (x,y) shift maxbeats = toTP $ map ((*(maxbeats/intToDouble y)) . (+ (-1))) $ filter (/=0) $ zipWith (*) (map intToDouble $ euclidean (x,y) shift) [1,2..]
-
-
-
 
 -- Given total length in beats, take a string of text and converts it into a time pattern
 textToTP :: Double -> String -> [TimePoint]

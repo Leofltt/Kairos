@@ -178,13 +178,13 @@ updateInstrument perf k f = do
 
 updatePfields :: Instr -> IO ()
 updatePfields i = do
-   pfields <- readTVarIO (pf i)
+   -- pfields <- readTVarIO (pf i)
    pfpats <- readTVarIO (pats i)
    mapM_ (updateonepfield (pf i)) (M.elems pfpats)
 
 updateonepfield :: TVar PfMap -> PfPat -> IO ()
 updateonepfield pfmap pats = do
-  Just pf <- lookupMap pfmap (pfNum pats)
+  -- Just pf <- lookupMap pfmap (pfNum pats)
   newVal <- updater pats pats
   addToMap  pfmap (pfNum pats,newVal)
 

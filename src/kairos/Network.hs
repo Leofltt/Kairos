@@ -18,7 +18,6 @@ import Data.ByteString.Internal as B ( packChars )
 import Vivid.OSC as V
     ( encodeOSC, OSC(..), OSCDatum(OSC_S, OSC_F) )
 
-
 -- UDP network to connect to Csound on port 11000
 
 sendMsg :: String -> String -> IO ()

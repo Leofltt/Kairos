@@ -132,7 +132,7 @@ beatToTime x bpm beatPerMeasure = (x * beatPerMeasure) * (60.00 / bpm)
 timeToBeat :: Time -> TimeSignature -> Beats
 timeToBeat delta ts = delta * (bpm ts/ 60.00) / beatInMsr ts
 
-timeDelta :: [TimeSignature] -> [Time] -> Time
+timeDelta :: [TimeSignature] -> [Time] -> Beats
 timeDelta (x:xs) (now:sts) = timeToBeat (now  - head sts) x + timeDelta xs sts
 timeDelta [] _ = 0
 

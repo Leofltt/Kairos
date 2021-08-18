@@ -322,6 +322,7 @@ defaultOrc = do
                                             ])
 
 -- returns all instruments that are not effects
+notEffect :: [String] -> [String]
 notEffect = filter (/= "rev") . filter (/= "del") . filter (/= "mix") . filter ( /= "chorus")
 
 -- function to default a pattern to the value of the pfield

@@ -8,7 +8,6 @@ import Data.List ( elemIndex )
 import Data.Maybe ( fromJust )
 import Control.Concurrent.STM ( atomically, readTVarIO, writeTVar )
 
-
 runMarkovSimpleCSV :: String -> [Pfield] ->  IO [Pfield]
 runMarkovSimpleCSV cs pat = do
   doc <- parseCSVFromFile cs
@@ -36,7 +35,6 @@ runMarkov table n = do
   pat' <- runMarkovSimple table patrn
   atomically $ writeTVar (pat n) pat'
   return $ head pat'
-
 
 pickProb4Index :: Double -> [Double] -> Double
 pickProb4Index perc (x:xs) | x >= perc = x

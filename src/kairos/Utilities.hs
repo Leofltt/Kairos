@@ -102,12 +102,15 @@ interleave l1 l2 = sort $ inter l1 $ filterEqualsList l1 l2
 
 inter :: Ord a => [a] -> [a] -> [a]
 inter [x]  y     = x:y
-inter  []     y     = y
-inter  x      []    = x
+inter []   y     = y
+inter x    []    = x
 inter (a:as) (b:bs) = a : b : inter as bs
 
 offset :: Num a => a ->  [a] -> [a]
 offset i = map (+ i)
+
+modifyList :: (t -> a) -> [t] -> [a]
+modifyList f l = [f x | x <- l]
 
 --adapted from: https://stackoverflow.com/questions/27095647/convert-a-string-list-to-a-double-list-in-haskell
 stringToDouble :: [String] -> [Double]
