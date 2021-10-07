@@ -6,7 +6,7 @@ import Kairos.TimePoint
 import Kairos.Clock
 import Kairos.Instrument
 import Kairos.Network ( sendEvent, setChan, sendOSC )
-import Kairos.Utilities ( addToMap, lookupMap, inter )
+import Kairos.Utilities ( addToMap, lookupMap, inter, sameConstructor)
 import Control.Concurrent ( forkIO )
 import Control.Concurrent.STM ( newTVarIO, readTVarIO, TVar )
 import Data.Maybe ( fromJust, isJust, isNothing )
@@ -23,22 +23,22 @@ defaultPerformance = do
              , timePs = t
              }
 
-setChannel :: String -> Double -> IO ()
-setChannel chanName val = do
+setChannel :: String -> String -> Double -> IO ()
+setChannel port chanName val = do
   let m = chanName ++ " " ++ show val
-  setChan m
+  setChan port m
 
 playInstr :: Instr -> IO ()
 playInstr instr = do
   pfields <- readTVarIO $ pf instr
   let pfs = M.elems pfields
-  if kind instr == Csound
+  if sameConstructor (kind instr) (Csound "")
     then do
       let pfieldList = pfToString pfs
       let pfds = "i" ++ show (insN instr) ++ " 0 " ++ pfieldList
-      sendEvent pfds
+      sendEvent (getPort (kind instr)) pfds
     else do
-      sendOSC (insN instr) pfs
+      sendOSC (getPort (kind instr)) (insN instr) pfs
 
 playOne :: Performance -> Instr -> TimePoint -> IO ()
 playOne perf i tp = do
@@ -178,13 +178,11 @@ updateInstrument perf k f = do
 
 updatePfields :: Instr -> IO ()
 updatePfields i = do
-   -- pfields <- readTVarIO (pf i)
    pfpats <- readTVarIO (pats i)
    mapM_ (updateonepfield (pf i)) (M.elems pfpats)
 
 updateonepfield :: TVar PfMap -> PfPat -> IO ()
 updateonepfield pfmap pats = do
-  -- Just pf <- lookupMap pfmap (pfNum pats)
   newVal <- updater pats pats
   addToMap  pfmap (pfNum pats,newVal)
 

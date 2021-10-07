@@ -29,24 +29,24 @@ sendMsg m n = do
   sendAll sock $ C.pack n
   close sock
 
-sendCsound :: String -> IO ()
-sendCsound = sendMsg "11000"
+sendCsound :: String -> String -> IO ()
+sendCsound = sendMsg
 
-sendScore :: String -> IO ()
-sendScore n = let m = "$ " ++ n in
-  sendCsound m
+sendScore :: String -> String -> IO ()
+sendScore p n = let m = "$ " ++ n in
+  sendCsound p m
 
-sendEvent :: String -> IO ()
-sendEvent n = let m = "& " ++ n in
-  sendCsound m
+sendEvent :: String -> String -> IO ()
+sendEvent p n = let m = "& " ++ n in
+  sendCsound p m
 
-setChan :: String -> IO ()
-setChan n = let m = "@" ++ n in
-  sendCsound m
+setChan :: String -> String -> IO ()
+setChan p n = let m = "@" ++ n in
+  sendCsound p m
 
 -- send an OSC messagge to port 11100
-sendOSC :: Int -> [Pfield] -> IO ()
-sendOSC i l = sendMsgOSC "11100" $ createOSC i l
+sendOSC :: String -> Int -> [Pfield] -> IO ()
+sendOSC p i l = sendMsgOSC p $ createOSC i l
 
 sendMsgOSC :: String -> OSC -> IO ()
 sendMsgOSC m n = do

@@ -2,6 +2,7 @@
 
 import Kairos.Lib
 
+csd1 = "11000"
 :set prompt "κ> "
 perf <- defaultPerformance
 displayIns = displayInstruments perf
@@ -73,17 +74,16 @@ silence = stopAll perf
 playA = playAll perf
 playFx = playEffect perf
 solo = soloIns perf
-fbdel = setChannel "fbdel"
-dtdel = setChannel "dtdel"
-fbrev = setChannel "fbrev"
-cfrev = setChannel "cfrev"
-volrev = setChannel "volrev"
-voldel = setChannel "voldel"
-volchorus = setChannel "volchorus"
-delchorus = setChannel "delchorus"
-divchorus = setChannel "divchorus"
-m_vol = setChannel "m_vol"
--- mapM_ playFx ["rev","del","chorus","mix"]
+fbdel = setChannel csd1 "fbdel"
+dtdel = setChannel csd1 "dtdel"
+fbrev = setChannel csd1 "fbrev"
+cfrev = setChannel csd1 "cfrev"
+volrev = setChannel csd1 "volrev"
+voldel = setChannel csd1 "voldel"
+volchorus = setChannel csd1 "volchorus"
+delchorus = setChannel csd1 "delchorus"
+divchorus = setChannel csd1 "divchorus"
+m_vol = setChannel csd1 "m_vol"
 techno1 k s h = cPat "fourFloor" k >> cPat "downB" s >> cPat "upFour" h
 dnb1 k s h = cPat "dbk" k >> cPat "downB" s >> cPat "eightN" h
 runPfield i (a,b,c) = b i c a

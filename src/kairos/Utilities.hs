@@ -8,6 +8,8 @@ import Data.List (sort)
 import System.Random (getStdRandom,randomR, mkStdGen, randomRs, randomRIO)
 import System.IO.Unsafe ( unsafePerformIO )
 import Control.Monad.IO.Class ( MonadIO )
+import Data.Data ( Data(toConstr) )
+import Data.Function ( on )
 
 
 -- Map Utilities
@@ -156,3 +158,7 @@ numSeqFromBin d = reverse . filter (/=0) $ binToNormSum $ numToBinary d
 
 doubleToFloat :: Double -> Float
 doubleToFloat = realToFrac
+
+sameConstructor :: Data a => a -> a -> Bool
+sameConstructor = (==) `on` toConstr
+
