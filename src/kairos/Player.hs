@@ -1,7 +1,7 @@
 module Kairos.Player where
 
 import Kairos.Performance ( Performance(..) )
-import Kairos.Pfield ( PfPat(updater, pfNum), pfToString, PfMap )
+import Kairos.Pfield ( PfPat(updater, pfId), pfToString, PfMap, idInt )
 import Kairos.TimePoint
 import Kairos.Clock
 import Kairos.Instrument
@@ -34,9 +34,14 @@ playInstr instr = do
   let pfs = M.elems pfields
   if sameConstructor (kind instr) (Csound "")
     then do
-      let pfieldList = pfToString pfs
-      let pfds = "i" ++ show (insN instr) ++ " 0 " ++ pfieldList
-      sendEvent (getPort (kind instr)) pfds
+      if itype instr == Instrument 
+        then do
+          let pfieldList = pfToString pfs
+          let pfds = "i" ++ show (insN instr) ++ " 0 " ++ pfieldList
+          sendEvent (getPort (kind instr)) pfds
+        else do
+          -- play effect (to change effect parameters) not implemented yet
+          return ()
     else do
       sendOSC (getPort (kind instr)) (insN instr) pfs
 
@@ -184,7 +189,7 @@ updatePfields i = do
 updateonepfield :: TVar PfMap -> PfPat -> IO ()
 updateonepfield pfmap pats = do
   newVal <- updater pats pats
-  addToMap  pfmap (pfNum pats,newVal)
+  addToMap  pfmap (idInt (pfId pats),newVal)
 
 changeStatus :: Performance -> String -> Status -> IO ()
 changeStatus e k newS = updateInstrument e k (\x -> x { status = newS })

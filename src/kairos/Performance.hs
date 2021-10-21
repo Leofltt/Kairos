@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-missing-fields #-}
 module Kairos.Performance where
 
 import Kairos.Instrument ( Instr(pats), Orchestra )
@@ -16,10 +17,10 @@ data Performance = P { orc :: Orchestra
                      }
 
 -- function to create a PfPat
-createPfPat :: Int -> [Pfield] -> (PfPat -> IO Pfield) -> IO PfPat
-createPfPat num pfields updtr = do
+createPfPat :: Int -> String -> [Pfield] -> (PfPat -> IO Pfield) -> IO PfPat
+createPfPat num name pfields updtr = do
   ptrn <- newTVarIO pfields
-  return $ PfPat { pfNum = num
+  return $ PfPat { pfId = Either num name
                  , pat = ptrn
                  , updater = updtr
                  }

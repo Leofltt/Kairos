@@ -3,7 +3,7 @@
 module Kairos.Instrument where
 
 import Kairos.TimePoint ( TimePoint )
-import Kairos.Pfield ( PfMap, PfPat(pfNum, pat), Pfield(Ps, Pd) )
+import Kairos.Pfield ( PfMap, PfPat(pfId, pat), Pfield(Ps, Pd), idInt )
 import Kairos.Utilities ( lookupMap )
 import Control.Concurrent.STM
     ( atomically, newTVarIO, readTVarIO, writeTVar, TVar )
@@ -226,6 +226,27 @@ models port chan = do
              , itype  = Instrument
              }
 
+modelChord :: String -> Double -> IO Instr
+modelChord port chan = do
+  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 90)
+                                    ,(5,Pd 0),(6,Pd 0)
+                                    ,(7,Pd 64),(8,Pd chan)
+                                    ,(9,Pd 60),(10,Pd 115)
+                                    ,(11,Pd 0),(12,Pd 20)
+                                    ,(13,Pd 50),(14,Pd 50)
+                                    ,(15,Pd 20),(16,Pd 20)
+                                    ]
+  emptyPat <- newTVarIO M.empty
+  return $ I { insN = 101
+             , pf = pfields
+             , toPlay = Nothing
+             , status = Inactive
+             , timeF  = ""
+             , pats   = emptyPat
+             , kind   = Csound port
+             , itype  = Instrument
+             }
+
 -- default effects
 
 reverb :: IO Instr
@@ -315,6 +336,7 @@ defaultOrc = do
   strPad <- stringPad
   phaxo <- phax
   cycles1 <- models "11000" 1
+  mstab <- modelChord "11000" 2
   chorus <- chorus
   mix <- master
   ot <- oscInstr 666 "11100" [(3, Pd 0.8),(2,Ps "Test")]
@@ -324,7 +346,7 @@ defaultOrc = do
                                             ,("karp",karpS),("lpFM",lpFM)
                                             ,("sSaw", sSaw),("strPad",strPad)
                                             ,("mix",mix),("chorus",chorus)
-                                            ,("phax",phaxo),("test",ot)
+                                            ,("phax",phaxo),("test",ot),("mstab",mstab)
                                             ,("mc",cycles1)
                                             ])
 
@@ -335,5 +357,5 @@ notEffect = filter (/= "rev") . filter (/= "del") . filter (/= "mix") . filter (
 -- function to default a pattern to the value of the pfield
 defaultPfpat :: Instr -> PfPat -> IO ()
 defaultPfpat i pfp = do
-  Just pf <- lookupMap (pf i) (pfNum pfp)
+  Just pf <- lookupMap (pf i) (idInt $ pfId pfp)
   atomically $ writeTVar (pat pfp) [pf]
