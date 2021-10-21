@@ -18,9 +18,9 @@ import Data.ByteString.Internal as B ( packChars )
 import Vivid.OSC as V
     ( encodeOSC, OSC(..), OSCDatum(OSC_S, OSC_F) )
 
--- UDP network to connect to Csound on port 11000
+type UDPPort = String 
 
-sendMsg :: String -> String -> IO ()
+sendMsg :: UDPPort -> String -> IO ()
 sendMsg m n = do
   addrinfos <- getAddrInfo Nothing (Just "127.0.0.1") (Just m)
   let serveraddr = head addrinfos
@@ -29,26 +29,26 @@ sendMsg m n = do
   sendAll sock $ C.pack n
   close sock
 
-sendCsound :: String -> String -> IO ()
+sendCsound :: UDPPort -> String -> IO ()
 sendCsound = sendMsg
 
-sendScore :: String -> String -> IO ()
+sendScore :: UDPPort -> String -> IO ()
 sendScore p n = let m = "$ " ++ n in
   sendCsound p m
 
-sendEvent :: String -> String -> IO ()
+sendEvent :: UDPPort -> String -> IO ()
 sendEvent p n = let m = "& " ++ n in
   sendCsound p m
 
-setChan :: String -> String -> IO ()
+setChan :: UDPPort -> String -> IO ()
 setChan p n = let m = "@" ++ n in
   sendCsound p m
 
--- send an OSC messagge to port 11100
-sendOSC :: String -> Int -> [Pfield] -> IO ()
+-- send an OSC messagge to port p
+sendOSC :: UDPPort -> Int -> [Pfield] -> IO ()
 sendOSC p i l = sendMsgOSC p $ createOSC i l
 
-sendMsgOSC :: String -> OSC -> IO ()
+sendMsgOSC :: UDPPort -> OSC -> IO ()
 sendMsgOSC m n = do
   addrinfos <- getAddrInfo Nothing (Just "127.0.0.1") (Just m)
   let serveraddr = head addrinfos
