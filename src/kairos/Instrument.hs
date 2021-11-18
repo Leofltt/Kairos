@@ -265,7 +265,7 @@ reverb = do
 
 delay :: IO Instr
 delay = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd (-1))]
+  pfields <- newTVarIO $ M.fromList [(3,Pd (-1)),(4, Pd 333),(5, Pd 0.6)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 551
              , pf     = pfields
@@ -293,7 +293,7 @@ chorus = do
 
 master :: IO Instr
 master = do
-  pfields <- newTVarIO $ M.fromList [(3, Pd (-1))]
+  pfields <- newTVarIO $ M.fromList [(3, Pd (-1)),(4, Pd 0.8)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 999
              , pf     = pfields

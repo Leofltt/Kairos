@@ -37,8 +37,7 @@ cPat "sixteenN" "dperc"
 durTS "dperc" [Pd (1/16)] keep
 stuts "dperc" [Pd 1] keep
 divs "dperc" [Pd 16] keep
-
-pick "dperc" (scramble $ toPfD [0,1..15]) (percentNext 55)
+pick "dperc" (scramble $ toPfs [0,1..15]) (percentNext 55)
 
 cPat "sixteenN" "control"
 durTS "control" [Pd (1/16)] keep

@@ -1,11 +1,11 @@
 module Kairos.Player where
 
 import Kairos.Performance ( Performance(..) )
-import Kairos.Pfield ( PfPat(updater, pfId), pfToString, PfMap, idInt )
+import Kairos.Pfield ( Pfield, PfPat(updater, pfId), pfToString, PfMap, idInt, idString, fromPf, PfId )
 import Kairos.TimePoint
 import Kairos.Clock
 import Kairos.Instrument
-import Kairos.Network ( sendEvent, setChan, sendOSC )
+import Kairos.Network ( sendEvent, setChan, sendOSC, UDPPort )
 import Kairos.Utilities ( addToMap, lookupMap, inter, sameConstructor)
 import Control.Concurrent ( forkIO )
 import Control.Concurrent.STM ( newTVarIO, readTVarIO, TVar )
@@ -23,26 +23,39 @@ defaultPerformance = do
              , timePs = t
              }
 
-setChannel :: String -> String -> Double -> IO ()
+setChannel :: UDPPort -> String -> Double -> IO ()
 setChannel port chanName val = do
   let m = chanName ++ " " ++ show val
   setChan port m
+
+makeTupleFromPfields :: Instr -> IO [(PfId, Pfield)]
+makeTupleFromPfields i = do
+  pfpats <- readTVarIO (pats i)
+  pfields <- readTVarIO (pf i)
+  return $ zip (map pfId $ M.elems pfpats) $ M.elems pfields
+
+playChannel :: Instr -> IO ()
+playChannel ins = do
+  theList <- makeTupleFromPfields ins 
+  mapM_ (setChanny (getPort (kind ins))) theList
+
+setChanny :: UDPPort -> (PfId, Pfield) -> IO ()
+setChanny p (s,v) = setChannel p (idString s) $ fromPf v
 
 playInstr :: Instr -> IO ()
 playInstr instr = do
   pfields <- readTVarIO $ pf instr
   let pfs = M.elems pfields
   if sameConstructor (kind instr) (Csound "")
-    then do
+    then do -- send to Csound
       if itype instr == Instrument 
-        then do
+        then do -- send note + parameters
           let pfieldList = pfToString pfs
           let pfds = "i" ++ show (insN instr) ++ " 0 " ++ pfieldList
           sendEvent (getPort (kind instr)) pfds
-        else do
-          -- play effect (to change effect parameters) not implemented yet
-          return ()
-    else do
+        else do -- send effect parameters to appropriate channels
+          playChannel instr
+    else do -- send OSC message
       sendOSC (getPort (kind instr)) (insN instr) pfs
 
 playOne :: Performance -> Instr -> TimePoint -> IO ()
@@ -71,8 +84,9 @@ playNow perf i = do
   Just p <- lookupMap (orc perf) i
   playOne perf p (pure tp)
 
-playEffect :: Performance -> String -> IO ()
-playEffect = playNow
+-- deprecated : effects get started by Csound on startup of csd file
+-- playEffect :: Performance -> String -> IO ()
+-- playEffect = playNow
 
 -- inspired by Conductive, R. Bell https://lac.linuxaudio.org/2011/papers/35.pdf
 play :: Performance -> String -> IO ()
@@ -118,13 +132,14 @@ playLoop perf i Init = do
   Just p <- lookupMap (orc perf) i
   n <- beatInBar (clock perf)
   let pb = toPlay p
-  if isNothing pb && (timeF p== "")
+  if isNothing pb && (timeF p == "")
      then do  changeStatus perf i Stopping
               Just p' <- lookupMap (orc perf) i
               playLoop perf i $ status p'
-     else do  let tp = fromJust pb
+     else do  -- let tp = fromJust pb
               Just timeString <- lookupMap (timePs perf) (timeF p)
-              let nb = nextBeat (max tp (TP n) ) timeString
+              -- quantize start to first beat in the pattern
+              let nb = head timeString -- nextBeat (max tp (TP n) ) timeString
               updateToPlay perf i (Just nb)
               changeStatus perf i Active
               Just p' <- lookupMap (orc perf) i
@@ -183,8 +198,8 @@ updateInstrument perf k f = do
 
 updatePfields :: Instr -> IO ()
 updatePfields i = do
-   pfpats <- readTVarIO (pats i)
-   mapM_ (updateonepfield (pf i)) (M.elems pfpats)
+  pfpats <- readTVarIO (pats i)
+  mapM_ (updateonepfield (pf i)) (M.elems pfpats)
 
 updateonepfield :: TVar PfMap -> PfPat -> IO ()
 updateonepfield pfmap pats = do

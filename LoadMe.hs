@@ -2,6 +2,7 @@
 
 defPath s = "/Users/leofltt/Desktop/KairosSamples" ++ s
 markPath s = "/Users/leofltt/Desktop/Kairos/MarkovTables" ++ s
+csd1 = "11000"
 k909 = defPath "/909/Kick-909.aif"
 addI "K909" $ sampler k909
 kcj = defPath "/kicks/KickCymbJungle.wav"
@@ -259,9 +260,9 @@ fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
 csv1 = markPath "/Test.csv"
 csv2 = markPath "/Test2.csv"
 csv3 = markPath "/Test3.csv"
--- params "lpFM" [ (keep, vol, [Pd 0.7]),(keep, rev, [Pd 0.5]),((percentNext 73), pitch, toPfD [53, 56, 58, 53, 48]),(keep, fmIndx, [Pd 12.3]), (keep, fmDepth, [Pd 987.23]),(keep,cf,[Pd 3880]),( keep, rev, [Pd 0.6]),(keep, adRatio,[Pd 0.7]),(randomize,pan,toPfD[0.4,0.6,0.75,0.35])]
--- params "303" [ (keep,dur,toPfD[ 0.25]),(keep,res,[Pd 4]),(keep, vol, [Pd 0.5]),(keep, cf, [Pd 3500]),((runMarkov csv3), pitch, toPfD (withScale 41 dorian)),(keep, rev, [Pd 0.4])]
--- params "hov" [ (keep,dur,toPfD[ 1.2]),(keep, vol, [Pd 0.3]),(keep, cf, [Pd 800]),((runMarkov csv3), pitch, toPfD (withScale 41 dorian)),(keep, rev, [Pd 0.7])]
+params "lpFM" [ (keep, vol, [Pd 0.7]),(keep, rev, [Pd 0.5]),((percentNext 73), pitch, toPfs [53, 56, 58, 53, 48]),(keep, fmIndx, [Pd 12.3]), (keep, fmDepth, [Pd 987.23]),(keep,cf,[Pd 3880]),( keep, rev, [Pd 0.6]),(keep, adRatio,[Pd 0.7]),(randomize,pan,toPfs[0.4,0.6,0.75,0.35])]
+params "303" [ (keep,dur,toPfs [0.25]),(keep,res,[Pd 4]),(keep, vol, [Pd 0.5]),(keep, cf, [Pd 3500]),((runMarkovCSV csv3), pitch, toPfs (withScale 41 dorian)),(keep, rev, [Pd 0.4])]
+params "hov" [ (keep,dur,toPfs [1.2]),(keep, vol, [Pd 0.3]),(keep, cf, [Pd 800]),((runMarkovCSV csv3), pitch, toPfs (withScale 41 dorian)),(keep, rev, [Pd 0.7])]
 let plucky = cf "303" [Pd 5000] keep >> res "303" [Pd 6] keep >> dur "303" [Pd 0.17] keep
 plucky
 :! clear

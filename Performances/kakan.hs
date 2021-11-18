@@ -11,7 +11,7 @@ cT 113
 
 -- Colours are black and white.
 
-params "hov" [ (keep,durTS,toPfD[ 2]),(keep, vol, [Pd 0.5]),(keep, cf, [Pd 900]),((runMarkov csv3), pitch, toPfD (withScale 39 phrygian)),(keep, rev, [Pd 0.8])  ]
+params "hov" [ (keep,durTS,toPfs[ 2]),(keep, vol, [Pd 0.5]),(keep, cf, [Pd 900]),((runMarkov csv3), pitch, toPfs (withScale 39 phrygian)),(keep, rev, [Pd 0.8])  ]
 
 
 addC "hov" "intro" =<< patternWithDensity 8 16 30
@@ -19,7 +19,7 @@ addC "hov" "intro" =<< patternWithDensity 8 16 30
 vol "hov" [Pd 0.6] keep
 
 cf "hov" [Pd 1500] keep
-pitch "hov" (toPfD (withScale 36 mixo)) $ runMarkov csv3 
+pitch "hov" (toPfs (withScale 36 harm)) $ runMarkov csv3 
 
 -- second min
 

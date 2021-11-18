@@ -72,7 +72,7 @@ contour i list fun =  addPf i 16 "contour" list fun -- model:cycles
 
 silence = stopAll perf
 playA = playAll perf
-playFx = playEffect perf
+-- playFx = playEffect perf | DEPRECATED : Fxs are started by Csound on startup and run forever
 solo = soloIns perf
 fbdel = setChannel csd1 "fbdel"
 dtdel = setChannel csd1 "dtdel"
