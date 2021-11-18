@@ -53,8 +53,11 @@ playInstr instr = do
           let pfieldList = pfToString pfs
           let pfds = "i" ++ show (insN instr) ++ " 0 " ++ pfieldList
           sendEvent (getPort (kind instr)) pfds
-        else do -- send effect parameters to appropriate channels
-          playChannel instr
+        else if itype instr == Effect 
+          then do -- send effect parameters to appropriate channels
+            playChannel instr
+          else do
+            putStrLn "Error: Unknown instrument type"
     else do -- send OSC message
       sendOSC (getPort (kind instr)) (insN instr) pfs
 

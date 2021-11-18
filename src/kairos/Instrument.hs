@@ -251,7 +251,7 @@ modelChord port chan = do
 
 reverb :: IO Instr
 reverb = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd (-1))]
+  pfields <- newTVarIO $ M.fromList [(1, Pd 1),(2, Pd 1000),(3, Pd 0.6)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 550
              , pf     = pfields
@@ -265,7 +265,7 @@ reverb = do
 
 delay :: IO Instr
 delay = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd (-1)),(4, Pd 333),(5, Pd 0.6)]
+  pfields <- newTVarIO $ M.fromList [(1, Pd 1),(2, Pd 333),(3, Pd 0.6)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 551
              , pf     = pfields
@@ -279,7 +279,7 @@ delay = do
 
 chorus :: IO Instr
 chorus = do
-   pfields <- newTVarIO $ M.fromList [(3, Pd (-1))]
+   pfields <- newTVarIO $ M.fromList [(1, Pd 1),(2, Pd 3),(3, Pd 4)]
    emptyPat <- newTVarIO M.empty
    return $ I { insN   = 552
               , pf     = pfields
@@ -293,7 +293,7 @@ chorus = do
 
 master :: IO Instr
 master = do
-  pfields <- newTVarIO $ M.fromList [(3, Pd (-1)),(4, Pd 0.8)]
+  pfields <- newTVarIO $ M.fromList [(1, Pd 0.8)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 999
              , pf     = pfields
