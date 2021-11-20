@@ -57,9 +57,12 @@ playInstr instr = do
           then do -- send effect parameters to appropriate channels
             playChannel instr
           else do
-            putStrLn "Error: Unknown instrument type"
-    else do -- send OSC message
-      sendOSC (getPort (kind instr)) (insN instr) pfs
+            error "Error: Unknown instrument type"
+    else if sameConstructor (kind instr) (OSC "")
+      then do
+        sendOSC (getPort (kind instr)) (insN instr) pfs
+      else do 
+        error "Error: Unknown instrument destination kind"
 
 playOne :: Performance -> Instr -> TimePoint -> IO ()
 playOne perf i tp = do
@@ -86,10 +89,6 @@ playNow perf i = do
   tp <- beatInBar (clock perf)
   Just p <- lookupMap (orc perf) i
   playOne perf p (pure tp)
-
--- deprecated : effects get started by Csound on startup of csd file
--- playEffect :: Performance -> String -> IO ()
--- playEffect = playNow
 
 -- inspired by Conductive, R. Bell https://lac.linuxaudio.org/2011/papers/35.pdf
 play :: Performance -> String -> IO ()
