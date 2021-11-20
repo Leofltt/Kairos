@@ -10,34 +10,34 @@ import Control.Concurrent.STM
 import qualified Data.Map.Strict as M
 import Data.Data ( Data, Typeable )
 
--- Orchestra
+-- | Orchestra : a map of instruments and their names
 type Orchestra = TVar (M.Map [Char] Instr)
 
--- Instrument
-data Instr = I { insN :: InstrumentID
-               , pf :: TVar PfMap
-               , status :: Status
-               , toPlay :: Maybe TimePoint
-               , pats :: TVar (M.Map Int PfPat) -- Patterns of Parameters and their IDs
-               , timeF :: String                -- Name of the time function to refer to
-               , kind :: MessageTo String
-               , itype :: InstrType
+-- | an Instr is a "player" in the Orchestra it may be either an instrument or an effect
+data Instr = I { insN :: InstrumentID           -- ^ Instrument ID : Int
+               , pf :: TVar PfMap               -- ^ Pfields and their id int
+               , status :: Status               -- ^ is the instrument playing ?
+               , toPlay :: Maybe TimePoint      -- ^ when to play the instrument next
+               , pats :: TVar (M.Map Int PfPat) -- ^ Patterns of Parameters and their IDs
+               , timeF :: String                -- ^ Name of the time function to refer to
+               , kind :: MessageTo String       -- ^ where to send the message (Csound or OSC)
+               , itype :: InstrType             -- ^ Instrument or Effect ?
                }
 
--- Instrument Name: an integer number
+-- | Instrument Name: an integer number
 type InstrumentID = Int
 
--- is the instrument Active ?
+-- | is the instrument Active ?
 data Status = Init | Active | Inactive | Stopping deriving (Show, Eq)
 
--- where are we sending the data
+-- | where are we sending the data
 data MessageTo a = Csound a | OSC a deriving (Show, Eq, Typeable, Data)
 
 getPort :: MessageTo String -> String 
 getPort (Csound x) = x 
 getPort (OSC x) = x
 
--- instrument or effect ?
+-- | instrument or effect ?
 data InstrType = Instrument | Effect deriving (Show, Eq)
 
 getPfields :: Instr -> IO PfMap
@@ -354,7 +354,7 @@ defaultOrc = do
 notEffect :: [String] -> [String]
 notEffect = filter (/= "rev") . filter (/= "del") . filter (/= "mix") . filter ( /= "chorus")
 
--- function to default a pattern to the value of the pfield
+-- | function to default a pfield pattern to the value of the pfield
 defaultPfpat :: Instr -> PfPat -> IO ()
 defaultPfpat i pfp = do
   Just pf <- lookupMap (pf i) (idInt $ pfId pfp)

@@ -12,7 +12,7 @@ import Kairos.Euclidean ( euclidean )
 import Control.Applicative (liftA2)
 import Data.Time.Clock.POSIX (getPOSIXTime)
 
--- a point in time
+-- | a point in time
 newtype TimePointf a = TP { whenTP :: a
                        } deriving (Eq, Ord, Functor, Show)
 
@@ -24,6 +24,7 @@ instance Applicative TimePointf where
 
 instance Monad TimePointf where
   TP x >>= f = f x
+  return = TP
 
 instance (Num a) => Num (TimePointf a) where
   (+) = liftA2 (+)

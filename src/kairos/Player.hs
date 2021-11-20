@@ -13,6 +13,7 @@ import Data.Maybe ( fromJust, isJust, isNothing )
 import qualified Data.Map.Strict as M
 import Control.Monad (when, void)
 
+-- | create a default performance
 defaultPerformance :: IO Performance
 defaultPerformance = do
   o <- defaultOrc
@@ -59,7 +60,7 @@ playInstr instr = do
           else do
             error "Error: Unknown instrument type"
     else if sameConstructor (kind instr) (OSC "")
-      then do
+      then do -- send to OSC target
         sendOSC (getPort (kind instr)) (insN instr) pfs
       else do 
         error "Error: Unknown instrument destination kind"
@@ -83,13 +84,14 @@ playOne perf i tp = do
            else do
                    return ()
 
--- play an instrument once immediately
+-- | play an instrument once immediately
 playNow :: Performance -> String -> IO ()
 playNow perf i = do
   tp <- beatInBar (clock perf)
   Just p <- lookupMap (orc perf) i
   playOne perf p (pure tp)
 
+-- | start the play loop of an instrument 
 -- inspired by Conductive, R. Bell https://lac.linuxaudio.org/2011/papers/35.pdf
 play :: Performance -> String -> IO ()
 play perf pn = let
@@ -100,7 +102,7 @@ play perf pn = let
   in do Just i <- lookupMap (orc perf) pn
         checkStatus i $ status i
 
--- play loop callBack
+-- | play loop callBack
 playLoop :: Performance -> String -> Status -> IO ()
 
 playLoop perf pn Active = do
@@ -141,7 +143,7 @@ playLoop perf i Init = do
      else do  -- let tp = fromJust pb
               Just timeString <- lookupMap (timePs perf) (timeF p)
               -- quantize start to first beat in the pattern
-              let nb = head timeString -- nextBeat (max tp (TP n) ) timeString
+              let nb = head timeString -- legacy version (unquantized)= nextBeat (max tp (TP n) ) timeString
               updateToPlay perf i (Just nb)
               changeStatus perf i Active
               Just p' <- lookupMap (orc perf) i
@@ -152,6 +154,7 @@ playLoop perf p Stopping = do
   putStrLn $ "instrument " ++ p ++ " is now Inactive."
   return ()
 
+-- | stop an instrument
 stop :: Performance -> String -> IO ()
 stop perf i = do
   Just p <- lookupMap (orc perf) i
@@ -159,20 +162,20 @@ stop perf i = do
       changeStatus perf i Stopping
       return ()
 
--- stop all instruments that are not effects
+-- | stop all instruments that are not effects
 stopAll :: Performance -> IO ()
 stopAll perf = mapM_ (stop perf) .  notEffect . M.keys =<< readTVarIO (orc perf)
 
--- plays all instruments that are not effects
+-- | plays all instruments that are not effects
 playAll :: Performance -> IO ()
 playAll perf = mapM_ (play perf) .  notEffect . M.keys =<< readTVarIO (orc perf)
 
--- solo an instrument
+-- | solo an instrument
 soloIns :: Performance -> String -> IO ()
 soloIns perf i = mapM_ (stop perf) . filter (/=i) . notEffect . M.keys =<< readTVarIO (orc perf)
 
 
--- display all Time Patterns names and their content
+-- | display all Time Patterns names and their content
 displayTPat :: Performance -> IO [String]
 displayTPat perf = do
    tpats <- readTVarIO (timePs perf)

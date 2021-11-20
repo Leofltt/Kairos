@@ -10,7 +10,7 @@ import Control.Concurrent.STM ( newTVarIO, readTVarIO, TVar )
 import qualified Data.Map.Strict as M
 import Data.Maybe (fromJust, isNothing)
 
--- the Performance is the scope of the composition
+-- | the Performance is the scope of the composition
 data Performance = P { orc :: Orchestra
                      , clock :: Clock
                      , timePs :: TVar (M.Map [Char] [TimePoint]) -- a map of time patterns with their names
@@ -56,7 +56,6 @@ getTimePoint perf s = do
   return t
 
 -- add a named pattern of timepoints to a performance
-
 addTPf :: Performance -> String -> [TimePoint] -> IO ()
 addTPf e n ts = addToMap (timePs e) (n,ts)
 
