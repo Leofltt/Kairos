@@ -24,7 +24,7 @@ defaultPerformance = do
              , timePs = t
              }
 
-setChannel :: UDPPort -> String -> Double -> IO ()
+setChannel :: UDPPort -> String -> Pfield -> IO ()
 setChannel port chanName val = do
   let m = chanName ++ " " ++ show val
   setChan port m
@@ -41,7 +41,7 @@ playChannel ins = do
   mapM_ (setChanny (getPort (kind ins))) theList
 
 setChanny :: UDPPort -> (PfId, Pfield) -> IO ()
-setChanny p (s,v) = setChannel p (idString s) $ fromPf v
+setChanny p (s,v) = setChannel p (idString s) v
 
 playInstr :: Instr -> IO ()
 playInstr instr = do
@@ -95,10 +95,10 @@ playNow perf i = do
 -- inspired by Conductive, R. Bell https://lac.linuxaudio.org/2011/papers/35.pdf
 play :: Performance -> String -> IO ()
 play perf pn = let
-  checkStatus i Inactive  = void ( forkIO $ playLoop perf pn Inactive)
-  checkStatus i Stopping = void ( playLoop perf pn Stopping)
-  checkStatus i Init = void ( playLoop perf pn Init)
-  checkStatus i Active  = putStrLn $ "the instrument " ++ pn ++ " is already Active!"
+  checkStatus _ Inactive  = void ( forkIO $ playLoop perf pn Inactive)
+  checkStatus _ Stopping = void ( playLoop perf pn Stopping)
+  checkStatus _ Init = void ( playLoop perf pn Init)
+  checkStatus _ Active  = putStrLn $ "the instrument " ++ pn ++ " is already Active!"
   in do Just i <- lookupMap (orc perf) pn
         checkStatus i $ status i
 
@@ -134,7 +134,7 @@ playLoop perf p Inactive = do
 
 playLoop perf i Init = do
   Just p <- lookupMap (orc perf) i
-  n <- beatInBar (clock perf)
+  -- n <- beatInBar (clock perf)
   let pb = toPlay p
   if isNothing pb && (timeF p == "")
      then do  changeStatus perf i Stopping
@@ -207,9 +207,9 @@ updatePfields i = do
   mapM_ (updateonepfield (pf i)) (M.elems pfpats)
 
 updateonepfield :: TVar PfMap -> PfPat -> IO ()
-updateonepfield pfmap pats = do
-  newVal <- updater pats pats
-  addToMap  pfmap (idInt (pfId pats),newVal)
+updateonepfield pfmap patts = do
+  newVal <- updater patts patts
+  addToMap  pfmap (idInt (pfId patts),newVal)
 
 changeStatus :: Performance -> String -> Status -> IO ()
 changeStatus e k newS = updateInstrument e k (\x -> x { status = newS })

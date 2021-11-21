@@ -9,17 +9,17 @@ import Data.Maybe ( fromJust )
 import Control.Concurrent.STM ( atomically, readTVarIO, writeTVar )
 
 runMarkovSimpleCSV :: String -> [Pfield] ->  IO [Pfield]
-runMarkovSimpleCSV cs pat = do
+runMarkovSimpleCSV cs patt = do
   doc <- parseCSVFromFile cs
   let table = fmap (stringToDouble . tail) (prepareCSV doc)
-  runMarkovSimple table pat
+  runMarkovSimple table patt
 
 runMarkovSimple :: [[Double]] -> [Pfield] ->  IO [Pfield]
-runMarkovSimple table pat = do
-  let note = length $ filter (< head pat) pat
+runMarkovSimple table patt = do
+  let note = length $ filter (< head patt) patt
   prob <- randF
   let list = scanl1 (+) (pickRow note table)
-  let newList = listFromIndex pat $ fromJust $ pickIndex prob list
+  let newList = listFromIndex patt $ fromJust $ pickIndex prob list
   return newList
 
 runMarkovCSV :: String -> PfPat -> IO Pfield
@@ -48,13 +48,16 @@ listFromIndex :: [Pfield] -> Int -> [Pfield]
 listFromIndex list indx = firstnote:filter (/= firstnote) list where
   firstnote = (!!) list indx
 
+prepareCSV :: Either a [[b]] -> [[b]]
 prepareCSV a = tail $ noEmptyRows a
 
+noEmptyRows :: Either a [[b]] -> [[b]]
 noEmptyRows = either (const []) (filter (\row -> 2 <= length row))
 
 pickRow :: Int -> [[a]] -> [a]
 pickRow indx prepFile = (!!) prepFile indx
 
+removeNewLine :: [[Char]] -> [[Char]]
 removeNewLine list = init list ++ [filter removeNL (last list)]
 
 removeNL :: Char -> Bool

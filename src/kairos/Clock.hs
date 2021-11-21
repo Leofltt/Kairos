@@ -7,21 +7,21 @@ import Control.Concurrent.STM
 import Data.Time.Clock.POSIX ( getPOSIXTime )
 import Control.Monad.IO.Class ( MonadIO(..) )
 
--- clock
+-- | clock
 data Clock = Clock { startAt :: Time
                    , timeSig :: TVar [TimeSignature]
                    }
 
--- time signature
+-- | time signature
 data TimeSignature = TS { beatInMsr :: Double
                         , bpm :: Double
                         , startTime :: Time
                         } deriving (Show,Eq)
 
--- Performance seconds
+-- | Performance seconds
 type Time = Double
 
--- measureNumber.currPhase ( ex. 4.1 == measure 4 beat 2 )
+-- | measureNumber.currPhase ( ex. 4.1 == measure 4 beat 2 )
 type Beats = Double
 
 displayClock :: Clock -> IO [Char]
@@ -59,7 +59,7 @@ defaultClock  = do
                  , timeSig = ts
                  }
 
--- the strt parameter represents after how many measures.currPhase you want the TS to start
+-- | new time signature: the strt parameter represents after how many measures.currPhase you want the TS to start
 newTS :: Double -> Double -> Beats -> TimeSignature
 newTS tmp msr strt =
   TS { bpm = tmp
@@ -78,7 +78,7 @@ changeTempo c t = do
   tss <- addTS c $ newTS t (beatInMsr cts) 1 -- 1: tempo is changed on the next bar
   putStrLn $ "Current bpm: " ++ show (bpm $ head tss)
 
--- given a clock and a TS, prepends the TS to the list of current ts in the clock, correcting the start time appropriately
+-- | given a clock and a TS, prepends the TS to the list of current ts in the clock, correcting the start time appropriately
 addTS :: Clock -> TimeSignature -> IO [TimeSignature]
 addTS c t = do
   ts <- readTVarIO $ timeSig c
@@ -126,7 +126,7 @@ nextBar = (+ 1) . thisBar
 
 -- given an amount of currPhase, bpm and beatsPerMeasure, gives a Double back representing the length in s
 beatToTime :: Beats -> Double -> Double -> Double
-beatToTime x bpm beatPerMeasure = (x * beatPerMeasure) * (60.00 / bpm)
+beatToTime x bpm_val beatPerMeasure = (x * beatPerMeasure) * (60.00 / bpm_val)
 
 -- given a time delta and a TS, return the amount of beats in that timesignature
 timeToBeat :: Time -> TimeSignature -> Beats

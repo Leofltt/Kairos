@@ -5,7 +5,7 @@ module Kairos.Pfield where
 import Data.Typeable ( Typeable )
 import Control.Concurrent.STM ( TVar )
 import qualified Data.Map.Strict as M
-import Data.Either
+import Data.Either ()
 
 -- | a single Pfield
 data Pfield  = Ps { pString :: String }
@@ -22,10 +22,12 @@ class PfAble a where
 instance PfAble Double where
     toPf = Pd
     fromPf (Pd x) = x
+    fromPf (Ps _) = error "pfield is a string, not a double"
 
 instance PfAble String where
     toPf = Ps
     fromPf (Ps x) = x
+    fromPf (Pd x) = show x
 
 toPfs :: PfAble a => [a] -> [Pfield]
 toPfs = map toPf
@@ -34,10 +36,10 @@ toPfs = map toPf
 data PfId = Either Int String deriving (Eq, Show, Ord) 
 
 idInt :: PfId -> Int 
-idInt (Either x y) = x
+idInt (Either x _) = x
 
 idString :: PfId -> String 
-idString (Either x y) = y 
+idString (Either _ y) = y 
 
 -- | pattern of pfields and related update function
 data PfPat = PfPat { pfId :: PfId                  -- ^ id of the pfield
