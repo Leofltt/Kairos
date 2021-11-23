@@ -51,11 +51,11 @@ fromTP = map whenTP
 
 -- functions to create TimePoint patterns -------------------------------
 
--- create tuples of t elements to fill up b number of beats
+-- | create tuples of t elements to fill up b number of beats
 tupleForBar :: Double -> Double -> [TimePoint]
 tupleForBar b t = toTP $ takeWhile (<b) $ Prelude.map (+(b/(t*b))) [(0/t*b), (1/t*b) ..]
 
--- Given total length in beats, the beat subdivision wanted and the % of beats, generate a time pattern
+-- | Given total length in beats, the beat subdivision wanted and the % of beats, generate a time pattern
 patternWithDensity :: Double -> Double -> Int  -> IO (Maybe [TimePoint])
 patternWithDensity b sub dens = do
   seed <- round . (* 1000) <$> getPOSIXTime
@@ -75,15 +75,15 @@ tempF [x] (v:_) d     | v <= d = [x]
 tempF (x:xs) (v:vs) d | v <= d = x:tempF xs (vs++[v]) d
                       | otherwise = tempF xs (vs++[v]) d
 
--- Given a tuple, a rotation shift and a number of beats returns an euclidean rhythm TP
+-- | Given a tuple, a rotation shift and a number of beats returns an euclidean rhythm TP
 euclid :: (Int,Int) -> Int -> Double -> [TimePoint]
 euclid (x,y) shift maxbeats = toTP $ map ((*(maxbeats/intToDouble y)) . (+ (-1))) $ filter (/=0) $ zipWith (*) (map intToDouble $ euclidean (x,y) shift) [1,2..]
 
--- Given total length in beats, take a string of text and converts it into a time pattern
+-- | Given total length in beats, take a string of text and converts it into a time pattern
 textToTP :: Double -> String -> [TimePoint]
 textToTP maxbeats t = toTP $ Prelude.map (*maxbeats) $ numSeqFromText t
 
--- Given total length in beats, take a binary number and converts it into a time pattern
+-- | Given total length in beats, take a binary number and converts it into a time pattern
 binToTP :: Double -> Double -> [TimePoint]
 binToTP maxbeats b = toTP $ Prelude.map (*maxbeats) $ numSeqFromBin b
 

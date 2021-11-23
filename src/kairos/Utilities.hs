@@ -12,7 +12,7 @@ import Data.Data ( Data(toConstr) )
 import Data.Function ( on )
 
 
--- Map Utilities
+-- | Map Utilities
 
 modifyMap :: TVar a -> (a -> a) -> IO ()
 modifyMap theMap f = atomically $ modifyTVar' theMap f
@@ -28,13 +28,15 @@ withMap theMap f = do
 lookupMap :: Ord k => TVar (M.Map k a) -> k -> IO (Maybe a)
 lookupMap theMap k = withMap theMap $ M.lookup k
 
--- PfPat Updaters
+-- | PfPat Updaters
 
+-- | keep the current value
 keep ::  PfPat -> IO Pfield
 keep n = do
   pats <- readTVarIO (pat n)
   return $ head pats
 
+-- | next value in the list
 nextVal :: PfPat -> IO Pfield
 nextVal n = do
   patrn <- readTVarIO (pat n)
@@ -42,6 +44,7 @@ nextVal n = do
   atomically $ writeTVar (pat n) pat'
   return $ head pat'
 
+-- | read the list in reverse
 retrograde :: PfPat -> IO Pfield
 retrograde n = do
   patrn <- readTVarIO (pat n)
@@ -49,6 +52,7 @@ retrograde n = do
   atomically $ writeTVar (pat n) pat'
   return $ head pat'
 
+-- | pick a random value from the list
 randomize :: PfPat -> IO Pfield
 randomize n = do
   p <- readTVarIO (pat n)
@@ -56,6 +60,7 @@ randomize n = do
   ran <- randI l
   return $ (!!) p ran
 
+-- | go to next value a certain % of times
 percentNext :: Int -> PfPat -> IO Pfield
 percentNext i n = do
   val <- randI 100
@@ -64,6 +69,18 @@ percentNext i n = do
   atomically $ writeTVar (pat n) result
   return $ head result
 
+-- | updater aliases for ease of use
+
+nv :: PfPat -> IO Pfield
+nv = nextVal
+np :: Int -> PfPat -> IO Pfield
+np = percentNext
+rnd :: PfPat -> IO Pfield
+rnd = randomize
+retro :: PfPat -> IO Pfield
+retro = retrograde
+k :: PfPat -> IO Pfield
+k = keep
 
 -- Misc Utilities
 

@@ -6,12 +6,13 @@
 
 <CsoundSynthesizer>
 <CsOptions>
--odac2
+-odac0
 --port=11000
 -d
 -B 256
 -b 128
--Q0
+--opcode-lib=~/Users/$USER/Library/csound/6.0/plugins64
+;-Q 0 
 
 </CsOptions>
 <CsInstruments>
@@ -94,13 +95,6 @@ aenv = linseg:a(0, 0.01, 1, p3 - 0.02, 1, 0.01, 0)
 xout ain * aenv
 endop
 
-opcode panner, aa, aai
-aL,aR,i_pan xin
-aLeft = aL * sqrt(1-i_pan)
-aRight = aR * sqrt(i_pan)
-xout aLeft, aRight
-endop
-
 opcode loadSample, i, S
 Sample xin
 iNum ftgen 0, 0, 0, -1, Sample, 0, 0, 0
@@ -123,14 +117,14 @@ iratio = p12
 if inchs == 1 then
 
 aLeft diskin2 p9, p10
-aL, aR panner aLeft, aLeft, i_pan
+aL, aR pan3 aLeft, aLeft, i_pan, 1
 
 
 else
 
 aLeft, aRight diskin2 p9, p10
 
-aL, aR panner aLeft, aRight, i_pan
+aL, aR pan3 aLeft, aRight, i_pan, 1
 
 endif
 
@@ -186,13 +180,13 @@ andx =  phasor(sr/isamslice) * isamslice + ipos
 if inchs == 1 then
 isam ftgen 0, 0, isize, -1, Sname, 0, 0, 1
 aL table3 andx, isam, 0
-aL, aR panner aL, aL, i_pan
+aL, aR pan3 aL, aL, i_pan, 1
 else
 iLeft ftgen 0, 0, isize, -1, Sname, 0, 0, 1
 iRight ftgen 0, 0,isize, -1, Sname, 0, 0, 2
 aL table3 andx, iLeft, 0
 aR table3 andx, iRight, 0
-aL, aR panner aL, aR, i_pan
+aL, aR pan3 aL, aR, i_pan, 1
 endif
 
 aL = declick(aL)
@@ -236,7 +230,7 @@ asig = vco2(1, cpsmidinn(p9), imode)
 asig = diode_ladder(asig, acut, p11, 1, 4)
 asig = (tanh (asig * 4)) * 0.5
 asig declick asig
-aL, aR panner asig, asig, i_pan
+aL, aR pan3 asig, asig, i_pan, 1
 
 zawm i_vol * aL, 1
 zawm i_vol * aR, 2
@@ -285,7 +279,7 @@ adel2 = vdelay3(ao/2, (0.1+alfo2)*1000, 1000)
 adecl = declick(ao+adel*0.8)
 adecr = declick(ao+adel2*0.8)
 
-aL, aR panner adecl* aenv, adecl* aenv, i_pan
+aL, aR pan3 adecl* aenv, adecl* aenv, i_pan, 1
 
 zawm i_vol * aL, 1
 zawm i_vol * aR, 2
@@ -325,7 +319,7 @@ a808 = sum(asqr1, asqr2, asqr3, asqr4, asqr5, asqr6)
 a808 =    butterhp(a808, 5270)
 a808 =    butterhp(a808, 5270)
 
-aL, aR panner a808*aenv, a808*aenv, i_pan
+aL, aR pan3 a808*aenv, a808*aenv, i_pan, 1
 
 zawm i_vol * aL, 1
 zawm i_vol * aR, 2
@@ -364,7 +358,7 @@ acar = poscil(1, cpsmidinn(p9) + amod * kdpth * sr/4, gisine)
 
 audio = diode_ladder(acar, kfilt, kres , 1, 1.5)
 
-aL, aR panner audio*aenv, audio*aenv, i_pan
+aL, aR pan3 audio*aenv, audio*aenv, i_pan, 1
 
 zawm i_vol * aL, 1
 zawm i_vol * aR, 2
@@ -382,7 +376,7 @@ endin
 
 instr 7 ; SuperSaw
 
-;adapted from Steven Yi Livecode.orc
+;adapted from Steven Yi Livecode.orc && inspired by the JP8080
 
 i_dur = p3
 i_vol = p4
@@ -394,29 +388,30 @@ i_chor = p8
 icf = p10
 ires = p11
 iad = p12
-iwidth = p13
+idetune = p13
+imix = p14
 
 aenv  = linseg(0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0)
 
-asig = vco2(1,  cpsmidinn(p8))
-asig += vco2(1, cpsmidinn(p9) * cent(9.04234))
-asig += vco2(1,  cpsmidinn(p9) * cent(-7.214342))
+ifreq = cpsmidinn(p9)
 
-asig += vco2(1,  cpsmidinn(p9) * cent(1206.294143))
-asig += vco2(1,  cpsmidinn(p9) * cent(1193.732))
-asig += vco2(1,  cpsmidinn(p9) * cent(1200))
+asig = vco2(1,  ifreq)
 
-asig += vco2(1,  cpsmidinn(p9) * cent(2406.294143))
-asig += vco2(1,  cpsmidinn(p9) * cent(2393.732))
-asig += vco2(1,  cpsmidinn(p9) * cent(2400))
+asig += vco2(imix,  ifreq * (1 + idetune * -0.107))
+asig += vco2(imix,  ifreq * (1 + idetune * -0.061))
+asig += vco2(imix,  ifreq * (1 + idetune * -0.019))
+asig += vco2(imix,  ifreq * (1 + idetune * 0.019))
+asig += vco2(imix,  ifreq * (1 + idetune * 0.064))
+asig += vco2(imix,  ifreq * (1 + idetune * 0.11))
 
-asig *= 0.1
+asig *= 0.142857
 
-asig = zdf_ladder(asig, iwidth+icf,1)
-asig = K35_hpf(asig, icf, ires)
+asig = zdf_ladder(asig, icf, ires)
+asig = K35_hpf(asig, ifreq * 0.5, 2)
+
 asig = declick(asig)
 
-aL, aR panner asig*aenv, asig*aenv, i_pan
+aL, aR pan3 asig*aenv, asig*aenv, i_pan, 1
 
 zawm i_vol * aL, 1
 zawm i_vol * aR, 2
@@ -456,7 +451,7 @@ asig = afund + acel1 + acel2
 asig = asig + .2*anoise
 asig = butterlp(asig, (iamp * 127 - 60)*40+600)
 
-aL, aR panner asig, asig, i_pan
+aL, aR pan3 asig, asig, i_pan, 1
 
 zawm  aL, 1
 zawm  aR, 2
@@ -485,7 +480,7 @@ kpitch = expseg:k(cpsmidinn(p9), p3, 432)
 
 asig = pluck(1, cpsmidinn(p9), 432, 0, 4, p10, (49*p11)+1) 
 
-aL, aR panner asig, asig, i_pan
+aL, aR pan3 asig, asig, i_pan, 1
 
 zawm i_vol * aL, 1
 zawm i_vol * aR, 2
@@ -575,7 +570,7 @@ ap2 = declick(ap2)
 
 ap2 dam ap2, 0.8, 0.8, 2, 0.01, 0.3 
 
-aL, aR panner ap2, ap2, i_pan
+aL, aR pan3 ap2, ap2, i_pan, 1
 
 zawm i_vol * aL, 1
 zawm i_vol * aR, 2
@@ -590,6 +585,84 @@ zawm i_chor * aL, 11
 zawm i_chor * aR, 12
 
 endin
+
+instr 100 ; Model:Cycles / Model:Samples MIDI Out
+
+ivol = p4
+irev = p5
+idel = p6
+ipan = p7
+ichan = p8
+inote = p9
+ivel =  p10
+ipitch = p11
+idecay = p12
+icolor = p13
+ishape = p14
+isweep = p15
+icontour = p16
+;ilfospeed = p17
+;iswing = p18
+;ichance = p19
+;imachine = p20
+;ipunch = p21
+;igate = p22
+
+;midiout_i 176, ichan, 7, ivol
+;midiout_i 176, ichan, 65, ipitch
+;midiout_i 176, ichan, 80, idecay
+midiout_i 176, ichan, 10, ipan
+;
+;midiout_i 176, ichan, 12, idel
+;midiout_i 176, ichan, 13, irev
+;
+;midiout_i 176, ichan, 16, icolor
+;midiout_i 176, ichan, 17, ishape
+;midiout_i 176, ichan, 18, isweep
+;midiout_i 176, ichan, 19, icontour
+
+midion ichan, inote, ivel
+
+endin 
+
+instr 101 ; Model:Cycles chord control
+
+ivol = p4
+irev = p5
+idel = p6
+ipan = p7
+ichan = p8
+inote = p9
+ivel =  p10
+ipitch = p11
+idecay = p12
+icolor = p13
+ishape = p14
+isweep = p15
+icontour = p16
+;ilfospeed = p17
+;iswing = p18
+;ichance = p19
+;imachine = p20
+;ipunch = p21
+;igate = p22
+
+;midiout_i 176, ichan, 7, ivol
+;midiout_i 176, ichan, 65, ipitch
+;midiout_i 176, ichan, 80, idecay
+midiout_i 176, ichan, 10, ipan
+;
+;midiout_i 176, ichan, 12, idel
+;midiout_i 176, ichan, 13, irev
+;
+;midiout_i 176, ichan, 16, icolor
+midiout_i 176, ichan, 17, ishape
+;midiout_i 176, ichan, 18, isweep
+;midiout_i 176, ichan, 19, icontour
+
+midion ichan, inote, ivel
+
+endin 
 
 instr 550 ; ReverbSC
 
@@ -624,45 +697,6 @@ zawm adelL * gkvoldel, 9
 zawm adelR * gkvoldel, 10
 
 endin
-
-instr 100 ; Model:Cycles MIDI Out
-
-ivol = p4
-irev = p5
-idel = p6
-ipan = p7
-ichan = p8
-inote = p9
-ivel =  p10
-ipitch = p11
-idecay = p12
-icolor = p13
-ishape = p14
-isweep = p15
-icontour = p16
-;ilfospeed = p17
-;iswing = p18
-;ichance = p19
-;imachine = p20
-;ipunch = p21
-;igate = p22
-
-;midiout_i 176, ichan, 7, ivol
-;midiout_i 176, ichan, 65, ipitch
-;midiout_i 176, ichan, 80, idecay
-;midiout_i 176, ichan, 10, ipan
-;
-;midiout_i 176, ichan, 12, idel
-;midiout_i 176, ichan, 13, irev
-;
-;midiout_i 176, ichan, 16, icolor
-;midiout_i 176, ichan, 17, ishape
-;midiout_i 176, ichan, 18, isweep
-;midiout_i 176, ichan, 19, icontour
-
-midion ichan, inote, ivel
-
-endin 
 
 instr 552	;Spectral Chorus
 
