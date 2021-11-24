@@ -22,6 +22,7 @@ runMarkovSimple table patt = do
   let newList = listFromIndex patt $ fromJust $ pickIndex prob list
   return newList
 
+-- | updater to run Markov on CSV file
 runMarkovCSV :: String -> PfPat -> IO Pfield
 runMarkovCSV file n = do
   patrn <- readTVarIO (pat n)
@@ -29,12 +30,19 @@ runMarkovCSV file n = do
   atomically $ writeTVar (pat n) pat'
   return $ head pat'
 
+-- | updater to run Markov on hand coded transition table [[Double]]
 runMarkov :: [[Double]] -> PfPat -> IO Pfield
 runMarkov table n = do
   patrn <- readTVarIO (pat n)
   pat' <- runMarkovSimple table patrn
   atomically $ writeTVar (pat n) pat'
   return $ head pat'
+
+-- | shorthand versions
+rMkv :: [[Double]] -> PfPat -> IO Pfield
+rMkv = runMarkov
+rMkvCSV :: String -> PfPat -> IO Pfield
+rMkvCSV = runMarkovCSV
 
 pickProb4Index :: Double -> [Double] -> Double
 pickProb4Index perc (x:xs) | x >= perc = x

@@ -117,15 +117,27 @@ for simplicity of usage, we want to create partially applied functions based on 
 that simply assigns the pattern to pfield number 4, which is used as the amplitude scaling value (0-1) common to all the default orchestra instruments.
 Check out the file [BootKairos.hs] to see all the functions already implemented in such way.
 
-An alternative to this method is the `params` syntax that allows to set multiple parameters at once.
+An alternative to this method is the `prms` syntax that allows to set multiple parameters at once.
 
-`params "instrumentname" [(fun1, vol, list1), (fun2, pan, list2)]`
+`prms "instrumentname" [(vol, updtr1, list1), (pan, updtr2, list2)]`
 
 Here is a list of the currently implemented update functions:
+- `keep` : keeps the current value
 - `nextVal` : picks the successive value in the list
 - `randomize` : picks a random value
 - `percentNext int` : given an int probability (0-100), returns the next value with int % probability, otherwise keeps current value
-- `runMarkov csv-file` : given a csv file with a table of probabilities, picks the next value appropriately
+- `retrograde` : goes backwards in the list
+- `runMarkov [[Double]]` : runs a Markov chain using the hand coded [[Double]] probability transition matrix
+- `runMarkov csv-file` : given a csv file with a table of probabilities, picks the next value based on the table
+
+There are also shorthand forms defined for faster use during performance which are respectively:
+- `k`
+- `nv`
+- `rnd`
+- `np`
+- `retro`
+- `rMkv`
+- `rMkvCSV`
 
 #### Adding your own Csound or OSC Instruments
 
