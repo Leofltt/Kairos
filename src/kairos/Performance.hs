@@ -5,6 +5,7 @@ import Kairos.Instrument ( Instr(pats), Orchestra )
 import Kairos.Clock
 import Kairos.TimePoint ( TimePoint )
 import Kairos.Pfield
+import Kairos.PfPat
 import Kairos.Utilities ( addToMap, lookupMap, stringToDouble )
 import Control.Concurrent.STM ( newTVarIO, readTVarIO, TVar )
 import qualified Data.Map.Strict as M

@@ -4,7 +4,8 @@ import Kairos.Performance as K
 import Kairos.Network as K
 import Kairos.Clock as K
 import Kairos.TimePoint as K
-import Kairos.Pfield as K 
+import Kairos.Pfield as K
+import Kairos.PfPat as K
 import Kairos.Instrument as K
 import Kairos.Player as K
 import Kairos.Utilities as K

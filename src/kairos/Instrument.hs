@@ -3,8 +3,9 @@
 module Kairos.Instrument where
 
 import Kairos.TimePoint ( TimePoint )
-import Kairos.Pfield ( PfMap, PfPat(pfId, pat), Pfield(Ps, Pd), idInt )
+import Kairos.Pfield ( PfMap, Pfield(Ps, Pd) )
 import Kairos.Utilities ( lookupMap )
+import Kairos.PfPat
 import Control.Concurrent.STM
     ( atomically, newTVarIO, readTVarIO, writeTVar, TVar )
 import qualified Data.Map.Strict as M

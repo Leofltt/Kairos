@@ -1,7 +1,8 @@
 module Kairos.Player where
 
 import Kairos.Performance ( Performance(..) )
-import Kairos.Pfield ( Pfield, PfPat(updater, pfId), pfToString, PfMap, idInt, idString, fromPf, PfId )
+import Kairos.Pfield
+import Kairos.PfPat
 import Kairos.TimePoint
 import Kairos.Clock
 import Kairos.Instrument

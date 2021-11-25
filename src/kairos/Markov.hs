@@ -1,6 +1,7 @@
 module Kairos.Markov where
 
-import Kairos.Pfield ( Pfield, PfPat(pat) )
+import Kairos.Pfield ( Pfield )
+import Kairos.PfPat
 import Kairos.Utilities ( randF, stringToDouble )
 import Text.CSV ( parseCSVFromFile )
 import Data.Char ( isNumber, isSymbol )

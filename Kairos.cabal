@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 54f7c3b47b64e0607d9cafa63eedaf5e0b3806d6a97bc82bc4a73235ca954e01
+-- hash: 12c5e4223557b2a0deb514bf0879685d9138ad25ab15d0e795865ab532077695
 
 name:           Kairos
 version:        0.3.5
@@ -35,6 +35,7 @@ library
       Kairos.Clock
       Kairos.TimePoint
       Kairos.Pfield
+      Kairos.PfPat
       Kairos.Instrument
       Kairos.Network
       Kairos.Player

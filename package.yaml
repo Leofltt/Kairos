@@ -37,6 +37,7 @@ library:
   - Kairos.Clock
   - Kairos.TimePoint
   - Kairos.Pfield
+  - Kairos.PfPat
   - Kairos.Instrument
   - Kairos.Network
   - Kairos.Player

@@ -3,9 +3,7 @@
 module Kairos.Pfield where
 
 import Data.Typeable ( Typeable )
-import Control.Concurrent.STM ( TVar )
 import qualified Data.Map.Strict as M
-import Data.Either ()
 
 -- | a single Pfield
 data Pfield  = Ps { pString :: String }
@@ -31,21 +29,6 @@ instance PfAble String where
 
 toPfs :: PfAble a => [a] -> [Pfield]
 toPfs = map toPf
-
--- | pfield Id containing the pfield number and it's name
-data PfId = Either Int String deriving (Eq, Show, Ord) 
-
-idInt :: PfId -> Int 
-idInt (Either x _) = x
-
-idString :: PfId -> String 
-idString (Either _ y) = y 
-
--- | pattern of pfields and related update function
-data PfPat = PfPat { pfId :: PfId                  -- ^ id of the pfield
-                   , pat  :: TVar [Pfield]         -- ^ the string of possible values (or only value, depends on what the updater needs)
-                   , updater :: PfPat -> IO Pfield -- ^ the function that decides which value to take
-                   }
 
 -- | Map of Pfields and their IDs
 type PfMap = M.Map Int Pfield
