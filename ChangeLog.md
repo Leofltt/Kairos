@@ -12,4 +12,6 @@
 
 0.3.5 Ability to create patterns for effects parameters, status init will quantize to next bar instead of first available beat
 
+0.3.6 Refactor of PfPat and updaters (phase 1), added simplified shorthand aliases for functions. Some updates to all the necessary files && started revisiting documentation (slowly...)
+
 ## Unreleased changes

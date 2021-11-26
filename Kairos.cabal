@@ -1,13 +1,7 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.4.
---
--- see: https://github.com/sol/hpack
---
--- hash: 12c5e4223557b2a0deb514bf0879685d9138ad25ab15d0e795865ab532077695
-
 name:           Kairos
-version:        0.3.5
+version:        0.3.6
 synopsis:       Audio live coding library
 description:    Please see the README on GitHub at <https://github.com/leofltt/Kairos#readme>
 category:       Sound
