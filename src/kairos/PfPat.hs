@@ -74,6 +74,8 @@ retro :: PfPat -> IO Pfield
 retro = retrograde
 k :: PfPat -> IO Pfield
 k = keep
+
+-- | auto mode: if list has one element use keep, otherwise use netxVal
 a :: PfPat -> IO Pfield
 a n = do 
     p <- readTVarIO (pat n)
