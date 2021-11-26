@@ -7,7 +7,7 @@ import Kairos.Utilities
     ( genNRandomValues,
       intToDouble,
       numSeqFromText,
-      numSeqFromBin )
+      numSeqFromBin, binToNormSum )
 import Kairos.Euclidean ( euclidean )
 import Control.Applicative (liftA2)
 import Data.Time.Clock.POSIX (getPOSIXTime)
@@ -49,7 +49,25 @@ tpD = pure
 fromTP :: [TimePoint] -> [Double]
 fromTP = map whenTP
 
--- functions to create TimePoint patterns -------------------------------
+-- | functions to create TimePoint patterns -------------------------------
+
+-- | mininotation for rhythm patterns
+
+type Twinkle = [Spark]
+
+type Spark = Char
+
+shine :: Double -> Twinkle -> [TimePoint]
+shine maxbeats s = toTP $ Prelude.map (*maxbeats) $ reverse $ binToNormSum $ makeList s
+
+makeList :: Twinkle -> [Double]
+makeList = map sparkToDouble
+
+sparkToDouble :: Spark -> Double
+sparkToDouble '*' = 1
+sparkToDouble '~' = 0
+sparkToDouble _ = error "sparkToDouble: invalid spark"
+
 
 -- | create tuples of t elements to fill up b number of beats
 tupleForBar :: Double -> Double -> [TimePoint]
@@ -83,7 +101,7 @@ euclid (x,y) shift maxbeats = toTP $ map ((*(maxbeats/intToDouble y)) . (+ (-1))
 textToTP :: Double -> String -> [TimePoint]
 textToTP maxbeats t = toTP $ Prelude.map (*maxbeats) $ numSeqFromText t
 
--- | Given total length in beats, take a binary number and converts it into a time pattern
+-- | Given total length in beats, take a number, convert it to binary and converts it into a time pattern
 binToTP :: Double -> Double -> [TimePoint]
 binToTP maxbeats b = toTP $ Prelude.map (*maxbeats) $ numSeqFromBin b
 

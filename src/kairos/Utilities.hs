@@ -105,18 +105,18 @@ intToDouble :: Int -> Double
 intToDouble = fromIntegral
 
 binToNormSum :: [Double] -> [Double]
-binToNormSum x =  map ((/ (intToDouble $ length x)) . intToDouble) (binToSum x)
+binToNormSum x = map (((/ (intToDouble $ length x)) . intToDouble) . (\c -> c-1)) (binToSum x)
 
 binToSum :: [Double] -> [Int]
 binToSum [] = []
-binToSum x | last x == 0 = 0 : binToSum (init x)
+binToSum x | last x == 0 = binToSum (init x)
            | last x == 1 = length x : binToSum (init x)
 
 numSeqFromText :: String -> [Double]
-numSeqFromText t = reverse . filter (/=0) $ binToNormSum $ textToBinary t
+numSeqFromText t = reverse $ binToNormSum $ textToBinary t
 
 numSeqFromBin :: Double -> [Double]
-numSeqFromBin d = reverse . filter (/=0) $ binToNormSum $ numToBinary d
+numSeqFromBin d = reverse $ binToNormSum $ numToBinary d
 
 doubleToFloat :: Double -> Float
 doubleToFloat = realToFrac

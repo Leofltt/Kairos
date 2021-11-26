@@ -1,8 +1,7 @@
 module Kairos.PfPat where 
 
-import Kairos.Pfield 
+import Kairos.Pfield ( Pfield ) 
 import Data.Either ()
--- import Control.Concurrent.STM ( TVar )
 import Kairos.Utilities ( checkPercentNext, randI )
 import Control.Concurrent.STM ( atomically, readTVarIO, writeTVar, TVar )
 
