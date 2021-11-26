@@ -74,3 +74,11 @@ retro :: PfPat -> IO Pfield
 retro = retrograde
 k :: PfPat -> IO Pfield
 k = keep
+a :: PfPat -> IO Pfield
+a n = do 
+    p <- readTVarIO (pat n)
+    if length p == 1 
+        then do 
+            k n
+        else do 
+            nv n
