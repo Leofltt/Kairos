@@ -6,7 +6,7 @@
 
 <CsoundSynthesizer>
 <CsOptions>
--odac0
+-odac4
 --port=11000
 -d
 -B 256
@@ -103,12 +103,12 @@ endop
 
 instr 1 ; Sampler
 
-i_dur = p3
-i_vol = p4
-i_rev = p5
-i_del = p6
-i_pan = p7
-i_chor = p8
+idur = p3
+ivol = p4
+irev = p5
+idel = p6
+ipan = p7
+ichor = p8
 
 inchs = filenchnls(p9)
 kthreshold = p11
@@ -117,14 +117,14 @@ iratio = p12
 if inchs == 1 then
 
 aLeft diskin2 p9, p10
-aL, aR pan3 aLeft, aLeft, i_pan, 1
+aL, aR pan3 aLeft, aLeft, ipan, 1
 
 
 else
 
 aLeft, aRight diskin2 p9, p10
 
-aL, aR pan3 aLeft, aRight, i_pan, 1
+aL, aR pan3 aLeft, aRight, ipan, 1
 
 endif
 
@@ -134,17 +134,17 @@ iftime = 0.05
 aL dam aL, kthreshold, icomp1, 1, irtime, iftime
 aR dam aR, kthreshold, icomp1, 1, irtime, iftime
 
-zawm i_vol * aL, 1
-zawm i_vol * aR, 2
+zawm ivol * aL, 1
+zawm ivol * aR, 2
 
-zawm i_rev * aL, 3
-zawm i_rev * aR, 4
+zawm irev * aL, 3
+zawm irev * aR, 4
 
-zawm i_del * aL, 7
-zawm i_del * aR, 8
+zawm idel * aL, 7
+zawm idel * aR, 8
 
-zawm i_chor * aL, 11
-zawm i_chor * aR, 12
+zawm ichor * aL, 11
+zawm ichor * aR, 12
 
 
 endin
@@ -152,12 +152,12 @@ endin
 
 instr 2 ; Stutter
 
-i_dur = p3
-i_vol = p4
-i_rev = p5
-i_del = p6
-i_pan = p7
-i_chor = p8
+idur = p3
+ivol = p4
+irev = p5
+idel = p6
+ipan = p7
+ichor = p8
 Sname = p9
 itune = p10  ; to be implemented
 kthreshold = p11
@@ -171,7 +171,7 @@ inchs = filenchnls(Sname)
 ilength = filelen(Sname)
 isr = filesr(Sname)
 isize = ilength * isr
-isamdur = i_dur * sr
+isamdur = idur * sr
 isamslice =  ceil(isamdur / i_repeat)
 ipos = i_pick / i_divisor * isize
 
@@ -180,13 +180,13 @@ andx =  phasor(sr/isamslice) * isamslice + ipos
 if inchs == 1 then
 isam ftgen 0, 0, isize, -1, Sname, 0, 0, 1
 aL table3 andx, isam, 0
-aL, aR pan3 aL, aL, i_pan, 1
+aL, aR pan3 aL, aL, ipan, 1
 else
 iLeft ftgen 0, 0, isize, -1, Sname, 0, 0, 1
 iRight ftgen 0, 0,isize, -1, Sname, 0, 0, 2
 aL table3 andx, iLeft, 0
 aR table3 andx, iRight, 0
-aL, aR pan3 aL, aR, i_pan, 1
+aL, aR pan3 aL, aR, ipan, 1
 endif
 
 aL = declick(aL)
@@ -198,17 +198,17 @@ iftime = 0.05
 aL dam aL, kthreshold, icomp1, 1, irtime, iftime
 aR dam aR, kthreshold, icomp1, 1, irtime, iftime
 
-zawm i_vol * aL, 1
-zawm i_vol * aR, 2
+zawm ivol * aL, 1
+zawm ivol * aR, 2
 
-zawm i_rev * aL, 3
-zawm i_rev * aR, 4
+zawm irev * aL, 3
+zawm irev * aR, 4
 
-zawm i_del * aL, 7
-zawm i_del * aR, 8
+zawm idel * aL, 7
+zawm idel * aR, 8
 
-zawm i_chor * aL, 11
-zawm i_chor * aR, 12
+zawm ichor * aL, 11
+zawm ichor * aR, 12
 
 endin
 
@@ -216,12 +216,12 @@ instr 3 ; Bass 303
 
 ;adapted from Steven Yi Livecode.orc
 
-i_dur = p3
-i_vol = p4
-i_rev = p5
-i_del = p6
-i_pan = p7
-i_chor = p8
+idur = p3
+ivol = p4
+irev = p5
+idel = p6
+ipan = p7
+ichor = p8
 
 imode = p12
 
@@ -230,44 +230,50 @@ asig = vco2(1, cpsmidinn(p9), imode)
 asig = diode_ladder(asig, acut, p11, 1, 4)
 asig = (tanh (asig * 4)) * 0.5
 asig declick asig
-aL, aR pan3 asig, asig, i_pan, 1
+aL, aR pan3 asig, asig, ipan, 1
 
-zawm i_vol * aL, 1
-zawm i_vol * aR, 2
+zawm ivol * aL, 1
+zawm ivol * aR, 2
 
-zawm i_rev * aL, 3
-zawm i_rev * aR, 4
+zawm irev * aL, 3
+zawm irev * aR, 4
 
-zawm i_del * aL, 7
-zawm i_del * aR, 8
+zawm idel * aL, 7
+zawm idel * aR, 8
 
-zawm i_chor * aL, 11
-zawm i_chor * aR, 12
+zawm ichor * aL, 11
+zawm ichor * aR, 12
 
 endin
 
 instr 4 ; Hoover Bass
 
-
-i_dur = p3
-i_vol = p4
-i_rev = p5
-i_del = p6
-i_pan = p7
-i_chor = p8
-
+idur = p3
+ivol = p4
+irev = p5
+idel = p6
+ipan = p7
+ichor = p8
+ifreq = cpsmidinn(p9)
+icf = p10
+ires = p11
 iad = p12
-aenv = linseg:a(0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0)
-kcf = expseg:k(2, p3/2, 0.1)
+
+ifEnvMax = 1.333*ifreq >= sr/2 ? ifreq : 1.333*ifreq
+
+kcfEnv = expon(ifEnvMax, p3, icf)
+
+aenv = linseg:a(0, (idur -0.02)*iad+0.01, 1,   (idur -0.02)*(1-iad)+0.01, 0)
+
 kr3 unirand 1
 kr3 port kr3, 0.01
 klf3 = lfo:k(0.5, 1.5*kr3, 0)
 klf3 = limit((klf3+0.5), 0.05, 0.95)
-a1 = vco2(1, cpsmidinn(p9),4,(klf3*0.01))
-a2 = vco2(1, cpsmidinn(p9)*(0.08+(7/12)),4,(klf3*0.01))
-a3 = vco2(1, cpsmidinn(p9)*0.52)
+a1 = vco2(1, ifreq,4,(klf3*0.01))
+a2 = vco2(1, ifreq*(0.08+(7/12)),4,(klf3*0.01))
+a3 = vco2(1, ifreq*0.52)
 af = a1 + a3 * 0.88 + a2 * 0.66
-ao = diode_ladder(af, p10+(kcf * cpsmidinn(p9)), p11)
+ao = diode_ladder(af, kcfEnv, ires)
 kr1 unirand 1
 kr2 unirand 1
 kr1 port kr1, 0.01
@@ -279,34 +285,36 @@ adel2 = vdelay3(ao/2, (0.1+alfo2)*1000, 1000)
 adecl = declick(ao+adel*0.8)
 adecr = declick(ao+adel2*0.8)
 
-aL, aR pan3 adecl* aenv, adecl* aenv, i_pan, 1
+aL, aR pan3 adecl* aenv, adecl* aenv, ipan, 1
 
-zawm i_vol * aL, 1
-zawm i_vol * aR, 2
+zawm ivol * aL, 1
+zawm ivol * aR, 2
 
-zawm i_rev * aL, 3
-zawm i_rev * aR, 4
+zawm irev * aL, 3
+zawm irev * aR, 4
 
-zawm i_del * aL, 7
-zawm i_del * aR, 8
+zawm idel * aL, 7
+zawm idel * aR, 8
 
-zawm i_chor * aL, 11
-zawm i_chor * aR, 12
+zawm ichor * aL, 11
+zawm ichor * aR, 12
 
 endin
 
 instr 5 ; HiHats 808
 
-i_dur = p3
-i_vol = p4
-i_rev = p5
-i_del = p6
-i_pan = p7
-i_chor = p8
+idur = p3
+ivol = p4
+irev = p5
+idel = p6
+ipan = p7
+ichor = p8
+iopen = p9
+itune = p10
 
-pa        =        (p9 >= 0.5 ? 1 : .15)   ; Select open or closed
-ifreq1    =        540*p10                     ; Tune
-ifreq2    =        800*p10                     ; Tune
+pa        =        (iopen >= 0.5 ? 1 : .15)   ; Select open or closed
+ifreq1    =        540*itune                     ; Tune
+ifreq2    =        800*itune                     ; Tune
 
 aenv  =   expsega(.01, .0005, 1, pa - .0005, .01)   ; Percussive envelope
 asqr1 =   poscil(1, ifreq1, 2, -1)
@@ -319,30 +327,30 @@ a808 = sum(asqr1, asqr2, asqr3, asqr4, asqr5, asqr6)
 a808 =    butterhp(a808, 5270)
 a808 =    butterhp(a808, 5270)
 
-aL, aR pan3 a808*aenv, a808*aenv, i_pan, 1
+aL, aR pan3 a808*aenv, a808*aenv, ipan, 1
 
-zawm i_vol * aL, 1
-zawm i_vol * aR, 2
+zawm ivol * aL, 1
+zawm ivol * aR, 2
 
-zawm i_rev * aL, 3
-zawm i_rev * aR, 4
+zawm irev * aL, 3
+zawm irev * aR, 4
 
-zawm i_del * aL, 7
-zawm i_del * aR, 8
+zawm idel * aL, 7
+zawm idel * aR, 8
 
-zawm i_chor * aL, 11
-zawm i_chor * aR, 12
+zawm ichor * aL, 11
+zawm ichor * aR, 12
 
 endin
 
 instr 6 ; Simple subtractive-FM
 
-i_dur = p3
-i_vol = p4
-i_rev = p5
-i_del = p6
-i_pan = p7
-i_chor = p8
+idur = p3
+ivol = p4
+irev = p5
+idel = p6
+ipan = p7
+ichor = p8
 
 kindx = p15
 kcar = p13
@@ -352,25 +360,24 @@ iad = p12
 kres = p11
 aenv = linseg:a(0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0)
 
-
 amod = poscil(1, cpsmidinn(p9) * kindx, gisine)
 acar = poscil(1, cpsmidinn(p9) + amod * kdpth * sr/4, gisine)
 
 audio = diode_ladder(acar, kfilt, kres , 1, 1.5)
 
-aL, aR pan3 audio*aenv, audio*aenv, i_pan, 1
+aL, aR pan3 audio*aenv, audio*aenv, ipan, 1
 
-zawm i_vol * aL, 1
-zawm i_vol * aR, 2
+zawm ivol * aL, 1
+zawm ivol * aR, 2
 
-zawm i_rev * aL, 3
-zawm i_rev * aR, 4
+zawm irev * aL, 3
+zawm irev * aR, 4
 
-zawm i_del * aL, 7
-zawm i_del * aR, 8
+zawm idel * aL, 7
+zawm idel * aR, 8
 
-zawm i_chor * aL, 11
-zawm i_chor * aR, 12
+zawm ichor * aL, 11
+zawm ichor * aR, 12
 
 endin
 
@@ -378,62 +385,68 @@ instr 7 ; SuperSaw
 
 ;adapted from Steven Yi Livecode.orc && inspired by the JP8080
 
-i_dur = p3
-i_vol = p4
-i_rev = p5
-i_del = p6
-i_pan = p7
-i_chor = p8
-
+idur = p3
+ivol = p4
+irev = p5
+idel = p6
+ipan = p7
+ichor = p8
+ifreq = cpsmidinn(p9)
 icf = p10
 ires = p11
 iad = p12
 idetune = p13
 imix = p14
 
+idetune *= idetune 
+
 aenv  = linseg(0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0)
 
-ifreq = cpsmidinn(p9)
+ifEnvMax = 1.333*ifreq >= sr/2 ? ifreq : 1.333*ifreq
 
-asig = vco2(1,  ifreq)
+kcfEnv = expon(ifEnvMax, p3, icf)
 
-asig += vco2(imix,  ifreq * (1 + idetune * -0.107))
+asig1 = vco2(1,  ifreq)
+
+asig = vco2(imix,  ifreq * (1 + idetune * -0.107))
 asig += vco2(imix,  ifreq * (1 + idetune * -0.061))
 asig += vco2(imix,  ifreq * (1 + idetune * -0.019))
 asig += vco2(imix,  ifreq * (1 + idetune * 0.019))
 asig += vco2(imix,  ifreq * (1 + idetune * 0.064))
 asig += vco2(imix,  ifreq * (1 + idetune * 0.11))
 
-asig *= 0.142857
+asig *= 0.17
 
-asig = zdf_ladder(asig, icf, ires)
+asig += asig1
+
+asig = zdf_ladder(asig, kcfEnv, ires)
 asig = K35_hpf(asig, ifreq * 0.5, 2)
 
 asig = declick(asig)
 
-aL, aR pan3 asig*aenv, asig*aenv, i_pan, 1
+aL, aR pan3 asig*aenv, asig*aenv, ipan, 1
 
-zawm i_vol * aL, 1
-zawm i_vol * aR, 2
+zawm ivol * aL, 1
+zawm ivol * aR, 2
 
-zawm i_rev * aL, 3
-zawm i_rev * aR, 4
+zawm irev * aL, 3
+zawm irev * aR, 4
 
-zawm i_del * aL, 7
-zawm i_del * aR, 8
+zawm idel * aL, 7
+zawm idel * aR, 8
 
-zawm i_chor * aL, 11
-zawm i_chor * aR, 12
+zawm ichor * aL, 11
+zawm ichor * aR, 12
 
 endin
 
 instr 8	;String pad from Bay at Night, Diaz
 
-i_dur = p3
-i_rev = p5
-i_del = p6
-i_pan = p7
-i_chor = p8
+idur = p3
+irev = p5
+idel = p6
+ipan = p7
+ichor = p8
 
 ihz= cpsmidinn(p9)
 iamp = p4
@@ -451,59 +464,59 @@ asig = afund + acel1 + acel2
 asig = asig + .2*anoise
 asig = butterlp(asig, (iamp * 127 - 60)*40+600)
 
-aL, aR pan3 asig, asig, i_pan, 1
+aL, aR pan3 asig, asig, ipan, 1
 
 zawm  aL, 1
 zawm  aR, 2
 
-zawm i_rev * aL, 3
-zawm i_rev * aR, 4
+zawm irev * aL, 3
+zawm irev * aR, 4
 
-zawm i_del * aL, 7
-zawm i_del * aR, 8
+zawm idel * aL, 7
+zawm idel * aR, 8
 
-zawm i_chor * aL, 11
-zawm i_chor * aR, 12
+zawm ichor * aL, 11
+zawm ichor * aR, 12
 
 endin
 
 instr 9 ; Karplus - Strong
 
-i_dur = p3
-i_vol = p4
-i_rev = p5
-i_del = p6
-i_pan = p7
-i_chor = p8
+idur = p3
+ivol = p4
+irev = p5
+idel = p6
+ipan = p7
+ichor = p8
 
 kpitch = expseg:k(cpsmidinn(p9), p3, 432)
 
 asig = pluck(1, cpsmidinn(p9), 432, 0, 4, p10, (49*p11)+1) 
 
-aL, aR pan3 asig, asig, i_pan, 1
+aL, aR pan3 asig, asig, ipan, 1
 
-zawm i_vol * aL, 1
-zawm i_vol * aR, 2
+zawm ivol * aL, 1
+zawm ivol * aR, 2
 
-zawm i_rev * aL, 3
-zawm i_rev * aR, 4
+zawm irev * aL, 3
+zawm irev * aR, 4
 
-zawm i_del * aL, 7
-zawm i_del * aR, 8
+zawm idel * aL, 7
+zawm idel * aR, 8
 
-zawm i_chor * aL, 11
-zawm i_chor * aR, 12
+zawm ichor * aL, 11
+zawm ichor * aR, 12
 
 endin
 
 instr 10 ; phaserSynth 
 
 idur = p3
-i_vol = p4
-i_rev = p5
-i_del = p6
-i_pan = p7
-i_chor = p8
+ivol = p4
+irev = p5
+idel = p6
+ipan = p7
+ichor = p8
 
 inote = cpsmidinn(p9)
 
@@ -570,19 +583,19 @@ ap2 = declick(ap2)
 
 ap2 dam ap2, 0.8, 0.8, 2, 0.01, 0.3 
 
-aL, aR pan3 ap2, ap2, i_pan, 1
+aL, aR pan3 ap2, ap2, ipan, 1
 
-zawm i_vol * aL, 1
-zawm i_vol * aR, 2
+zawm ivol * aL, 1
+zawm ivol * aR, 2
 
-zawm i_rev * aL, 3
-zawm i_rev * aR, 4
+zawm irev * aL, 3
+zawm irev * aR, 4
 
-zawm i_del * aL, 7
-zawm i_del * aR, 8
+zawm idel * aL, 7
+zawm idel * aR, 8
 
-zawm i_chor * aL, 11
-zawm i_chor * aR, 12
+zawm ichor * aL, 11
+zawm ichor * aR, 12
 
 endin
 
