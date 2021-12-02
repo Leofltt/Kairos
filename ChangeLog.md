@@ -14,4 +14,6 @@
 
 0.3.6 Refactor of PfPat and updaters (phase 1), added simplified shorthand aliases for functions. Some updates to all the necessary files && started revisiting documentation (slowly...)
 
+0.3.7 Added rhythmic mininotation
+
 ## Unreleased changes

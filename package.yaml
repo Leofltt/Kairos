@@ -1,5 +1,5 @@
 name:                Kairos
-version:             0.3.6
+version:             0.3.7
 github:              "leofltt/Kairos"
 license:             MIT
 author:              "Leo Foletto"
@@ -44,6 +44,8 @@ library:
   - Kairos.Scales
   - Kairos.Markov
   - Kairos.Euclidean
+  - Kairos.Star.Rhythm.Spark
+  - Kairos.Star.Rhythm.LList
 
 #  other-modules:
 
