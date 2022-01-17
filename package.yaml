@@ -45,7 +45,7 @@ library:
   - Kairos.Markov
   - Kairos.Euclidean
   - Kairos.Star.Rhythm.Spark
-  - Kairos.Star.Rhythm.LList
+  - Kairos.Star.Rhythm.L
 
 #  other-modules:
 

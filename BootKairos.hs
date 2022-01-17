@@ -88,7 +88,7 @@ delvol i list fun =  addPf i 1 "voldel" list fun -- delay volume
 fbrev = setChannel csd1 "fbrev"
 revfb i list fun =  addPf i 3 "fbrev" list fun -- rev fb
 cfrev = setChannel csd1 "cfrev"
-revcd i list fun =  addPf i 2 "cfrev" list fun -- rev cf
+revcf i list fun =  addPf i 2 "cfrev" list fun -- rev cf
 volrev = setChannel csd1 "volrev"
 revvol i list fun =  addPf i 1 "volrev" list fun -- rev volume
 

@@ -1,5 +1,6 @@
-module Kairos.Star.Rhythm.LList where
+module Kairos.Star.Rhythm.L where
 
+-- | A data type that holds either an element of type a or a list of elements of type a.
 data LList a = E a | L [a] deriving (Show, Eq, Ord)
 
 instance Functor LList where

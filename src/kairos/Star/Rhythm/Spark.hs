@@ -1,6 +1,6 @@
 module Kairos.Star.Rhythm.Spark where
 
-import Kairos.Star.Rhythm.LList (LList(E,L))
+import Kairos.Star.Rhythm.L (LList(E,L))
 
 type Spark = Char
 
