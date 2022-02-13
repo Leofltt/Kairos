@@ -14,6 +14,6 @@
 
 0.3.6 Refactor of PfPat and updaters (phase 1), added simplified shorthand aliases for functions. Some updates to all the necessary files && started revisiting documentation (slowly...)
 
-0.3.7 Added rhythmic mininotation
+0.3.7 Added rhythmic mininotation, added Spec Tests (WIP), changed all TP addC to be maybeAddC (aka maybeAddC is deprecated, just use addC instead)
 
 ## Unreleased changes
