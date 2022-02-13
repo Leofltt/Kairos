@@ -14,11 +14,9 @@ cPat p i = changeTimeF perf i p
 cT = changeTempo (clock perf)
 addT =  addTS (clock perf)
 maybeAddP = maybeAddTPf perf 
-addP = addTPf perf
 addIns = addInstrument perf
 addI name ins = addIns name =<< ins
-maybeAddC i n s = maybeAddP n s >> cPat n i
-addC i n s = addP n s >> cPat n i
+addC i n s = maybeAddP n s >> cPat n i
 getTP = getTimePoint perf
 addPf' = addPfPath' perf
 addPf i pfnum pfname list fun = addPf' i pfnum =<< createPfPat pfnum pfname list fun

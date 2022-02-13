@@ -3,7 +3,7 @@ module Kairos.Performance where
 
 import Kairos.Instrument ( Instr(pats), Orchestra )
 import Kairos.Clock
-import Kairos.TimePoint ( TimePoint )
+import Kairos.TimePoint ( TimePoint, notEmpty )
 import Kairos.Pfield
 import Kairos.PfPat
 import Kairos.Utilities ( addToMap, lookupMap, stringToDouble )
@@ -60,6 +60,7 @@ getTimePoint perf s = do
 addTPf :: Performance -> String -> [TimePoint] -> IO ()
 addTPf e n ts = addToMap (timePs e) (n,ts)
 
-maybeAddTPf :: Performance -> String -> Maybe [TimePoint] -> IO ()
-maybeAddTPf e n ts | isNothing ts = putStrLn "Pattern is empty"
-                   | otherwise = addTPf e n $ fromJust ts
+maybeAddTPf :: Performance -> String -> [TimePoint] -> IO ()
+maybeAddTPf e n ts | isNothing mts = putStrLn "Pattern is empty"
+                   | otherwise = addTPf e n $ fromJust mts
+                   where mts = notEmpty ts

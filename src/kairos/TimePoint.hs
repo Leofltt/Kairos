@@ -62,13 +62,13 @@ tupleForBar :: Double -> Double -> [TimePoint]
 tupleForBar b t = toTP $ takeWhile (<b) $ Prelude.map (+(b/(t*b))) [(0/t*b), (1/t*b) ..]
 
 -- | Given total length in beats, the beat subdivision wanted and the % of beats, generate a time pattern
-patternWithDensity :: Double -> Double -> Int  -> IO (Maybe [TimePoint])
+patternWithDensity :: Double -> Double -> Int  -> IO [TimePoint]
 patternWithDensity b sub dens = do
   seed <- round . (* 1000) <$> getPOSIXTime
   let bar = tupleForBar b sub
   let vals = genNRandomValues (length bar) seed ::[Int]
   let newBar = tempF bar vals dens
-  return $ notEmpty newBar
+  return newBar
 
 -- return Nothing if list is Empty, otherwise Just list
 notEmpty :: [a] -> Maybe [a]

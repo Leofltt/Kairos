@@ -33,5 +33,8 @@ bjorklund (i,j') =
 euclidean :: (Int, Int) -> Int -> [Int]
 euclidean x shift = rotate shift $ bjorklund x  
 
+-- todo : fix this to work in both directions, 
+-- right now it shifts left w/ positive values (counterintuitive)
+-- and doesn't really behave with negative values
 rotate ::  Int -> [a] -> [a]
 rotate n list = take (length list) (drop n (cycle list)) 
