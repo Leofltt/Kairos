@@ -246,7 +246,3 @@ closertoNow e k ts = do
 updateToPlay :: Performance -> String -> Maybe TimePoint -> IO ()
 updateToPlay e k newTP = updateInstrument e k (\x -> x { toPlay = newTP })
 
-nextBeat :: TimePoint -> [TimePoint] -> TimePoint
-nextBeat b xs | not (any (b <) xs) = head xs
-              | otherwise = head $ filter (b <) xs
-

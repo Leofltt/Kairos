@@ -51,6 +51,10 @@ tpD = pure
 fromTP :: [TimePoint] -> [Double]
 fromTP = map whenTP
 
+nextBeat :: TimePoint -> [TimePoint] -> TimePoint
+nextBeat b xs | not (any (b <) xs) = head xs
+              | otherwise = head $ filter (b <) xs
+
 -- | functions to create TimePoint patterns -------------------------------
 
 -- | from Star.Rhythm mininotation
