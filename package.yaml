@@ -27,6 +27,8 @@ dependencies:
 - transformers
 - csv
 - vivid-osc 
+- hspec 
+
 library:
   source-dirs: src
 
@@ -46,6 +48,8 @@ library:
   - Kairos.Euclidean
   - Kairos.Star.Rhythm.Spark
   - Kairos.Star.Rhythm.L
+  - Kairos.Test.TimePoint
+
 
 #  other-modules:
 

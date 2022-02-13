@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: c09ba740053ddacdfe6da0fdcc497573ab688f0f9f0d18c0370d0f6431aed721
+-- hash: ce40787f194c665800c005962b81c7d6207b748075ecc2b4d454759a609d9f8a
 
 name:           Kairos
 version:        0.3.7
@@ -45,6 +45,7 @@ library
       Kairos.Euclidean
       Kairos.Star.Rhythm.Spark
       Kairos.Star.Rhythm.L
+      Kairos.Test.TimePoint
   other-modules:
       Kairos.StarParse
       Kairos.Updater
@@ -56,6 +57,7 @@ library
     , bytestring
     , containers
     , csv
+    , hspec
     , network
     , random
     , stm
@@ -78,6 +80,7 @@ test-suite Kairos-test
     , bytestring
     , containers
     , csv
+    , hspec
     , network
     , random
     , stm

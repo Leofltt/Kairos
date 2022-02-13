@@ -1,4 +1,9 @@
-import Kairos
+import Kairos.Test.TimePoint (timePointTest)
 
 main :: IO ()
-main = putStrLn "Test suite not yet implemented"
+main = do
+    putStrLn "Executing Spec tests:"
+    putStrLn "======================"
+    putStrLn "TimePoint tets:"
+    timePointTest
+    putStrLn "======================"
