@@ -1,8 +1,8 @@
 module Kairos.Player where
 
-import Kairos.Performance ( Performance(..) )
-import Kairos.Pfield
-import Kairos.PfPat
+import Kairos.Performance ( Performance(timePs, orc, clock) )
+import Kairos.Pfield ( pfToString, PfMap, Pfield )
+import Kairos.PfPat ( idInt, idString, PfId, PfPat(updater, pfId) )
 import Kairos.TimePoint
 import Kairos.Clock
 import Kairos.Instrument
@@ -13,17 +13,6 @@ import Control.Concurrent.STM ( newTVarIO, readTVarIO, TVar )
 import Data.Maybe ( fromJust, isJust, isNothing )
 import qualified Data.Map.Strict as M
 import Control.Monad (when, void)
-
--- | create a default performance
-defaultPerformance :: IO Performance
-defaultPerformance = do
-  o <- defaultOrc
-  c <- defaultClock
-  t <- defaultTPMap
-  return $ P { orc = o
-             , clock = c
-             , timePs = t
-             }
 
 setChannel :: UDPPort -> String -> Pfield -> IO ()
 setChannel port chanName val = do
@@ -181,21 +170,6 @@ displayTPat :: Performance -> IO [String]
 displayTPat perf = do
    tpats <- readTVarIO (timePs perf)
    return $ inter ( M.keys tpats)  ( map (show . fromTP) (M.elems tpats))
-
-
--- default map of named patterns of timepoints  
-defaultTPMap :: IO (TVar (M.Map [Char] [TimePoint]))
-defaultTPMap = do
-  newTVarIO $ M.fromList [("upFour", upFour),("downB", downB),("eightN",eightN)
-                                  ,("sixteenN",sixteenN),("fourFloor",fourFloor),("dbk",dbk)
-                                  ,("jGhost1",jGhost1),("jGhost",jGhost),("dubb",dubb)
-                                  ,("sixBar", sixBar),("uno", uno),("jgk",jgk),("irsn",irsn)
-                                  ,("stdbkk",stdbkk),("stdbks",stdbks),("ir1k",ir1k),("bouncyk",bouncyk)
-                                  ,("ukgch",ukgch),("ukgrs",ukgrs),("jgs",jgs),("jgk",jgk)
-                                  ,("kpanb",kpanb),("kpanc",kpanc),("kpanbox",kpanbox),("b2",b2)
-                                  ,("bou2",bou2),("fwk1",fwk1),("fwk2",fwk2),("adb",adb),("adk",adk)
-                                  ,("dbk2",dbk2)
-                                  ]
 
 updateInstrument :: Performance -> String -> (Instr -> Instr) -> IO ()
 updateInstrument perf k f = do

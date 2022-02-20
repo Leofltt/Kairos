@@ -1,9 +1,9 @@
 {-# OPTIONS_GHC -Wno-missing-fields #-}
 module Kairos.Performance where
 
-import Kairos.Instrument ( Instr(pats), Orchestra )
+import Kairos.Instrument ( Instr(pats), Orchestra, defaultOrc )
 import Kairos.Clock
-import Kairos.TimePoint ( TimePoint, notEmpty )
+import Kairos.TimePoint ( TimePoint, notEmpty, defaultTPMap )
 import Kairos.Pfield
 import Kairos.PfPat
 import Kairos.Utilities ( addToMap, lookupMap, stringToDouble )
@@ -16,6 +16,17 @@ data Performance = P { orc :: Orchestra
                      , clock :: Clock
                      , timePs :: TVar (M.Map [Char] [TimePoint]) -- a map of time patterns with their names
                      }
+
+-- | create a default performance
+defaultPerformance :: IO Performance
+defaultPerformance = do
+  o <- defaultOrc
+  c <- defaultClock
+  t <- defaultTPMap
+  return $ P { orc = o
+             , clock = c
+             , timePs = t
+             }
 
 -- function to create a PfPat
 createPfPat :: Int -> String -> [Pfield] -> (PfPat -> IO Pfield) -> IO PfPat

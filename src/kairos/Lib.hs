@@ -11,4 +11,3 @@ import Kairos.Player as K
 import Kairos.Utilities as K
 import Kairos.Scales as K
 import Kairos.Markov as K
-import Kairos.Euclidean as K

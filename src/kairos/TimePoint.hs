@@ -13,6 +13,8 @@ import Kairos.Star.Rhythm.Spark ( Spark, lLfromSps, sparkToDouble )
 import Kairos.Star.Rhythm.L (flatten, toTimeSeq)
 import Control.Applicative (liftA2)
 import Data.Time.Clock.POSIX (getPOSIXTime)
+import qualified Data.Map.Strict as M
+import Control.Concurrent.STM ( TVar, newTVarIO ) 
 
 -- | a point in time
 newtype TimePointf a = TP { whenTP :: a
@@ -112,6 +114,20 @@ interp2 tot [x] = [(x + tot)/2]
 interp2 tot (x:y:xs) = ((x+y)/2):interp2 tot xs
 
 --- default Patterns ----------------------------------------
+
+-- default map of named patterns of timepoints  
+defaultTPMap :: IO (TVar (M.Map [Char] [TimePoint]))
+defaultTPMap = do
+  newTVarIO $ M.fromList [("upFour", upFour),("downB", downB),("eightN",eightN)
+                                  ,("sixteenN",sixteenN),("fourFloor",fourFloor),("dbk",dbk)
+                                  ,("jGhost1",jGhost1),("jGhost",jGhost),("dubb",dubb)
+                                  ,("sixBar", sixBar),("uno", uno),("jgk",jgk),("irsn",irsn)
+                                  ,("stdbkk",stdbkk),("stdbks",stdbks),("ir1k",ir1k),("bouncyk",bouncyk)
+                                  ,("ukgch",ukgch),("ukgrs",ukgrs),("jgs",jgs),("jgk",jgk)
+                                  ,("kpanb",kpanb),("kpanc",kpanc),("kpanbox",kpanbox),("b2",b2)
+                                  ,("bou2",bou2),("fwk1",fwk1),("fwk2",fwk2),("adb",adb),("adk",adk)
+                                  ,("dbk2",dbk2)
+                                  ]
 
 -- a few time patterns in 4/4
 downB = [TP 1.0,TP 3.0]

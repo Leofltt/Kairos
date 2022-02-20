@@ -50,6 +50,7 @@ library:
   - Kairos.Star.Rhythm.L
   - Kairos.Test.TimePoint
   - Kairos.Test.Clock
+  - Kairos.Test.PfPat
 
 
 #  other-modules:
