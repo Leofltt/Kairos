@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 9acfdad8d949a4b4be6e1104d5f91d3f3bf3d3499d8da1781deec6185a9a295c
+-- hash: 31a389d7e769582444c9e79f51a16eb23cbc6706e64169134fe2e6634119c26e
 
 name:           Kairos
 version:        0.3.7
@@ -45,8 +45,6 @@ library
       Kairos.Euclidean
       Kairos.Star.Rhythm.Spark
       Kairos.Star.Rhythm.L
-      Kairos.Test.TimePoint
-      Kairos.Test.Clock
   other-modules:
       Paths_Kairos
   hs-source-dirs:
@@ -69,6 +67,9 @@ test-suite Kairos-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      Test.Clock
+      Test.PfPat
+      Test.TimePoint
       Paths_Kairos
   hs-source-dirs:
       test

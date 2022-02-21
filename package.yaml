@@ -48,9 +48,6 @@ library:
   - Kairos.Euclidean
   - Kairos.Star.Rhythm.Spark
   - Kairos.Star.Rhythm.L
-  - Kairos.Test.TimePoint
-  - Kairos.Test.Clock
-  - Kairos.Test.PfPat
 
 
 #  other-modules:

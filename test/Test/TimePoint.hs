@@ -1,4 +1,4 @@
-module Kairos.Test.TimePoint where
+module Test.TimePoint where
 
 import Test.Hspec ( hspec, describe, it, shouldBe )
 import Kairos.TimePoint

@@ -1,4 +1,4 @@
-module Kairos.Test.PfPat where
+module Test.PfPat where
 
 import Test.Hspec ( hspec, describe, it, shouldBe )
 import Kairos.PfPat

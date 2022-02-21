@@ -1,6 +1,6 @@
-import Kairos.Test.TimePoint (timePointTest)
-import Kairos.Test.Clock (clockTest)
-import Kairos.Test.PfPat (pfPatTest)
+import Test.TimePoint (timePointTest)
+import Test.Clock (clockTest)
+import Test.PfPat (pfPatTest)
 
 main :: IO ()
 main = do
