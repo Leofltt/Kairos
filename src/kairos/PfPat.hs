@@ -32,17 +32,19 @@ keep n = do
 nextVal :: PfPat -> IO Pfield
 nextVal n = do
   patrn <- readTVarIO (pat n)
+  let res = head patrn
   let pat' = tail patrn++[head patrn]
   atomically $ writeTVar (pat n) pat'
-  return $ head pat'
+  return res
 
 -- | read the list in reverse
 retrograde :: PfPat -> IO Pfield
 retrograde n = do
   patrn <- readTVarIO (pat n)
+  let res = head patrn
   let pat' = last patrn:init patrn
   atomically $ writeTVar (pat n) pat'
-  return $ head pat'
+  return res
 
 -- | pick a random value from the list
 randomize :: PfPat -> IO Pfield
@@ -57,9 +59,10 @@ percentNext :: Int -> PfPat -> IO Pfield
 percentNext i n = do
   val <- randI 100
   p <- readTVarIO (pat n)
+  let res = head p
   let result = checkPercentNext val i p
   atomically $ writeTVar (pat n) result
-  return $ head result
+  return res
 
 -- | updater aliases for ease of use
 
