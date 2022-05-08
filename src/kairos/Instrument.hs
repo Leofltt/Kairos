@@ -137,7 +137,7 @@ fmSub = do
 
 superSaw :: IO Instr
 superSaw = do
-  pfields <- newTVarIO $ M.fromList [(3, Pd 1), (4, Pd 1), (5, Pd 0), (6, Pd 0), (7,Pd 0.5),(8, Pd 0),(9, Pd 60),(10, Pd 5000)
+  pfields <- newTVarIO $ M.fromList [(3, Pd 1), (4, Pd 0.8), (5, Pd 0), (6, Pd 0), (7,Pd 0.5),(8, Pd 0),(9, Pd 60),(10, Pd 5000)
                                     ,(11, Pd 2),(12, Pd 0.2), (13, Pd 0.3), (14, Pd 0.5)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 7
@@ -294,7 +294,7 @@ chorus = do
 
 master :: IO Instr
 master = do
-  pfields <- newTVarIO $ M.fromList [(1, Pd 0.8)]
+  pfields <- newTVarIO $ M.fromList [(1, Pd 0.8),(2, Pd 0),(3, Pd 0),(4, Pd 50)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 999
              , pf     = pfields

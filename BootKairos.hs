@@ -64,7 +64,7 @@ fbP i list fun =  addPf i 22 "fbP" list fun     -- phax
 
 chan i list fun = addPf i 8 "chan" list fun      -- model:cycles
 note i list fun = addPf i 9 "note" list fun      -- model:cycles
-vel i list fun = addPf i 10 "vel" list fun      -- model:cycles
+vel i list fun = addPf i 7 "vel" list fun      -- model:cycles
 mc_pitch i list fun = addPf i 11 "pitch" list fun -- model:cycles
 decay i list fun = addPf i 12 "decay" list fun    -- model:cycles
 color i list fun = addPf i 13 "color" list fun    -- model:cycles
@@ -99,6 +99,13 @@ chordiv i list fun =  addPf i 3 "divchorus" list fun -- chorus divisor
 
 m_vol = setChannel csd1 "m_vol"
 mixvol i list fun =  addPf i 1 "m_vol" list fun -- mix volume
+
+wl = setChannel csd1 "wl"
+wlvol i list fun =  addPf i 2 "wl" list fun -- waveloss volume
+dropwl = setChannel csd1 "dropwl"
+wldrop i list fun =  addPf i 3 "dropwl" list fun -- waveloss drop
+maxwl = setChannel csd1 "maxwl"
+wlmax i list fun =  addPf i 4 "maxwl" list fun -- waveloss max
 
 techno1 k s h = cPat "fourFloor" k >> cPat "downB" s >> cPat "upFour" h
 dnb1 k s h = cPat "dbk" k >> cPat "downB" s >> cPat "eightN" h
