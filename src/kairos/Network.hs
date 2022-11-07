@@ -44,7 +44,7 @@ setChan :: UDPPort -> String -> IO ()
 setChan p n = let m = "@" ++ n in
   sendCsound p m
 
--- send an OSC messagge to port p
+-- | send an OSC messagge to port p
 sendOSC :: UDPPort -> Int -> [Pfield] -> IO ()
 sendOSC p i l = sendMsgOSC p $ createOSC i l
 

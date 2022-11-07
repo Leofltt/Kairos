@@ -48,6 +48,7 @@ library:
   - Kairos.Euclidean
   - Kairos.Star.Rhythm.Spark
   - Kairos.Star.Rhythm.L
+  - Kairos.Kit
 
 
 #  other-modules:

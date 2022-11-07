@@ -5,7 +5,8 @@ module Kairos.Instrument where
 import Kairos.TimePoint ( TimePoint )
 import Kairos.Pfield ( PfMap, Pfield(Ps, Pd) )
 import Kairos.Utilities ( lookupMap )
-import Kairos.PfPat
+import Kairos.PfPat ( PfPat(pfId, pat), idInt )
+import Kairos.Network (UDPPort)
 import Control.Concurrent.STM
     ( atomically, newTVarIO, readTVarIO, writeTVar, TVar )
 import qualified Data.Map.Strict as M
@@ -21,7 +22,7 @@ data Instr = I { insN :: InstrumentID           -- ^ Instrument ID : Int
                , toPlay :: Maybe TimePoint      -- ^ when to play the instrument next
                , pats :: TVar (M.Map Int PfPat) -- ^ Patterns of Parameters and their IDs
                , timeF :: String                -- ^ Name of the time function to refer to
-               , kind :: MessageTo String       -- ^ where to send the message (Csound or OSC)
+               , kind :: MessageTo UDPPort      -- ^ where to send the message (Csound or OSC)
                , itype :: InstrType             -- ^ Instrument or Effect ?
                }
 

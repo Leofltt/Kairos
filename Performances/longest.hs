@@ -32,7 +32,7 @@ pitch "ms5" (toPfs [47, 47, 47, 46, 47, 47]) a
 pitch "ms5" (toPfs [47, 35, 59]) a
 
 
-pitch "sSaw" (toPfs [37, 37, 37, 37, 39) a
+pitch "sSaw" (toPfs [37, 37, 37, 37, 39]) a
 addC "sSaw" "saw1" $ shine 4 "~~~*~~~*~*~~~*"
 vol "sSaw" [Pd 0.4] k
 p "sSaw"

@@ -1,5 +1,7 @@
 -- create Sampler instruments && CSVs
 
+-- loading samplers
+
 defPath s = "/Users/leofltt/Desktop/KairosSamples" ++ s
 markPath s = "/Users/leofltt/Desktop/Kairos/MarkovTables" ++ s
 csd1 = "11000"
@@ -256,12 +258,24 @@ addI "er1cr1" $ sampler er1cr1
 addI "er1cr2" $ sampler er1cr2
 addI "er1r" $ sampler er1r
 addI "er1kd" $ sampler er1kd
+ch886 = defPath "/raveshaped/CH886.wav"
+addI "ch886" $ sampler ch886
+chdb = defPath "/raveshaped/CHDigiboy.wav"
+addI "chdb" $ sampler chdb
+chroger = defPath "/raveshaped/CHRoger.wav"
+addI "chroger" $ sampler chroger
+ohmlfx = defPath "/raveshaped/OHMalefix.wav"
+addI "ohmlfx" $ sampler ohmlfx
+rimshock = defPath "/raveshaped/RimShock.wav"
+addI "rimshock" $ sampler rimshock
+-- a lot of text
 fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
+-- csv files with tables
 csv1 = markPath "/Test.csv"
 csv2 = markPath "/Test2.csv"
 csv3 = markPath "/Test3.csv"
 -- prms "lpFM" [ (keep, vol, [Pd 0.7]),(keep, rev, [Pd 0.5]),((percentNext 73), pitch, toPfs [53, 56, 58, 53, 48]),(keep, fmIndx, [Pd 12.3]), (keep, fmDepth, [Pd 987.23]),(keep,cf,[Pd 3880]),( keep, rev, [Pd 0.6]),(keep, adRatio,[Pd 0.7]),(randomize,pan,toPfs[0.4,0.6,0.75,0.35])]
---prms "303" [ (keep,dur,toPfs [0.25]),(keep,res,[Pd 4]),(keep, vol, [Pd 0.5]),(keep, cf, [Pd 3500]),((runMarkovCSV csv3), pitch, toPfs (withScale 41 dorian)),(keep, rev, [Pd 0.4])]
+-- prms "303" [ (keep,dur,toPfs [0.25]),(keep,res,[Pd 4]),(keep, vol, [Pd 0.5]),(keep, cf, [Pd 3500]),((runMarkovCSV csv3), pitch, toPfs (withScale 41 dorian)),(keep, rev, [Pd 0.4])]
 -- prms "hov" [ (keep,dur,toPfs [1.2]),(keep, vol, [Pd 0.3]),(keep, cf, [Pd 800]),((runMarkovCSV csv3), pitch, toPfs (withScale 41 dorian)),(keep, rev, [Pd 0.7])]
 let plucky = cf "303" [Pd 5000] keep >> res "303" [Pd 6] keep >> dur "303" [Pd 0.17] keep
 plucky

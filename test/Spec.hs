@@ -1,6 +1,7 @@
 import Test.TimePoint (timePointTest)
 import Test.Clock (clockTest)
 import Test.PfPat (pfPatTest)
+import Test.Kit (kitTest)
 
 main :: IO ()
 main = do
@@ -14,4 +15,7 @@ main = do
     putStrLn "======================"
     putStrLn "PfPat tests:"
     pfPatTest
+    putStrLn "======================"
+    putStrLn "Kit tests:"
+    kitTest
     putStrLn "======================"

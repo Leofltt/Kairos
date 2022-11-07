@@ -1,9 +1,10 @@
 module Kairos.Scales where
 
-import Kairos.Utilities
+import Kairos.Utilities ( offset )
 
 type Scale = [Double]
 
+-- | create a list of values given a scale starting from a given root note 
 withScale :: Double -> Scale -> Scale
 root `withScale` scale = offset root scale
 
