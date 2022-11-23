@@ -1,7 +1,8 @@
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 module Kairos.Markov where
 
 import Kairos.Pfield ( Pfield )
-import Kairos.PfPat
+import Kairos.PfPat ( PfPat(pat) )
 import Kairos.Utilities ( randF, stringToDouble )
 import Text.CSV ( parseCSVFromFile )
 import Data.Char ( isNumber, isSymbol )

@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 module Kairos.Utilities where
 
 import Control.Concurrent.STM

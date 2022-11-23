@@ -2,3 +2,5 @@
 stack.yaml.lock
 *~
 .DS_Store
+Dev/
+dist-newstyle/
