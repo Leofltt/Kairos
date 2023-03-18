@@ -1,11 +1,28 @@
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 module Kairos.Player where
 
 import Kairos.Performance ( Performance(timePs, orc, clock) )
 import Kairos.Pfield ( pfToString, PfMap, Pfield )
 import Kairos.PfPat ( idInt, idString, PfId, PfPat(updater, pfId) )
 import Kairos.TimePoint
+    ( fromTP, nextBeat, wrapBar, TimePoint, TimePointf(TP, whenTP) )
 import Kairos.Clock
+    ( TimeSignature(beatInMsr),
+      timeD,
+      waitT,
+      currentTS,
+      currentBeat,
+      thisBar,
+      nextBar,
+      beatInBar,
+      timeAtBeat )
 import Kairos.Instrument
+    ( getPort,
+      notEffect,
+      Instr(itype, kind, insN, pats, pf, status, timeF, toPlay),
+      InstrType(Effect, Instrument),
+      MessageTo(OSC, Csound),
+      Status(..) )
 import Kairos.Network ( sendEvent, setChan, sendOSC, UDPPort )
 import Kairos.Utilities ( addToMap, lookupMap, inter, sameConstructor)
 import Control.Concurrent ( forkIO )
