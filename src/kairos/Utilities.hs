@@ -2,7 +2,7 @@
 module Kairos.Utilities where
 
 import Control.Concurrent.STM
-    ( atomically, readTVarIO, writeTVar, modifyTVar', TVar )
+    ( atomically, readTVarIO, modifyTVar', TVar )
 import qualified Data.Map.Strict as M
 import Data.List (sort)
 import System.Random (getStdRandom,randomR, mkStdGen, randomRs, randomRIO)
@@ -49,7 +49,7 @@ randF = do
   return $ fromIntegral x / 100
 
 checkPercentNext :: Int -> Int -> [a] -> [a]
-checkPercentNext v i p | v <= i = tail p++[head p]
+checkPercentNext v i p | v < i = tail p++[head p]
                        | otherwise = p
 
 genNRandomValues :: Int -> Int -> [Int]

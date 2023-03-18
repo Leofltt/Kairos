@@ -49,9 +49,9 @@ delchorus 315
 
 m_vol 0.6
 
-pitch "hov" (toPfD $ offset 7 [38,41,36,38,45,38]) $ randomize
+pitch "hov" ( offset 7 [38,41,36,38,45,38]) $ randomize
 addC "hov" "h1" =<< patternWithDensity 16 8 47 
-durTS "hov" [Pd 1.5] keep
+durTS "hov" [ 1.5] keep
 
 durTS "sovreign" [Pd (1/16)] keep
 stuts "sovreign" (toPfD ([2,2] ++(take 10 [1,1..1]))) randomize
