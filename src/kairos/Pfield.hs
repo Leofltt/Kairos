@@ -30,6 +30,9 @@ instance PfAble String where
 toPfs :: PfAble a => [a] -> [Pfield]
 toPfs = map toPf
 
+fromPfsD :: [Pfield] -> [Double ]
+fromPfsD = map fromPf 
+
 -- | Map of Pfields and their IDs
 type PfMap = M.Map Int Pfield
 

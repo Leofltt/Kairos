@@ -2,22 +2,22 @@
 
 ;the audio engine for the kairos live coding library
 
-;Leonardo Foletto, 2018
+;Leonardo Foletto, 2018-2022
 
 <CsoundSynthesizer>
 <CsOptions>
--odac4
+-odac3
 --port=11000
 -d
--B 256
--b 128
+-B 512
+-b 256
 --opcode-lib=~/Users/$USER/Library/csound/6.0/plugins64
-;-Q 0 
+-Q 0 
 
 </CsOptions>
 <CsInstruments>
 
-sr = 44100
+sr = 48000
 ksmps = 32
 nchnls = 2
 0dbfs = 1.0
@@ -44,7 +44,6 @@ zakinit 50,50
 gisine   ftgen 1, 0, 4096, 10, 1                           ; Sine wave
 gisquare ftgen 2, 0, 4096, 7, 1, 2048, 1, 0, -1, 2048, -1  ; Square wave
 gisaw    ftgen 3, 0, 4096, 7, 0, 2048, 1, 0, -1, 2048, 0   ; Saw wave  
-
 
 
 ; INIT CHANNELS FOR FXs
@@ -85,25 +84,49 @@ gkvolMaster init 1
 
 gkvolMaster chnexport "m_vol", 1, 2, 1, 0, 1
 
+; Waveloss
+
+gkvolWaveloss init 0 
+gkdropWaveloss init 0
+gkmaxWaveloss init 50
+
+gkvolWaveloss chnexport "wl", 1, 2, 1, 0, 1
+gkdropWaveloss chnexport "dropwl", 1, 2, 1, 0, 1
+gkmaxWaveloss chnexport "maxwl", 1, 2, 5, 1, 100
+gkmodeWaveloss chnexport "modewl", 1, 2, 0, 0, 1
+
 ;opcode for declicking an audio signal.
 ;Should only be used in instruments that have positive p3 duration.
 ;taken from Steven Yi livecode.orc
-
 opcode declick, a, a
 ain xin
 aenv = linseg:a(0, 0.01, 1, p3 - 0.02, 1, 0.01, 0)
 xout ain * aenv
 endop
 
+;opcode to load an audio file into a table.
 opcode loadSample, i, S
 Sample xin
 iNum ftgen 0, 0, 0, -1, Sample, 0, 0, 0
 xout iNum
 endop
 
+;Attack-Decay envelope with controllable slope
+;Should only be used in instruments that have positive p3 duration.
+opcode ADEnv, a, i
+iAD xin 
+if iAD > 1 then 
+iADD = iAD % 1
+aEnv = expseg:a(0.001, (p3 -0.02)*iADD+0.01, 1, (p3 -0.02)*(1-iADD)+0.01, 0.001)
+else 
+aEnv = linseg:a(0, (p3 -0.02)*iAD+0.01, 1, (p3 -0.02)*(1-iAD)+0.01, 0)
+endif
+xout aEnv
+endop
+
 instr 1 ; Sampler
 
-idur = p3
+p3 = filelen(p9)
 ivol = p4
 irev = p5
 idel = p6
@@ -222,12 +245,15 @@ irev = p5
 idel = p6
 ipan = p7
 ichor = p8
+ifreq = cpsmidinn(p9)
+icf = p10
+ires = p11
 
 imode = p12
 
-acut = 200 + expon(1, p3, 0.001) * p10
-asig = vco2(1, cpsmidinn(p9), imode)
-asig = diode_ladder(asig, acut, p11, 1, 4)
+acut = 200 + expon(1, idur, 0.001) * icf
+asig = vco2(1, ifreq, imode)
+asig = diode_ladder(asig, acut, ires, 1, 4)
 asig = (tanh (asig * 4)) * 0.5
 asig declick asig
 aL, aR pan3 asig, asig, ipan, 1
@@ -263,7 +289,7 @@ ifEnvMax = 1.333*ifreq >= sr/2 ? ifreq : 1.333*ifreq
 
 kcfEnv = expon(ifEnvMax, p3, icf)
 
-aenv = linseg:a(0, (idur -0.02)*iad+0.01, 1,   (idur -0.02)*(1-iad)+0.01, 0)
+aenv = ADEnv(iad)
 
 kr3 unirand 1
 kr3 port kr3, 0.01
@@ -358,7 +384,7 @@ kfilt = p10
 kdpth = p14
 iad = p12
 kres = p11
-aenv = linseg:a(0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0)
+aenv = ADEnv(iad)
 
 amod = poscil(1, cpsmidinn(p9) * kindx, gisine)
 acar = poscil(1, cpsmidinn(p9) + amod * kdpth * sr/4, gisine)
@@ -400,11 +426,11 @@ imix = p14
 
 idetune *= idetune 
 
-aenv  = linseg(0, (p3 -0.02)*iad+0.01, 1,   (p3 -0.02)*(1-iad)+0.01, 0)
+aenv  = ADEnv(iad)
 
-ifEnvMax = 1.333*ifreq >= sr/2 ? ifreq : 1.333*ifreq
+kcfEnv  = linseg(ifreq, (p3 -0.02)*iad+0.01, icf,   (p3 -0.02)*(1-iad)+0.01, 200)
 
-kcfEnv = expon(ifEnvMax, p3, icf)
+; kcfEnv = expon(icf, p3, ifreq/8)
 
 asig1 = vco2(1,  ifreq)
 
@@ -535,7 +561,7 @@ imode = p20
 ienv_amp = p21
 ifb = p22
 
-aenv = linseg:a(0, (idur -0.02)*iad+0.01, 1,   (idur -0.02)*(1-iad)+0.01, 0)
+aenv = ADEnv(iad)
 
 if (iadp1 >= 0 && isim >= 0) then
 kep1 = linseg:k(0, idur*iadp1, ienv_amp, idur*(1-iadp1), 0)
@@ -768,6 +794,12 @@ aL += adelL
 aR += adelR
 aL += achoL
 aR += achoR
+aLW waveloss aL * gkvolWaveloss, gkdropWaveloss * gkmaxWaveloss, gkmaxWaveloss, 0
+arW waveloss aR * gkvolWaveloss, gkdropWaveloss * gkmaxWaveloss, gkmaxWaveloss, 0
+aL *= (1-gkvolWaveloss)
+aR *= (1-gkvolWaveloss)
+aL += aLW
+aR += arW
 aL *= gkvolMaster
 aR *= gkvolMaster
 
