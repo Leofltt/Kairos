@@ -9,8 +9,8 @@ import Kairos.Utilities
       numSeqFromText,
       numSeqFromBin, binToNormSum )
 import Kairos.Euclidean ( euclidean )
-import Kairos.Star.Rhythm.Spark ( Spark, lLfromSps, sparkToDouble )
-import Kairos.Star.Rhythm.L (flatten, toTimeSeq)
+import Kairos.Parser.Rhythm.Spark ( Spark, lLfromSps, sparkToDouble )
+import Kairos.Parser.Rhythm.L (flatten, toTimeSeq)
 import Control.Applicative (liftA2)
 import Data.Time.Clock.POSIX (getPOSIXTime)
 import qualified Data.Map.Strict as M
@@ -56,6 +56,9 @@ fromTP = map whenTP
 nextBeat :: TimePoint -> [TimePoint] -> TimePoint
 nextBeat b xs | not (any (b <) xs) = head xs
               | otherwise = head $ filter (b <) xs
+
+catTP :: Double -> [TimePoint] -> [TimePoint] -> [TimePoint]
+catTP measure a b = a ++ sumdb where sumdb = map (+ TP measure) b
 
 -- | functions to create TimePoint patterns -------------------------------
 

@@ -3,6 +3,7 @@ module Kairos.Performance where
 
 import Kairos.Instrument ( Instr(pats), Orchestra, defaultOrc )
 import Kairos.Clock
+    ( TimeSignature(bpm, beatInMsr), Clock, defaultClock, currentTS )
 import Kairos.TimePoint ( TimePoint, notEmpty, defaultTPMap )
 import Kairos.Pfield
 import Kairos.PfPat
