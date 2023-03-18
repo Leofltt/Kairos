@@ -7,6 +7,27 @@ import Control.Concurrent.STM
 import Data.Time.Clock.POSIX ( getPOSIXTime )
 import Control.Monad.IO.Class ( MonadIO(..) )
 
+data ClockStatus = Playing | Paused | Stopped
+
+data NewClock = NewClock { oldClock :: Clock
+                         , ppqn :: Double
+                         , clockStatus :: TVar ClockStatus
+                         , currentTick :: TVar Int
+}
+
+changeClockStatus :: NewClock -> ClockStatus -> IO()
+changeClockStatus c newStatus = atomically $ writeTVar (clockStatus c) newStatus 
+
+transportLoop :: NewClock -> IO()
+transportLoop c = do
+  ts   <- currentTS (oldClock c)
+  let pulsesPerMinute = ppqn c * bpm ts
+  let waitInSec = 60.0 / pulsesPerMinute
+  tick <- readTVarIO (currentTick c)
+  atomically $ writeTVar (currentTick c) (tick+1) 
+  waitT waitInSec
+  
+
 -- | clock
 data Clock = Clock { startAt :: Time
                    , timeSig :: TVar [TimeSignature]
