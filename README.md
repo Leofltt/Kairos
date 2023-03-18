@@ -1,3 +1,10 @@
+!!!! NEW DOCS ARE WIP. 
+
+
+KYP
+
+
+
 # Kairos
 
 live Coding library for music composition and performance using the Csound audio engine and the Haskell interactive compiler GHCi.
