@@ -7,7 +7,7 @@ import Kairos.Utilities
     ( genNRandomValues,
       intToDouble,
       numSeqFromText,
-      numSeqFromBin, binToNormSum )
+      numSeqFromBin )
 import Kairos.Euclidean ( euclidean )
 import Kairos.Parser.Rhythm.Spark ( Spark, lLfromSps, sparkToDouble )
 import Kairos.Parser.Rhythm.L (flatten, toTimeSeq)
@@ -28,7 +28,6 @@ instance Applicative TimePointf where
 
 instance Monad TimePointf where
   TP x >>= f = f x
-  return = TP
 
 instance (Num a) => Num (TimePointf a) where
   (+) = liftA2 (+)
