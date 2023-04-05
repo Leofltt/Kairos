@@ -1,18 +1,8 @@
 module Kairos.PfPat where 
 
-import Kairos.Pfield ( Pfield ) 
-import Data.Either ()
+import Kairos.Pfield ( Pfield, PfId, idInt, idString, toPf, fromPf) 
 import Kairos.Utilities ( checkPercentNext, randI )
 import Control.Concurrent.STM ( atomically, readTVarIO, writeTVar, TVar )
-
--- | pfield Id containing the pfield number and it's name
-data PfId = Either Int String deriving (Eq, Show, Ord) 
-
-idInt :: PfId -> Int 
-idInt (Either x _) = x
-
-idString :: PfId -> String 
-idString (Either _ y) = y 
 
 -- | pattern of pfields and related update function
 data PfPat = PfPat { pfId :: PfId                  -- ^ id of the pfield

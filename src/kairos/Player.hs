@@ -2,8 +2,8 @@
 module Kairos.Player where
 
 import Kairos.Performance ( Performance(timePs, orc, clock) )
-import Kairos.Pfield ( pfToString, PfMap, Pfield )
-import Kairos.PfPat ( idInt, idString, PfId, PfPat(updater, pfId) )
+import Kairos.Pfield ( pfToString, PfMap, Pfield, idInt, idString, PfId )
+import Kairos.PfPat ( PfPat(updater, pfId) )
 import Kairos.TimePoint
     ( fromTP, nextBeat, wrapBar, TimePoint, TimePointf(TP, whenTP) )
 import Kairos.Clock
@@ -201,7 +201,7 @@ updatePfields i = do
 updateonepfield :: TVar PfMap -> PfPat -> IO ()
 updateonepfield pfmap patts = do
   newVal <- updater patts patts
-  addToMap  pfmap (idInt (pfId patts),newVal)
+  addToMap  pfmap ((pfId patts),newVal)
 
 changeStatus :: Performance -> String -> Status -> IO ()
 changeStatus e k newS = updateInstrument e k (\x -> x { status = newS })

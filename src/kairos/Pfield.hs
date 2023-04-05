@@ -1,9 +1,27 @@
 {-# LANGUAGE FlexibleInstances #-}
 
 module Kairos.Pfield where
-
+import Data.Either ()
 import Data.Typeable ( Typeable )
 import qualified Data.Map.Strict as M
+
+-- | pfield Id containing the pfield number and it's name
+data PfId = Either Int String deriving (Eq, Show, Ord) 
+
+new_pfId :: Int -> String -> PfId
+new_pfId x y = Either x y
+
+idInt :: PfId -> Int 
+idInt (Either x _) = x
+
+pfIdInt :: Int -> PfId
+pfIdInt x = Either x "" 
+
+idString :: PfId -> String 
+idString (Either _ y) = y 
+
+pfIdString :: String -> PfId
+pfIdString y = Either (-1) y
 
 -- | a single Pfield
 data Pfield  = Ps { pString :: String }
@@ -34,7 +52,7 @@ fromPfsD :: [Pfield] -> [Double ]
 fromPfsD = map fromPf 
 
 -- | Map of Pfields and their IDs
-type PfMap = M.Map Int Pfield
+type PfMap = M.Map PfId Pfield
 
 pfToString :: [Pfield] -> String
 pfToString ps = unwords $ map show ps
