@@ -3,14 +3,15 @@
 module Kairos.Instrument where
 
 import Kairos.TimePoint ( TimePoint )
-import Kairos.Pfield ( PfMap, Pfield(Ps, Pd) )
+import Kairos.Pfield ( PfMap, Pfield(Ps, Pd), idInt, PfId, pfIdInt )
 import Kairos.Utilities ( lookupMap )
-import Kairos.PfPat ( PfPat(pfId, pat), idInt )
+import Kairos.PfPat ( PfPat(pfId, pat) )
 import Kairos.Network (UDPPort)
 import Control.Concurrent.STM
     ( atomically, newTVarIO, readTVarIO, writeTVar, TVar )
 import qualified Data.Map.Strict as M
 import Data.Data ( Data, Typeable )
+import Data.Either
 
 -- | Orchestra : a map of instruments and their names
 type Orchestra = TVar (M.Map [Char] Instr)
@@ -50,7 +51,7 @@ getPfields i = do
 
 hihat :: Double -> IO Instr
 hihat oc = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8,Pd oc),(9,Pd oc),(10,Pd 1)]
+  pfields <- newTVarIO $ pfFromList [(pfIdInt 3,Pd 1),(pfIdInt 4,Pd 1),(pfIdInt 5,Pd 0),(pfIdInt 6, Pd 0),(pfIdInt 7,Pd 0.5),(pfIdInt 8,Pd oc),(pfIdInt 9,Pd oc),(pfIdInt 10,Pd 1)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 5
              , pf     = pfields
@@ -64,10 +65,10 @@ hihat oc = do
 
 sampler :: String -> IO Instr
 sampler path = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1)
-                                    ,(5,Pd 0),(6, Pd 0)
-                                    ,(7,Pd 0.5),(8, Pd 0)
-                                    ,(9,Ps path),(10,Pd 1),(11,Pd 0.9),(12,Pd 2)] -- p9 : Sample path, p10 : pitch
+  pfields <- newTVarIO $ pfFromList [(pfIdInt 3,Pd 1),(pfIdInt 4,Pd 1)
+                                    ,(pfIdInt 5,Pd 0),(pfIdInt 6, Pd 0)
+                                    ,(pfIdInt 7,Pd 0.5),(pfIdInt 8, Pd 0)
+                                    ,(pfIdInt 9,Ps path),(pfIdInt 10,Pd 1),(pfIdInt 11,Pd 0.9),(pfIdInt 12,Pd 2)] -- p9 : Sample path, p10 : pitch
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 1
              , pf     = pfields
@@ -81,7 +82,7 @@ sampler path = do
 
 acidBass :: IO Instr
 acidBass = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 0.7),(4,Pd 0.7),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8, Pd 0),(9,Pd 48),(10,Pd 14000),(11,Pd 9),(12, Pd 0)]
+  pfields <- newTVarIO $ pfFromList  [(pfIdInt 3,Pd 0.7),(pfIdInt 4,Pd 0.7),(pfIdInt 5,Pd 0),(pfIdInt 6, Pd 0),(pfIdInt 7,Pd 0.5),(pfIdInt 8, Pd 0),(pfIdInt 9,Pd 48),(pfIdInt 10,Pd 14000),(pfIdInt 11,Pd 9),(pfIdInt 12, Pd 0)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 3
              , pf     = pfields
@@ -95,7 +96,7 @@ acidBass = do
 
 hoover :: IO Instr
 hoover = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 0.7),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8, Pd 0),(9,Pd 48),(10,Pd 888),(11,Pd 5),(12, Pd 0.2)]
+  pfields <- newTVarIO $ pfFromList  [(pfIdInt 3,Pd 1),(pfIdInt 4,Pd 0.7),(pfIdInt 5,Pd 0),(pfIdInt 6, Pd 0),(pfIdInt 7,Pd 0.5),(pfIdInt 8, Pd 0),(pfIdInt 9,Pd 48),(pfIdInt 10,Pd 888),(pfIdInt 11,Pd 5),(pfIdInt 12, Pd 0.2)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 4
              , pf     = pfields
@@ -109,7 +110,7 @@ hoover = do
 
 karp :: IO Instr
 karp = do
-  pfields <- newTVarIO $ M.fromList  [(3,Pd 1),(4,Pd 0.5),(5,Pd 0),(6, Pd 0),(7,Pd 0.5),(8, Pd 0),(9,Pd 48),(10,Pd 0.1),(11,Pd 0.1)]
+  pfields <- newTVarIO $ pfFromList [(pfIdInt 3,Pd 1),(pfIdInt 4,Pd 0.5),(pfIdInt 5,Pd 0),(pfIdInt 6, Pd 0),(pfIdInt 7,Pd 0.5),(pfIdInt 8, Pd 0),(pfIdInt 9,Pd 48),(pfIdInt 10,Pd 0.1),(pfIdInt 11,Pd 0.1)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 9
              , pf     = pfields
@@ -123,8 +124,8 @@ karp = do
 
 fmSub :: IO Instr
 fmSub = do
-  pfields <- newTVarIO $ M.fromList [(3, Pd 1), (4, Pd 1), (5, Pd 0), (6, Pd 0), (7,Pd 0.5),(8, Pd 0),(9, Pd 60),(10, Pd 20000)
-                                    ,(11, Pd 2), (12, Pd 0.2), (13, Pd 1), (14, Pd 2000), (15, Pd 2.45) ]
+  pfields <- newTVarIO $ pfFromList [(pfIdInt 3, Pd 1), (pfIdInt 4, Pd 1), (pfIdInt 5, Pd 0), (pfIdInt 6, Pd 0), (pfIdInt 7,Pd 0.5),(pfIdInt 8, Pd 0),(pfIdInt 9, Pd 60),(pfIdInt 10, Pd 20000)
+                                    ,(pfIdInt 11, Pd 2), (pfIdInt 12, Pd 0.2), (pfIdInt 13, Pd 1), (pfIdInt 14, Pd 2000), (pfIdInt 15, Pd 2.45) ]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 6
              , pf     = pfields
@@ -138,8 +139,8 @@ fmSub = do
 
 superSaw :: IO Instr
 superSaw = do
-  pfields <- newTVarIO $ M.fromList [(3, Pd 1), (4, Pd 0.8), (5, Pd 0), (6, Pd 0), (7,Pd 0.5),(8, Pd 0),(9, Pd 60),(10, Pd 5000)
-                                    ,(11, Pd 2),(12, Pd 0.2), (13, Pd 0.3), (14, Pd 0.5)]
+  pfields <- newTVarIO $ pfFromList [(pfIdInt 3, Pd 1), (pfIdInt 4, Pd 0.8), (pfIdInt 5, Pd 0), (pfIdInt 6, Pd 0), (pfIdInt 7,Pd 0.5),(pfIdInt 8, Pd 0),(pfIdInt 9, Pd 60),(pfIdInt 10, Pd 5000)
+                                    ,(pfIdInt 11, Pd 2),(pfIdInt 12, Pd 0.2), (pfIdInt 13, Pd 0.3), (pfIdInt 14, Pd 0.5)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 7
              , pf     = pfields
@@ -153,7 +154,7 @@ superSaw = do
 
 stringPad :: IO Instr
 stringPad = do
-  pfields <- newTVarIO $ M.fromList [(3, Pd 1), (4, Pd 1), (5, Pd 0), (6, Pd 0), (7,Pd 0.5),(8, Pd 0),(9, Pd 60)]
+  pfields <- newTVarIO $ pfFromList [(pfIdInt 3, Pd 1), (pfIdInt 4, Pd 1), (pfIdInt 5, Pd 0), (pfIdInt 6, Pd 0), (pfIdInt 7,Pd 0.5),(pfIdInt 8, Pd 0),(pfIdInt 9, Pd 60)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 8
              , pf     = pfields
@@ -167,11 +168,11 @@ stringPad = do
 
 stutter :: String -> IO Instr
 stutter path = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1)
-                                    ,(5,Pd 0),(6, Pd 0)
-                                    ,(7,Pd 0.5),(8, Pd 0)
-                                    ,(9,Ps path),(10,Pd 1),(11,Pd 0.9)
-                                    ,(12,Pd 2),(13,Pd 8),(14,Pd 0),(15,Pd 1)] -- sample path, pitch, ktresh, kratio, divisor, pick, repeat
+  pfields <- newTVarIO $ pfFromList [(pfIdInt 3,Pd 1),(pfIdInt 4,Pd 1)
+                                    ,(pfIdInt 5,Pd 0),(pfIdInt 6, Pd 0)
+                                    ,(pfIdInt 7,Pd 0.5),(pfIdInt 8, Pd 0)
+                                    ,(pfIdInt 9,Ps path),(pfIdInt 10,Pd 1),(pfIdInt 11,Pd 0.9)
+                                    ,(pfIdInt 12,Pd 2),(pfIdInt 13,Pd 8),(pfIdInt 14,Pd 0),(pfIdInt 15,Pd 1)] -- sample path, pitch, ktresh, kratio, divisor, pick, repeat
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 2
              , pf     = pfields
@@ -185,16 +186,16 @@ stutter path = do
 
 phax :: IO Instr
 phax = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 1)
-                                    ,(5,Pd 0),(6,Pd 0)
-                                    ,(7,Pd 0.5),(8,Pd 0)
-                                    ,(9,Pd 48),(10,Pd 1100)
-                                    ,(11,Pd 0.8),(12,Pd 0.33)
-                                    ,(13,Pd 0),(14,Pd 1)
-                                    ,(15,Pd 3),(16,Pd 2)
-                                    ,(17,Pd 0.5),(18, Pd 0.5)
-                                    ,(19, Pd 0.91),(20, Pd 1)
-                                    ,(21, Pd 0.5),(22, Pd 0.9)
+  pfields <- newTVarIO $ pfFromList [(pfIdInt 3,Pd 1),(pfIdInt 4,Pd 1)
+                                    ,(pfIdInt 5,Pd 0),(pfIdInt 6,Pd 0)
+                                    ,(pfIdInt 7,Pd 0.5),(pfIdInt 8,Pd 0)
+                                    ,(pfIdInt 9,Pd 48),(pfIdInt 10,Pd 1100)
+                                    ,(pfIdInt 11,Pd 0.8),(pfIdInt 12,Pd 0.33)
+                                    ,(pfIdInt 13,Pd 0),(pfIdInt 14,Pd 1)
+                                    ,(pfIdInt 15,Pd 3),(pfIdInt 16,Pd 2)
+                                    ,(pfIdInt 17,Pd 0.5),(pfIdInt 18, Pd 0.5)
+                                    ,(pfIdInt 19, Pd 0.91),(pfIdInt 20, Pd 1)
+                                    ,(pfIdInt 21, Pd 0.5),(pfIdInt 22, Pd 0.9)
                                     ]
   emptyPat <- newTVarIO M.empty
   return $ I { insN = 10
@@ -209,13 +210,13 @@ phax = do
 
 models :: String -> Double -> IO Instr
 models port chan = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 90)
-                                    ,(5,Pd 0),(6,Pd 0)
-                                    ,(7,Pd 64),(8,Pd chan)
-                                    ,(9,Pd 60),(10,Pd 115)
-                                    ,(11,Pd 0),(12,Pd 20)
-                                    ,(13,Pd 50),(14,Pd 50)
-                                    ,(15,Pd 20),(16,Pd 20)
+  pfields <- newTVarIO $ pfFromList [(pfIdInt 3,Pd 1),(pfIdInt 4,Pd 90)
+                                    ,(pfIdInt 5,Pd 0),(pfIdInt 6,Pd 0)
+                                    ,(pfIdInt 7,Pd 64),(pfIdInt 8,Pd chan)
+                                    ,(pfIdInt 9,Pd 60),(pfIdInt 10,Pd 115)
+                                    ,(pfIdInt 11,Pd 0),(pfIdInt 12,Pd 20)
+                                    ,(pfIdInt 13,Pd 50),(pfIdInt 14,Pd 50)
+                                    ,(pfIdInt 15,Pd 20),(pfIdInt 16,Pd 20)
                                     ]
   emptyPat <- newTVarIO M.empty
   return $ I { insN = 100
@@ -230,13 +231,13 @@ models port chan = do
 
 modelChord :: String -> Double -> IO Instr
 modelChord port chan = do
-  pfields <- newTVarIO $ M.fromList [(3,Pd 1),(4,Pd 90)
-                                    ,(5,Pd 0),(6,Pd 0)
-                                    ,(7,Pd 64),(8,Pd chan)
-                                    ,(9,Pd 60),(10,Pd 115)
-                                    ,(11,Pd 0),(12,Pd 20)
-                                    ,(13,Pd 50),(14,Pd 50)
-                                    ,(15,Pd 20),(16,Pd 20)
+  pfields <- newTVarIO $ pfFromList [(pfIdInt 3,Pd 1),(pfIdInt 4,Pd 90)
+                                    ,(pfIdInt 5,Pd 0),(pfIdInt 6,Pd 0)
+                                    ,(pfIdInt 7,Pd 64),(pfIdInt 8,Pd chan)
+                                    ,(pfIdInt 9,Pd 60),(pfIdInt 10,Pd 115)
+                                    ,(pfIdInt 11,Pd 0),(pfIdInt 12,Pd 20)
+                                    ,(pfIdInt 13,Pd 50),(pfIdInt 14,Pd 50)
+                                    ,(pfIdInt 15,Pd 20),(pfIdInt 16,Pd 20)
                                     ]
   emptyPat <- newTVarIO M.empty
   return $ I { insN = 101
@@ -253,7 +254,7 @@ modelChord port chan = do
 
 reverb :: IO Instr
 reverb = do
-  pfields <- newTVarIO $ M.fromList [(1, Pd 1),(2, Pd 1000),(3, Pd 0.6)]
+  pfields <- newTVarIO $ pfFromList [(pfIdInt 1, Pd 1),(pfIdInt 2, Pd 1000),(pfIdInt 3, Pd 0.6)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 550
              , pf     = pfields
@@ -267,7 +268,7 @@ reverb = do
 
 delay :: IO Instr
 delay = do
-  pfields <- newTVarIO $ M.fromList [(1, Pd 1),(2, Pd 333),(3, Pd 0.6)]
+  pfields <- newTVarIO $ pfFromList [(pfIdInt 1, Pd 1),(pfIdInt 2, Pd 333),(pfIdInt 3, Pd 0.6)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 551
              , pf     = pfields
@@ -281,7 +282,7 @@ delay = do
 
 chorus :: IO Instr
 chorus = do
-   pfields <- newTVarIO $ M.fromList [(1, Pd 1),(2, Pd 3),(3, Pd 4)]
+   pfields <- newTVarIO $ pfFromList [(pfIdInt 1, Pd 1),(pfIdInt 2, Pd 3),(pfIdInt 3, Pd 4)]
    emptyPat <- newTVarIO M.empty
    return $ I { insN   = 552
               , pf     = pfields
@@ -295,7 +296,7 @@ chorus = do
 
 master :: IO Instr
 master = do
-  pfields <- newTVarIO $ M.fromList [(1, Pd 0.8),(2, Pd 0),(3, Pd 0),(4, Pd 50)]
+  pfields <- newTVarIO $ pfFromList [(pfIdInt 1, Pd 0.8),(pfIdInt 2, Pd 0),(pfIdInt 3, Pd 0),(pfIdInt 4, Pd 50)]
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = 999
              , pf     = pfields
@@ -308,9 +309,9 @@ master = do
              }
 
 -------------- Create OSC Instrument ---------
-oscInstr :: InstrumentID -> String -> [(Int,Pfield)] -> IO Instr
+oscInstr :: InstrumentID -> String -> [(PfId, Pfield)] -> IO Instr
 oscInstr i_n osc_port pfields = do
-  pfieldss <- newTVarIO $ M.fromList pfields
+  pfieldss <- newTVarIO $ pfFromList pfields
   emptyPat <- newTVarIO M.empty
   return $ I { insN   = i_n
              , pf     = pfieldss
@@ -341,7 +342,7 @@ defaultOrc = do
   mstab <- modelChord "11000" 2
   chorus <- chorus
   mix <- master
-  ot <- oscInstr 666 "11100" [(3, Pd 0.8),(2,Ps "Test")]
+  ot <- oscInstr 666 "11100" [(pfIdInt 3, Pd 0.8),(pfIdInt 2,Ps "Test")]
   newTVarIO (M.fromList [("OH808",ohh),("CH808",chh)
                                             ,("303",a303),("hov",hov)
                                             ,("rev",rev),("del",del)
@@ -359,5 +360,8 @@ notEffect = filter (/= "rev") . filter (/= "del") . filter (/= "mix") . filter (
 -- | function to default a pfield pattern to the value of the pfield
 defaultPfpat :: Instr -> PfPat -> IO ()
 defaultPfpat i pfp = do
-  Just pf <- lookupMap (pf i) (idInt $ pfId pfp)
+  Just pf <- lookupMap (pf i) (pfId pfp)
   atomically $ writeTVar (pat pfp) [pf]
+
+pfFromList :: [(PfId, Pfield )] -> M.Map PfId  Pfield
+pfFromList = M.fromList 
