@@ -2,7 +2,7 @@ module Test.PfPat where
 
 import Test.Hspec ( hspec, describe, it, shouldBe )
 import Kairos.PfPat
-import Kairos.Pfield ( Pfield(Pd) )
+import Kairos.Pfield ( Pfield(Pd), new_pfId )
 import Control.Concurrent.STM (newTVarIO, TVar)
 
 testPat :: IO (TVar [Pfield])
@@ -14,12 +14,12 @@ testAPat = newTVarIO [Pd 0]
 testPfPat :: IO PfPat
 testPfPat = do
     pfP <- testPat
-    return $ PfPat { pat = pfP, pfId = Either 1 "testId", updater = keep }
+    return $ PfPat { pat = pfP, pfId = new_pfId 1 "testId", updater = keep }
 
 testPfPatA :: IO PfPat
 testPfPatA = do
     pfP <- testAPat
-    return $ PfPat { pat = pfP, pfId = Either 1 "testId", updater = keep }
+    return $ PfPat { pat = pfP, pfId = new_pfId 1 "testId", updater = keep }
 
 pfPatTest :: IO ()
 pfPatTest = hspec $ do
