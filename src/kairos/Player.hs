@@ -1,8 +1,8 @@
-{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
+{-# OPTIONS_GHC -Wno-incomplete-patterns -Wno-incomplete-uni-patterns -Wno-type-defaults #-}
 module Kairos.Player where
 
 import Kairos.Performance ( Performance(timePs, orc, clock) )
-import Kairos.Pfield ( pfToString, PfMap, Pfield, idInt, idString, PfId )
+import Kairos.Pfield ( pfToString, PfMap, Pfield, idString, PfId )
 import Kairos.PfPat ( PfPat(updater, pfId) )
 import Kairos.TimePoint
     ( fromTP, nextBeat, wrapBar, TimePoint, TimePointf(TP, whenTP) )
@@ -26,7 +26,7 @@ import Kairos.Instrument
 import Kairos.Network ( sendEvent, setChan, sendOSC, UDPPort )
 import Kairos.Utilities ( addToMap, lookupMap, inter, sameConstructor)
 import Control.Concurrent ( forkIO )
-import Control.Concurrent.STM ( newTVarIO, readTVarIO, TVar )
+import Control.Concurrent.STM ( readTVarIO, TVar )
 import Data.Maybe ( fromJust, isJust, isNothing )
 import qualified Data.Map.Strict as M
 import Control.Monad (when, void)
