@@ -1,6 +1,6 @@
 module Kairos.PfPat where 
 
-import Kairos.Pfield ( Pfield, PfId, idInt, idString, toPf, fromPf) 
+import Kairos.Pfield ( Pfield, PfId) 
 import Kairos.Utilities ( checkPercentNext, randI )
 import Control.Concurrent.STM ( atomically, readTVarIO, writeTVar, TVar )
 

@@ -216,6 +216,10 @@ sovreign = defPath "/breaks/Sovreign.wav"
 tear = defPath "/breaks/Tear.wav"
 terrorist = defPath "/breaks/Terrorist.wav"
 walk = defPath "/breaks/Walk.wav"
+bibop = defPath "/breaks/Bibop.wav"
+creek = defPath "/breaks/Creek.wav"
+orb = defPath "/breaks/Orb.wav"
+karate = defPath "/breaks/Karate.wav"
 addI "alzir" $ stutter alzir
 addI "back" $ stutter back
 addI "bad" $ stutter bad
@@ -239,6 +243,10 @@ addI "pressin" $ stutter pressin
 addI "ricochet" $ stutter ricochet
 addI "rise" $ stutter rise
 addI "ror" $ stutter ror
+addI "bibop" $ stutter bibop
+addI "creek" $ stutter creek
+addI "orb" $ stutter orb
+addI "karate" $ stutter karate
 addI "sovreign" $ stutter sovreign
 addI "terrorist" $ stutter terrorist
 addI "walk" $ stutter walk
@@ -277,6 +285,6 @@ csv3 = markPath "/Test3.csv"
 -- prms "lpFM" [ (keep, vol, [Pd 0.7]),(keep, rev, [Pd 0.5]),((percentNext 73), pitch, toPfs [53, 56, 58, 53, 48]),(keep, fmIndx, [Pd 12.3]), (keep, fmDepth, [Pd 987.23]),(keep,cf,[Pd 3880]),( keep, rev, [Pd 0.6]),(keep, adRatio,[Pd 0.7]),(randomize,pan,toPfs[0.4,0.6,0.75,0.35])]
 -- prms "303" [ (keep,dur,toPfs [0.25]),(keep,res,[Pd 4]),(keep, vol, [Pd 0.5]),(keep, cf, [Pd 3500]),((runMarkovCSV csv3), pitch, toPfs (withScale 41 dorian)),(keep, rev, [Pd 0.4])]
 -- prms "hov" [ (keep,dur,toPfs [1.2]),(keep, vol, [Pd 0.3]),(keep, cf, [Pd 800]),((runMarkovCSV csv3), pitch, toPfs (withScale 41 dorian)),(keep, rev, [Pd 0.7])]
-let plucky = cf "303" [Pd 5000] keep >> res "303" [Pd 6] keep >> dur "303" [Pd 0.17] keep
-plucky
+-- let plucky = cf "303" [Pd 5000] keep >> res "303" [Pd 6] keep >> dur "303" [Pd 0.17] keep
+-- plucky
 :! clear
