@@ -6,22 +6,22 @@ import Data.Typeable ( Typeable )
 import qualified Data.Map.Strict as M
 
 -- | pfield Id containing the pfield number and it's name
-data PfId = Either Int String deriving (Eq, Show, Ord) 
+data PfId = Either Int String deriving (Eq, Show, Ord)
 
-new_pfId :: Int -> String -> PfId
-new_pfId x y = Either x y
+newPfId :: Int -> String -> PfId
+newPfId = Either
 
-idInt :: PfId -> Int 
+idInt :: PfId -> Int
 idInt (Either x _) = x
 
 pfIdInt :: Int -> PfId
-pfIdInt x = Either x "" 
+pfIdInt x = Either x ""
 
-idString :: PfId -> String 
-idString (Either _ y) = y 
+idString :: PfId -> String
+idString (Either _ y) = y
 
 pfIdString :: String -> PfId
-pfIdString y = Either (-1) y
+pfIdString = Either (-1)
 
 -- | a single Pfield
 data Pfield  = Ps { pString :: String }
@@ -49,7 +49,7 @@ toPfs :: PfAble a => [a] -> [Pfield]
 toPfs = map toPf
 
 fromPfsD :: [Pfield] -> [Double ]
-fromPfsD = map fromPf 
+fromPfsD = map fromPf
 
 -- | Map of Pfields and their IDs
 type PfMap = M.Map PfId Pfield

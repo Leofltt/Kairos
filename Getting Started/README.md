@@ -14,7 +14,7 @@ To get started you'll need to download:
 
 ### Installing with Cabal
 
-`cabal install --lib`
+`cabal install --lib --package-env .`
 
 `cabal repl` to start an interactive interpreter loading Kairos
 

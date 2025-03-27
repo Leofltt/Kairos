@@ -4,6 +4,7 @@ import Kairos.Lib
 
 csd1 = "11000"
 :set prompt "κ> "
+:set -w 
 perf <- defaultPerformance
 displayIns = displayInstruments perf
 displayTP = displayTPat perf
@@ -41,6 +42,7 @@ ratio i list fun = addPf i 12 "ratio" (toPfs list) fun    -- sampler, stutter
 divs i list fun = addPf i 13 "divs" (toPfs list) fun     -- stutter
 pick i list fun = addPf i 14 "pick" (toPfs list) fun     -- stutter
 stuts i list fun = addPf i 15 "stuts" (toPfs list) fun    -- stutter
+openclose i list fun = addPf i 9 "oc" (toPfs list) fun   -- hihat 808 open/close
 tuning i list fun = addPf i 10 "tuning" (toPfs list) fun   -- hihat 808 tuning
 rough i list fun = addPf i 10 "rough" (toPfs list) fun    -- karp roughness (0 - 1)
 stretch i list fun = addPf i 11 "stretch" (toPfs list) fun  -- karp stretch (0 - 1)
@@ -63,14 +65,13 @@ edP i list fun =  addPf i 21 "edP" (toPfs list) fun     -- phax
 fbP i list fun =  addPf i 22 "fbP" (toPfs list) fun     -- phax
 
 chan i list fun = addPf i 8 "chan" (toPfs list) fun      -- model:cycles
-note i list fun = addPf i 9 "note" (toPfs list) fun      -- model:cycles
-vel i list fun = addPf i 7 "vel" (toPfs list) fun      -- model:cycles
-mc_pitch i list fun = addPf i 11 "pitch" (toPfs list) fun -- model:cycles
-decay i list fun = addPf i 12 "decay" (toPfs list) fun    -- model:cycles
-color i list fun = addPf i 13 "color" (toPfs list) fun    -- model:cycles
-shape i list fun = addPf i 14 "shape" (toPfs list) fun    -- model:cycles
-sweep i list fun = addPf i 15 "sweep" (toPfs list) fun    -- model:cycles
-contour i list fun =  addPf i 16 "contour" (toPfs list) fun -- model:cycles
+vel i list fun = addPf i 10 "vel" (toPfs list) fun      -- model:cycles
+-- mc_pitch i list fun = addPf i 11 "pitch" (toPfs list) fun -- model:cycles
+-- decay i list fun = addPf i 12 "decay" (toPfs list) fun    -- model:cycles
+-- color i list fun = addPf i 13 "color" (toPfs list) fun    -- model:cycles
+-- shape i list fun = addPf i 14 "shape" (toPfs list) fun    -- model:cycles
+-- sweep i list fun = addPf i 15 "sweep" (toPfs list) fun    -- model:cycles
+-- contour i list fun =  addPf i 16 "contour" (toPfs list) fun -- model:cycles
 
 silence = stopAll perf
 playA = playAll perf

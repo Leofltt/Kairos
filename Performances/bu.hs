@@ -23,10 +23,10 @@ params "hov" [ (keep,durTS,toPfs[ 2]),(keep, vol, [Pd 0.5]),(keep, cf, [Pd 900])
 
 addC "hov" "intro" =<< patternWithDensity 8 16 30
 
-vol "hov" [Pd 0.6] keep
+vol "hov" [0.6] keep
 
-cf "hov" [Pd 1500] keep
-pitch "hov" (toPfs (withScale 36 harm)) $ runMarkov csv3 
+cf "hov" [1500] keep
+pitch "hov" ((withScale 36 harm)) $ runMarkov csv3 
 
 addC "p4l" "ok" [TP 3.22] 
 
@@ -46,7 +46,7 @@ addC "p4l" "swww" =<< patternWithDensity 16 64 40
 
 p "r1d"
 
-pan "r1d" (toPfs $ [10, 100, 70, 50]) $ rnd 
+pan "K909" ([10, 100, 70, 50]) $ rnd 
 
 addC "r1d" "ww" $ shine 12 "~~*~*~~*~*~*~~*~*~~*~~~*~*~*~*"
 

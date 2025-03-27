@@ -6,11 +6,11 @@
 
 <CsoundSynthesizer>
 <CsOptions>
--odac3
+-odac1
 --port=11000
 -d
--B 512
--b 256
+-B 128
+-b 64 
 --opcode-lib=~/Users/$USER/Library/csound/6.0/plugins64
 -Q 0 
 
