@@ -1,4 +1,5 @@
-{-# OPTIONS_GHC -Wno-incomplete-patterns -Wno-incomplete-uni-patterns -Wno-type-defaults #-}
+{-# OPTIONS_GHC -Wno-type-defaults #-}
+{-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
 module Kairos.Player where
 
 import Kairos.Performance ( Performance(timePs, orc, clock) )
@@ -44,7 +45,7 @@ makeTupleFromPfields i = do
 
 playChannel :: Instr -> IO ()
 playChannel ins = do
-  theList <- makeTupleFromPfields ins 
+  theList <- makeTupleFromPfields ins
   mapM_ (setChanny (getPort (kind ins))) theList
 
 setChanny :: UDPPort -> (PfId, Pfield) -> IO ()
@@ -56,12 +57,12 @@ playInstr instr = do
   let pfs = M.elems pfields
   if sameConstructor (kind instr) (Csound "")
     then do -- send to Csound
-      if itype instr == Instrument 
+      if itype instr == Instrument
         then do -- send note + parameters
           let pfieldList = pfToString pfs
           let pfds = "i" ++ show (insN instr) ++ " 0 " ++ pfieldList
           sendEvent (getPort (kind instr)) pfds
-        else if itype instr == Effect 
+        else if itype instr == Effect
           then do -- send effect parameters to appropriate channels
             playChannel instr
           else do
@@ -69,7 +70,7 @@ playInstr instr = do
     else if sameConstructor (kind instr) (OSC "")
       then do -- send to OSC target
         sendOSC (getPort (kind instr)) (insN instr) pfs
-      else do 
+      else do
         error "Error: Unknown instrument destination kind"
 
 playOne :: Performance -> Instr -> TimePoint -> IO ()
@@ -127,6 +128,7 @@ playLoop perf pn Active = do
               let nb = nextBeat tp timeString
               let nextToPlay | whenTP nb > whenTP tp = (whenTP  (wrapBar ts nb)/beatInMsr ts) + thisBar cb + (fromIntegral . floor $ whenTP  nb/beatInMsr ts - whenTP tp/beatInMsr ts)
                              | whenTP nb <= whenTP tp = (whenTP nb/beatInMsr ts) + nextBar cb
+                             | otherwise = error "This shouldn't be happening"
               nextTime <- timeAtBeat (clock perf) nextToPlay
               _ <- forkIO $ playOne perf p (wrapBar ts tp)
               updateToPlay perf pn (Just nb)
@@ -201,7 +203,7 @@ updatePfields i = do
 updateonepfield :: TVar PfMap -> PfPat -> IO ()
 updateonepfield pfmap patts = do
   newVal <- updater patts patts
-  addToMap  pfmap ((pfId patts),newVal)
+  addToMap  pfmap (pfId patts,newVal)
 
 changeStatus :: Performance -> String -> Status -> IO ()
 changeStatus e k newS = updateInstrument e k (\x -> x { status = newS })

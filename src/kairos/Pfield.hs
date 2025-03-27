@@ -8,8 +8,8 @@ import qualified Data.Map.Strict as M
 -- | pfield Id containing the pfield number and it's name
 data PfId = Either Int String deriving (Eq, Show, Ord)
 
-new_pfId :: Int -> String -> PfId
-new_pfId = Either
+newPfId :: Int -> String -> PfId
+newPfId = Either
 
 idInt :: PfId -> Int
 idInt (Either x _) = x

@@ -212,6 +212,8 @@ pressin = defPath "/breaks/Pressin.wav"
 ricochet = defPath "/breaks/Ricochet.wav"
 rise = defPath "/breaks/Rise.wav"
 ror = defPath "/breaks/RollOnRoll.wav"
+rust = defPath "/breaks/Rust.wav"
+samurai = defPath "/breaks/Samurai.wav"
 sovreign = defPath "/breaks/Sovreign.wav"
 tear = defPath "/breaks/Tear.wav"
 terrorist = defPath "/breaks/Terrorist.wav"
@@ -220,6 +222,7 @@ bibop = defPath "/breaks/Bibop.wav"
 creek = defPath "/breaks/Creek.wav"
 orb = defPath "/breaks/Orb.wav"
 karate = defPath "/breaks/Karate.wav"
+wazo = defPath "/breaks/Wazo.wav"
 addI "alzir" $ stutter alzir
 addI "back" $ stutter back
 addI "bad" $ stutter bad
@@ -250,6 +253,9 @@ addI "karate" $ stutter karate
 addI "sovreign" $ stutter sovreign
 addI "terrorist" $ stutter terrorist
 addI "walk" $ stutter walk
+addI "rust" $ stutter rust
+addI "samurai" $ stutter samurai
+addI "wazo" $ stutter wazo
 er1k = defPath "/ER1/kick04.wav"
 er1k2 = defPath "/ER1/kick03.wav"
 er1kl = defPath "/ER1/kick08.wav"

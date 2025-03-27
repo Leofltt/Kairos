@@ -2,11 +2,29 @@
 -- liberty , sovereign, tear
 
  
-cPat "eightN" "tear"
-durTS "tear" [Pd (1/8)] keep
-stuts "tear" [Pd 1, Pd 1] (percentNext 89)
-divs "tear" [Pd 8] keep
-pick "tear" (toPfD [0,1..7]) nextVal
+cPat "eightN" "bibop"
+durTS "bibop" [(1/8)] k
+stuts "bibop" [1, 1] nv
+divs "bibop" [8] k
+pick "bibop" [0,1..7] nv
+
+cPat "eightN" "creek"
+durTS "creek" [(1/8)] k
+stuts "creek" [1, 1] nv
+divs "creek" [8] k
+pick "creek" [0,1..7] nv 
+
+cPat "eightN" "orb"
+durTS "orb" [(1/8)] k
+stuts "orb" [1, 1] nv
+divs "orb" [8] k
+pick "orb" [0,1..7] nv 
+
+cPat "eightN" "karate"
+durTS "karate" [(1/8)] k
+stuts "karate" [1, 1] nv
+divs "karate" [8] k
+pick "karate" [0,1..7] nv 
 
 -- qxc 001 - tear, ch808, ohle, er1k, er1kd | mod: fracture texture | abl: razor
 

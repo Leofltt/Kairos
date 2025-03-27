@@ -135,6 +135,7 @@ timeToBeat delta ts = delta * (bpm ts/ 60.00) / beatInMsr ts
 timeDelta :: [TimeSignature] -> [Time] -> Beats
 timeDelta (x:xs) (now:sts) = timeToBeat (now  - head sts) x + timeDelta xs sts
 timeDelta [] _ = 0
+timeDelta _ [] = 0 -- this should never happen tbh 
 
 -- return the current beat in a bar
 beatInBar :: Clock -> IO Double

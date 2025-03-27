@@ -4,6 +4,7 @@ import Kairos.Lib
 
 csd1 = "11000"
 :set prompt "κ> "
+:set -w 
 perf <- defaultPerformance
 displayIns = displayInstruments perf
 displayTP = displayTPat perf

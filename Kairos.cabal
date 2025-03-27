@@ -1,4 +1,4 @@
-cabal-version:      3.0
+cabal-version:      3.4
 -- The cabal-version field refers to the version of the .cabal specification,
 -- and can be different from the cabal-install (the tool) version and the
 -- Cabal (the library) version you are using. As such, the Cabal (the library)
@@ -50,7 +50,7 @@ build-type:         Simple
 
 -- Extra doc files to be distributed with the package, such as a CHANGELOG or a README.
 extra-doc-files:    
-    CHANGELOG.md
+    ChangeLog.md
     README.md
 
 -- Extra source files to be distributed with the package, such as examples, or a tutorial module.
@@ -91,7 +91,7 @@ library
 
     -- Other library packages from which modules are imported.
     build-depends: 
-        base ^>=4.17.0.0,
+        base ^>=4.17.2.1,
         bytestring, 
         containers, 
         csv, 
@@ -137,7 +137,7 @@ test-suite Kairos-test
 
     -- Test dependencies.
     build-depends:
-        base ^>=4.17.0.0,
+        base ^>=4.17.2.1,
         Kairos,
         bytestring, 
         containers, 
