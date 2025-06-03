@@ -21,34 +21,42 @@ addC i n s = maybeAddP n s >> cPat n i
 getTP = getTimePoint perf
 addPf' = addPfPath' perf
 addPf i pfnum pfname list fun = addPf' i pfnum =<< createPfPat pfnum pfname list fun
+
 -- common parameters
 dur i list fun = addPf i 3 "dur" (toPfs list) fun      -- in seconds
 d' i fun list = dur i (fromPfsD list) fun
-durTS i list fun = d' i fun  =<< withTimeSignature perf (toPfs list)
-vol i list fun = addPf i 4 "vol" (toPfs list) fun      -- time signature dependent
+durTS i list fun = d' i fun  =<< withTimeSignature perf (toPfs list)  -- time signature dependent
+vol i list fun = addPf i 4 "vol" (toPfs list) fun     
 rev i list fun = addPf i 5 "rev" (toPfs list) fun
 del i list fun = addPf i 6 "del" (toPfs list) fun
 pan i list fun = addPf i 7 "pan" (toPfs list) fun
-chorus i list fun = addPf i 8 "chorus" list fun
+chorus i list fun = addPf i 8 "chorus" (toPfs list) fun
+
 -- instrument specific parameters (try to keep the consistent for ease of use)
 pitch i list fun = addPf i 9 "pitch" (toPfs list) fun     -- 303, hoover, karp, lpFM, superSaw, stringPad
 cf i list fun = addPf i 10 "cf" (toPfs list) fun       -- 303, hoover, lpFM, superSaw
 res i list fun = addPf i 11 "res" (toPfs list) fun      -- 303, hoover, lpFM, superSaw
 wf02 i list fun = addPf i  12 "wf02" (toPfs list) fun    -- 303 : 0 is saw, 2 or 10 is square, 12 is triangle
+
 cps i list fun = addPf i 10 "cps" (toPfs list) fun      -- sampler, stutter
 sample i list fun = addPf i 9 "sample" (toPfs list) fun    -- sampler, stutter
 tresh i list fun = addPf i 11 "tresh" (toPfs list) fun    -- sampler, stutter
 ratio i list fun = addPf i 12 "ratio" (toPfs list) fun    -- sampler, stutter
+
 divs i list fun = addPf i 13 "divs" (toPfs list) fun     -- stutter
 pick i list fun = addPf i 14 "pick" (toPfs list) fun     -- stutter
 stuts i list fun = addPf i 15 "stuts" (toPfs list) fun    -- stutter
+
 openclose i list fun = addPf i 9 "oc" (toPfs list) fun   -- hihat 808 open/close
 tuning i list fun = addPf i 10 "tuning" (toPfs list) fun   -- hihat 808 tuning
+
 rough i list fun = addPf i 10 "rough" (toPfs list) fun    -- karp roughness (0 - 1)
 stretch i list fun = addPf i 11 "stretch" (toPfs list) fun  -- karp stretch (0 - 1)
+
 detune i list fun = addPf i 13 "detune" (toPfs list) fun    -- superSaw
 sawmix i list fun = addPf i 14 "mix" (toPfs list) fun    -- superSaw
-adRatio i list fun = addPf i 12 "adRatio" (toPfs list) fun  -- lpFM, hoover, phax, superSaw
+
+adRatio i list fun = addPf i 12 "adRatio" (toPfs list) fun  -- lpFM, hoover, phax, superSaw, dtmf
 fmCar i list fun = addPf i 13 "fmCar" (toPfs list) fun    -- lpFM
 fmIndx i list fun = addPf i 15 "fmIndx" (toPfs list) fun   -- lpFM
 fmDepth i list fun = addPf i 14 "fmDepth" (toPfs list) fun  -- lpFM
@@ -64,8 +72,13 @@ modeP i list fun =  addPf i 20 "modeP" (toPfs list) fun   -- phax
 edP i list fun =  addPf i 21 "edP" (toPfs list) fun     -- phax
 fbP i list fun =  addPf i 22 "fbP" (toPfs list) fun     -- phax
 
+btn i list fun = addPf i 9 "button" (toPfs list) fun -- dtmf
+ampX i list fun = addPf i 10 "ampX" (toPfs list) fun -- dtmf 
+ampY i list fun = addPf i 11 "ampY" (toPfs list) fun -- dtmf 
+
 chan i list fun = addPf i 8 "chan" (toPfs list) fun      -- model:cycles
 vel i list fun = addPf i 10 "vel" (toPfs list) fun      -- model:cycles
+
 -- mc_pitch i list fun = addPf i 11 "pitch" (toPfs list) fun -- model:cycles
 -- decay i list fun = addPf i 12 "decay" (toPfs list) fun    -- model:cycles
 -- color i list fun = addPf i 13 "color" (toPfs list) fun    -- model:cycles
@@ -94,7 +107,7 @@ revvol i list fun =  addPf i 1 "volrev" (toPfs list) fun -- rev volume
 volchorus = setChannel csd1 "volchorus"
 chorvol i list fun =  addPf i 1 "volchorus" (toPfs list) fun -- chorus volume
 delchorus = setChannel csd1 "delchorus"
-chort i list fun =  addPf i 2 "delchorus" (toPfs list) fun -- chorus delay time
+chordt i list fun =  addPf i 2 "delchorus" (toPfs list) fun -- chorus delay time
 divchorus = setChannel csd1 "divchorus"
 chordiv i list fun =  addPf i 3 "divchorus" (toPfs list) fun -- chorus divisor
 

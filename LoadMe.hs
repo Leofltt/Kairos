@@ -282,8 +282,15 @@ ohmlfx = defPath "/raveshaped/OHMalefix.wav"
 addI "ohmlfx" $ sampler ohmlfx
 rimshock = defPath "/raveshaped/RimShock.wav"
 addI "rimshock" $ sampler rimshock
+mp = defPath "/iclc/mp.wav" 
+addI "mp" $ sampler mp
+dur "mp" [15] k
+ez = defPath "/iclc/cart.wav"
+addI "ez" $ sampler ez
+dur "ez" [1.5] k
 -- a lot of text
 fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
+f = fs 666
 -- csv files with tables
 csv1 = markPath "/Test.csv"
 csv2 = markPath "/Test2.csv"

@@ -16,6 +16,7 @@ import Data.Maybe (fromJust, isNothing)
 data Performance = P { orc :: Orchestra
                      , clock :: Clock
                      , timePs :: TVar (M.Map [Char] [TimePoint]) -- a map of time patterns with their names
+                     -- TODO: gotta add Musical Key in here
                      }
 
 -- | create a default performance

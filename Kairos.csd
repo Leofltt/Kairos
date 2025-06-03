@@ -9,16 +9,16 @@
 -odac1
 --port=11000
 -d
--B 128
--b 64 
---opcode-lib=~/Users/$USER/Library/csound/6.0/plugins64
--Q 0 
+-B 129
+-b 65 
+--opcode-lib=~/Users/$USER/Library/csound/7.0/plugins64
+
 
 </CsOptions>
 <CsInstruments>
 
 sr = 48000
-ksmps = 32
+ksmps = 16
 nchnls = 2
 0dbfs = 1.0
 
@@ -37,7 +37,7 @@ zakinit 50,50
 ; p5 : reverb send (0 - 1)
 ; p6 : delay send (0 - 1)
 ; p7 : panning (0 - 1)
-; p8 : chorus
+; p8 : chorus (0 - 1)
 
 ; TABLES
 
@@ -110,8 +110,81 @@ Sample xin
 iNum ftgen 0, 0, 0, -1, Sample, 0, 0, 0
 xout iNum
 endop
+opcode dtmf, a, Skk
+    Sbutton, kamp_low, kamp_high xin
 
-;Attack-Decay envelope with controllable slope
+    kRowFreqs[] fillarray 697, 770, 852, 941
+    kColFreqs[] fillarray 1209, 1336, 1477, 1633
+
+    ; Determine frequencies based on the button input (Sbutton)
+    ; DTMF Layout mapping:
+    ;           Col0    Col1    Col2    Col3
+    ; Row0:     1       2       3       A
+    ; Row1:     4       5       6       B
+    ; Row2:     7       8       9       C
+    ; Row3:     *       0       #       D
+
+    kfreq_low = kRowFreqs[0]
+    kfreq_high = kColFreqs[0]
+
+    if strcmpk(Sbutton, "1") == 0 then
+        kfreq_low = kRowFreqs[0]
+        kfreq_high = kColFreqs[0]
+    elseif strcmpk(Sbutton, "2") == 0 then
+        kfreq_low = kRowFreqs[0]
+        kfreq_high = kColFreqs[1]
+    elseif strcmpk(Sbutton, "3") == 0 then
+        kfreq_low = kRowFreqs[0]
+        kfreq_high = kColFreqs[2]
+    elseif strcmpk(Sbutton, "A") == 0 then
+        kfreq_low = kRowFreqs[0]
+        kfreq_high = kColFreqs[3]
+    elseif strcmpk(Sbutton, "4") == 0 then
+        kfreq_low = kRowFreqs[1]
+        kfreq_high = kColFreqs[0]
+    elseif strcmpk(Sbutton, "5") == 0 then
+        kfreq_low = kRowFreqs[1]
+        kfreq_high = kColFreqs[1]
+    elseif strcmpk(Sbutton, "6") == 0 then
+        kfreq_low = kRowFreqs[1]
+        kfreq_high = kColFreqs[2]
+    elseif strcmpk(Sbutton, "B") == 0 then
+        kfreq_low = kRowFreqs[1]
+        kfreq_high = kColFreqs[3]
+    elseif strcmpk(Sbutton, "7") == 0 then
+        kfreq_low = kRowFreqs[2]
+        kfreq_high = kColFreqs[0]
+    elseif strcmpk(Sbutton, "8") == 0 then
+        kfreq_low = kRowFreqs[2]
+        kfreq_high = kColFreqs[1]
+    elseif strcmpk(Sbutton, "9") == 0 then
+        kfreq_low = kRowFreqs[2]
+        kfreq_high = kColFreqs[2]
+    elseif strcmpk(Sbutton, "C") == 0 then
+        kfreq_low = kRowFreqs[2]
+        kfreq_high = kColFreqs[3]
+    elseif strcmpk(Sbutton, "*") == 0 then
+        kfreq_low = kRowFreqs[3]
+        kfreq_high = kColFreqs[0]
+    elseif strcmpk(Sbutton, "0") == 0 then
+        kfreq_low = kRowFreqs[3]
+        kfreq_high = kColFreqs[1]
+    elseif strcmpk(Sbutton, "#") == 0 then
+        kfreq_low = kRowFreqs[3]
+        kfreq_high = kColFreqs[2]
+    elseif strcmpk(Sbutton, "D") == 0 then
+        kfreq_low = kRowFreqs[3]
+        kfreq_high = kColFreqs[3]
+    endif
+
+    ; Generate the tones
+
+    aosc_low poscil kamp_low, kfreq_low, gisine    ; Assumes gisine is defined globally
+    aosc_high poscil kamp_high, kfreq_high, gisine  ; Assumes gisine is defined globally
+    xout aosc_low + aosc_high
+endop
+
+;opcode to generate dtmf tones
 ;Should only be used in instruments that have positive p3 duration.
 opcode ADEnv, a, i
 iAD xin 
@@ -625,6 +698,43 @@ zawm ichor * aR, 12
 
 endin
 
+instr 11 ;DTMF
+
+
+idur = p3
+ivol = p4
+irev = p5
+idel = p6
+ipan = p7
+ichor = p8
+
+SBut = p9
+iYAmp = p10
+iXAmp = p11
+iADRatio = p12
+
+aDTMF = dtmf(SBut, iXAmp, iYAmp)
+
+aenv = ADEnv(iADRatio)
+
+aDTMF = aDTMF * aenv
+
+aL, aR pan3 aDTMF, aDTMF, ipan, 1
+
+zawm ivol * aL, 1
+zawm ivol * aR, 2
+
+zawm irev * aL, 3
+zawm irev * aR, 4
+
+zawm idel * aL, 7
+zawm idel * aR, 8
+
+zawm ichor * aL, 11
+zawm ichor * aR, 12
+
+endin
+
 instr 100 ; Model:Cycles / Model:Samples MIDI Out
 
 ivol = p4
@@ -760,16 +870,16 @@ instr 552	;Spectral Chorus
  aoutl = (ar1l+ar2l+ar3l+ar4l)*.5
  aoutr = (ar1r+ar2r+ar3r+ar4r)*.5
  
-; fsigl pvsanal aoutl, 512, 128, 1024, 0  
-; fsiglBlur pvsblur fsigl, kblurtime, 5
-; aBlurL pvsynth fsiglBlur
-; 
-; fsigr pvsanal aoutl, 512, 128, 1024, 0  
-; fsigrBlur pvsblur fsigr, kblurtime, 5
-; aBlurR pvsynth fsigrBlur
+ fsigl pvsanal aoutl, 512, 128, 1024, 0  
+ fsiglBlur pvsblur fsigl, kblurtime, 5
+ aBlurL pvsynth fsiglBlur
+ 
+ fsigr pvsanal aoutl, 512, 128, 1024, 0  
+ fsigrBlur pvsblur fsigr, kblurtime, 5
+ aBlurR pvsynth fsigrBlur
 
-aL = aoutl * gkvolchorus
-aR = aoutr * gkvolchorus
+ aL = aBlurL * gkvolchorus
+ aR = aBlurR * gkvolchorus
 
  zawm aL, 13
  zawm aR, 14

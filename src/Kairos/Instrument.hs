@@ -237,6 +237,25 @@ phax = do
              , itype  = Instrument
              }
 
+dtmf:: IO Instr
+dtmf = do
+  pfields <- newTVarIO $ pfFromList [(newPfId 3 "dur",Pd 1),(newPfId 4 "vol",Pd 1)
+                                    ,(newPfId 5 "rev",Pd 0),(newPfId 6 "del", Pd 0)
+                                    ,(newPfId 7 "pan",Pd 0.5),(newPfId 8 "chorus", Pd 0)
+                                    ,(newPfId 9 "button",Ps "3"),(newPfId 10 "ampX",Pd 1.0)
+                                    ,(newPfId 11 "ampY",Pd 1.0),(newPfId 12 "adRatio",Pd 0.33)
+                                    ]
+  emptyPat <- newTVarIO M.empty
+  return $ I { insN = 11
+             , pf = pfields
+             , toPlay = Nothing
+             , status = Inactive
+             , timeF  = ""
+             , pats   = emptyPat
+             , kind   = Csound "11000"
+             , itype  = Instrument
+             }
+
 models :: String -> Double -> IO Instr
 models port chan = do
   pfields <- newTVarIO $ pfFromList [(newPfId 3 "dur",Pd 1),(newPfId 4 "vol",Pd 90)
@@ -311,7 +330,7 @@ delay = do
 
 chorus :: IO Instr
 chorus = do
-   pfields <- newTVarIO $ pfFromList [(newPfId 1 "volchorus", Pd 1),(pfIdInt 2, Pd 3),(pfIdInt 3, Pd 4)]
+   pfields <- newTVarIO $ pfFromList [(newPfId 1 "volchorus", Pd 1),(pfIdInt 2, Pd 17),(pfIdInt 3, Pd 60)]
    emptyPat <- newTVarIO M.empty
    return $ I { insN   = 552
               , pf     = pfields
@@ -368,19 +387,22 @@ defaultOrc = do
   strPad <- stringPad
   phaxo <- phax
   cycles1 <- models "11000" 1
+  dtmfSynth <- dtmf
   -- mstab <- modelChord "11000" 2
   choruss <- chorus
   mix <- master
   ot <- oscInstr 666 "11100" [(pfIdInt 3, Pd 0.8),(pfIdInt 2,Ps "Test")]
   newTVarIO (M.fromList [("OH808",ohh),("CH808",chh)
-                                            ,("303",a303),("hov",hov)
-                                            ,("rev",rev),("del",del)
-                                            ,("karp",karpS),("lpFM",lpFM)
-                                            ,("sSaw", sSaw),("strPad",strPad)
-                                            ,("mix",mix),("chorus",choruss)
-                                            ,("phax",phaxo),("test",ot)--,("mstab",mstab)
-                                            ,("mc",cycles1)
-                                            ])
+                        ,("303",a303),("hov",hov)
+                        ,("rev",rev),("del",del)
+                        ,("karp",karpS),("lpFM",lpFM)
+                        ,("sSaw", sSaw),("strPad",strPad)
+                        ,("mix",mix),("chorus",choruss)
+                        ,("phax",phaxo),("dtmf",dtmfSynth)
+                        ,("test",ot) 
+                                            -- ,("mstab",mstab)
+                        ,("mc",cycles1)
+                        ])
 
 -- returns all instruments that are not effects
 notEffect :: [String] -> [String]
