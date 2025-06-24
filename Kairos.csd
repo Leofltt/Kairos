@@ -29,8 +29,10 @@ zakinit 50,50
 ; 5, 6 : rev out
 ; 7, 8 : del in
 ; 9, 10 : del out
-; 11, 12 chorus in
-; 13, 14 chorus out
+; 11, 12 : chorus in
+; 13, 14 : chorus out
+; 15, 16 : SideChain RingMod in (TODO)
+; 17, 18 : Sidechain Comp in (TODO)
 
 ; common p-fields :
 ; p4 : amplitude (0 - 1)
@@ -110,6 +112,7 @@ Sample xin
 iNum ftgen 0, 0, 0, -1, Sample, 0, 0, 0
 xout iNum
 endop
+;opcode to generate dtmf tones
 opcode dtmf, a, Skk
     Sbutton, kamp_low, kamp_high xin
 
@@ -184,18 +187,121 @@ opcode dtmf, a, Skk
     xout aosc_low + aosc_high
 endop
 
-;opcode to generate dtmf tones
+
 ;Should only be used in instruments that have positive p3 duration.
-opcode ADEnv, a, i
-iAD xin 
+opcode ADEnv, a, ii
+iAD, iInvert xin 
+
+iMin = (0 + iInvert) % 2 
+iMax = (1 + iInvert) % 2
+
 if iAD > 1 then 
 iADD = iAD % 1
-aEnv = expseg:a(0.001, (p3 -0.02)*iADD+0.01, 1, (p3 -0.02)*(1-iADD)+0.01, 0.001)
+iMin = (iMin == 0) ? 0.001 : iMin 
+iMax = (iMax == 0) ? 0.001 : iMax
+aEnv = expseg:a(iMin, (p3 -0.02)*iADD+0.01, iMax, (p3 -0.02)*(1-iADD)+0.01, iMin)
 else 
-aEnv = linseg:a(0, (p3 -0.02)*iAD+0.01, 1, (p3 -0.02)*(1-iAD)+0.01, 0)
+aEnv = linseg:a(iMin, (p3 -0.02)*iAD+0.01, iMax, (p3 -0.02)*(1-iAD)+0.01, iMin)
 endif
 xout aEnv
 endop
+
+; a stereo phaser fx
+;opcode PhaserFx, aa, aakkkk
+;    aInL, aInR, kMix, kRate, kFdbk, kStages xin
+
+;    aPhaserL phaser2 aInL, kRate, kFdbk, kStages, 4
+;    aPhaserR phaser2 aInR, kRate, kFdbk, kStages, 4
+
+    ; Dry/Wet Mix
+;    aOutL = (aInL * (1 - kMix)) + (aPhaserL * kMix)
+;    aOutR = (aInR * (1 - kMix)) + (aPhaserR * kMix)
+
+;    xout aOutL, aOutR
+;endop
+
+; a basic distortion thingy
+opcode DistortionFx, aa, aakkkkk
+    aInL, aInR, kMix, kPregain, kPostgain, kShape1, kShape2 xin
+
+    aDistL distort1 aInL, kPregain, kPostgain, kShape1, kShape2
+    aDistR distort1 aInR, kPregain, kPostgain, kShape1, kShape2
+
+    ; Dry/Wet Mix
+    aOutL = (aInL * (1 - kMix)) + (aDistL * kMix)
+    aOutR = (aInR * (1 - kMix)) + (aDistR * kMix)
+
+    xout aOutL, aOutR
+endop
+
+; a Ring Modulator which can be sidechained to channels 15, 16 or used w/ regular waveforms
+opcode RingModFx, aa, aakkiik
+    aInL, aInR, kMix, kGain, iSource, iWavetable, kFreq xin
+    aModL, aModR init 0, 0
+
+    ; --- Generate or read the modulator signal ---
+    if iSource == 0 then
+        ; Source is external sidechain from ZAK
+        aModL zar 15 ; Read left sidechain signal from zak channel 15
+        aModR zar 16 ; Read right sidechain signal from zak channel 16
+    else
+        ; Source is internal oscillator
+        aInternalMod poscil 1, kFreq, iWavetable
+        aModL = aInternalMod
+        aModR = aInternalMod 
+    endif
+
+    ; --- Apply ring modulation ---
+    aRingL = aInL * aModL * kGain
+    aRingR = aInR * aModR * kGain
+
+    ; Dry/Wet Mix
+    aOutL = (aInL * (1 - kMix)) + (aRingL * kMix)
+    aOutR = (aInR * (1 - kMix)) + (aRingR * kMix)
+
+    xout aOutL, aOutR
+endop
+
+; a couple of resonant LP + HP filter inspired by the filter on Elektron MachineDrum
+opcode DjFilterFx, aa, aakkkkk
+    aInL, aInR, kMix, kLpFreq, kLpRes, kHpFreq, kHpRes xin
+
+    ; Resonant Lowpass Filter (Moog Ladder style)
+    aLpL moogladder aInL, kLpFreq, kLpRes
+    aLpR moogladder aInR, kLpFreq, kLpRes
+
+    ; Resonant Highpass Filter (State-Variable Filter)
+    aLp_dummyL, aHpL, aBp_dummyL svfilter aInL, kHpFreq, kHpRes
+    aLp_dummyR, aHpR, aBp_dummyR svfilter aInR, kHpFreq, kHpRes
+
+    ; Sum the outputs of the two filters and apply gain compensation
+    aFilteredL = (aLpL + aHpL) * 0.7
+    aFilteredR = (aLpR + aHpR) * 0.7
+
+    ; Dry/Wet Mix
+    aOutL = (aInL * (1 - kMix)) + (aFilteredL * kMix)
+    aOutR = (aInR * (1 - kMix)) + (aFilteredR * kMix)
+
+    xout aOutL, aOutR
+endop
+
+
+; FxChain to be used within each instrument before main send
+opcode FxChainInstr, aa, aakkkkkkkiikkkkkk
+    aLeft, aRight, kDistMix, kDistPregain, kDistPostgain, kDistShape1, kDistShape2,  kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq, kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes xin
+    ; Signal flow variables
+    aSigL = aLeft
+    aSigR = aRight
+
+    ; --- FX CHAIN ---
+ ;   aSigL, aSigR PhaserFx    aSigL, aSigR, kPhaserMix, kPhaserRate, kPhaserFdbk, kPhaserStages
+    aSigL, aSigR DistortionFx aSigL, aSigR, kDistMix, kDistPregain, kDistPostgain, kDistShape1, kDistShape2
+    aSigL, aSigR RingModFx    aSigL, aSigR, kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq
+    aSigL, aSigR DjFilterFx   aSigL, aSigR, kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes
+
+    xout aSigL, aSigR
+endop
+
 
 instr 1 ; Sampler
 
@@ -362,7 +468,7 @@ ifEnvMax = 1.333*ifreq >= sr/2 ? ifreq : 1.333*ifreq
 
 kcfEnv = expon(ifEnvMax, p3, icf)
 
-aenv = ADEnv(iad)
+aenv = ADEnv(iad, 0)
 
 kr3 unirand 1
 kr3 port kr3, 0.01
@@ -457,7 +563,7 @@ kfilt = p10
 kdpth = p14
 iad = p12
 kres = p11
-aenv = ADEnv(iad)
+aenv = ADEnv(iad, 0)
 
 amod = poscil(1, cpsmidinn(p9) * kindx, gisine)
 acar = poscil(1, cpsmidinn(p9) + amod * kdpth * sr/4, gisine)
@@ -499,7 +605,7 @@ imix = p14
 
 idetune *= idetune 
 
-aenv  = ADEnv(iad)
+aenv  = ADEnv(iad, 0)
 
 kcfEnv  = linseg(ifreq, (p3 -0.02)*iad+0.01, icf,   (p3 -0.02)*(1-iad)+0.01, 200)
 
@@ -634,7 +740,7 @@ imode = p20
 ienv_amp = p21
 ifb = p22
 
-aenv = ADEnv(iad)
+aenv = ADEnv(iad, 0)
 
 if (iadp1 >= 0 && isim >= 0) then
 kep1 = linseg:k(0, idur*iadp1, ienv_amp, idur*(1-iadp1), 0)
@@ -715,7 +821,7 @@ iADRatio = p12
 
 aDTMF = dtmf(SBut, iXAmp, iYAmp)
 
-aenv = ADEnv(iADRatio)
+aenv = ADEnv(iADRatio, 0)
 
 aDTMF = aDTMF * aenv
 
@@ -910,6 +1016,7 @@ aL *= (1-gkvolWaveloss)
 aR *= (1-gkvolWaveloss)
 aL += aLW
 aR += arW
+; TODO : Add "Dynamix" Style Comp + Parametric Eq 
 aL *= gkvolMaster
 aR *= gkvolMaster
 
