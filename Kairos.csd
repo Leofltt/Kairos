@@ -9,8 +9,8 @@
 -odac1
 --port=11000
 -d
--B 129
--b 65 
+-B 128
+-b 64 
 --opcode-lib=~/Users/$USER/Library/csound/7.0/plugins64
 
 
@@ -18,7 +18,7 @@
 <CsInstruments>
 
 sr = 48000
-ksmps = 16
+ksmps = 32
 nchnls = 2
 0dbfs = 1.0
 
@@ -40,6 +40,15 @@ zakinit 50,50
 ; p6 : delay send (0 - 1)
 ; p7 : panning (0 - 1)
 ; p8 : chorus (0 - 1)
+; p  : distortion d/w (0 - 1)
+; p  : ring mod d/w (0 - 1)
+; p  : ring mod sidechain send (0 - 1)
+; p  : compressor sidechain send (0 - 1)
+; p  :
+
+; kDistMix, kDistPregain, kDistPostgain, kDistShape1, kDistShape2,  
+; kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq, 
+; kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes 
 
 ; TABLES
 
@@ -112,6 +121,7 @@ Sample xin
 iNum ftgen 0, 0, 0, -1, Sample, 0, 0, 0
 xout iNum
 endop
+
 ;opcode to generate dtmf tones
 opcode dtmf, a, Skk
     Sbutton, kamp_low, kamp_high xin
@@ -182,8 +192,8 @@ opcode dtmf, a, Skk
 
     ; Generate the tones
 
-    aosc_low poscil kamp_low, kfreq_low, gisine    ; Assumes gisine is defined globally
-    aosc_high poscil kamp_high, kfreq_high, gisine  ; Assumes gisine is defined globally
+    aosc_low poscil kamp_low, kfreq_low, gisine 
+    aosc_high poscil kamp_high, kfreq_high, gisine 
     xout aosc_low + aosc_high
 endop
 
@@ -220,12 +230,30 @@ endop
 ;    xout aOutL, aOutR
 ;endop
 
-; a basic distortion thingy
-opcode DistortionFx, aa, aakkkkk
-    aInL, aInR, kMix, kPregain, kPostgain, kShape1, kShape2 xin
+; a basic distortion thingy with a single character knob.
+opcode DistortionFx, aa, aakkkk
+    aInL, aInR, kMix, kPregain, kPostgain, kCharacter xin
 
-    aDistL distort1 aInL, kPregain, kPostgain, kShape1, kShape2
-    aDistR distort1 aInR, kPregain, kPostgain, kShape1, kShape2
+    kShape1, kShape2 init 0, 0
+
+    ; kCharacter (0-1) maps to different distortion styles:
+    ; 0.0 = Soft Saturation
+    ; 0.5 = Hard Clipping
+    ; 1.0 = Asymmetrical Fuzz
+    if kCharacter < 0.5 then
+        ; Interpolate from Soft (0.0) to Hard (0.5)
+        kNorm = kCharacter * 2 ; Normalize to 0-1 range
+        kShape1 = 0.5 - (kNorm * 0.5)
+        kShape2 = 0.5 - (kNorm * 0.5)
+    else
+        ; Interpolate from Hard (0.5) to Fuzzy (1.0)
+        kNorm = (kCharacter - 0.5) * 2 ; Normalize to 0-1 range
+        kShape1 = 0 + (kNorm * 0.2)
+        kShape2 = 0 - (kNorm * 0.3)
+    endif
+
+    aDistL distort1 aInL, kPregain, kPostgain, kShape1, kShape2, 1
+    aDistR distort1 aInR, kPregain, kPostgain, kShape1, kShape2, 1
 
     ; Dry/Wet Mix
     aOutL = (aInL * (1 - kMix)) + (aDistL * kMix)
@@ -239,8 +267,7 @@ opcode RingModFx, aa, aakkiik
     aInL, aInR, kMix, kGain, iSource, iWavetable, kFreq xin
     aModL, aModR init 0, 0
 
-    ; --- Generate or read the modulator signal ---
-    if iSource == 0 then
+    if iSource == 1 then
         ; Source is external sidechain from ZAK
         aModL zar 15 ; Read left sidechain signal from zak channel 15
         aModR zar 16 ; Read right sidechain signal from zak channel 16
@@ -251,7 +278,6 @@ opcode RingModFx, aa, aakkiik
         aModR = aInternalMod 
     endif
 
-    ; --- Apply ring modulation ---
     aRingL = aInL * aModL * kGain
     aRingR = aInR * aModR * kGain
 
@@ -274,7 +300,6 @@ opcode DjFilterFx, aa, aakkkkk
     aLp_dummyL, aHpL, aBp_dummyL svfilter aInL, kHpFreq, kHpRes
     aLp_dummyR, aHpR, aBp_dummyR svfilter aInR, kHpFreq, kHpRes
 
-    ; Sum the outputs of the two filters and apply gain compensation
     aFilteredL = (aLpL + aHpL) * 0.7
     aFilteredR = (aLpR + aHpR) * 0.7
 
@@ -285,19 +310,76 @@ opcode DjFilterFx, aa, aakkkkk
     xout aOutL, aOutR
 endop
 
+; A sidechainable compressor/limiter with a macro 'hardness' control.
+; It uses the 'compress2' opcode, which works in the dB domain.
+;
+; kHardness (0-1) transitions the effect from a soft compressor to a hard limiter:
+; - Hardness 0: Soft-knee, slow attack/release, low ratio.
+; - Hardness 1: Hard-knee, fast attack/release, high ratio.
+opcode CompressorLimiterFx, aa, aakkki
+    aInL, aInR, kThreshDb, kHardness, kMix, iSidechainEnable xin
+
+    ; --- Define Min/Max values for interpolation ---
+    kRatioMin = 2       ; Soft compressor ratio (2:1)
+    kRatioMax = 100     ; Hard limiter ratio (100:1)
+    kAttackMax = 0.03   ; Soft compressor attack (30ms)
+    kAttackMin = 0.001  ; Hard limiter attack (1ms)
+    kReleaseMax = 0.5   ; Soft compressor release (500ms)
+    kReleaseMin = 0.05  ; Hard limiter release (50ms)
+    iMaxKneeDb = 12     ; Max one-sided knee width in dB (for a total 24dB span at hardness=0)
+
+    ; --- Interpolate parameters based on kHardness (0 to 1) ---
+    ; Use squared hardness for a more aggressive curve on the ratio
+    kHardnessSquared = kHardness * kHardness
+
+    kCurrentRatio   = kRatioMin + (kHardnessSquared * (kRatioMax - kRatioMin))
+    kCurrentAttack  = kAttackMax - (kHardness * (kAttackMax - kAttackMin))
+    kCurrentRelease = kReleaseMax - (kHardness * (kReleaseMax - kReleaseMin))
+
+    ; Calculate knee width in dB. As hardness -> 1, width -> 0.
+    kKneeWidthDb = iMaxKneeDb * (1 - kHardness)
+    kLoKneeDb = kThreshDb - kKneeWidthDb
+    kHiKneeDb = kThreshDb + kKneeWidthDb
+
+    ; --- Sidechain Logic ---
+    aSideL, aSideR init 0, 0
+    if iSidechainEnable == 1 then
+        aSideL zar 17
+        aSideR zar 18
+    else
+        aSideL = aInL
+        aSideR = aInR
+    endif
+    aSideControl = (aSideL + aSideR) * 0.5
+
+    ; --- Apply compression using compress2 ---
+    kGateThresh = -90 ; Standard noise floor threshold for compress2
+    ilookahead = 0.005 ; 5ms lookahead
+
+    aCompL compress2 aInL, aSideControl, kGateThresh, kLoKneeDb, kHiKneeDb, kCurrentRatio, kCurrentAttack, kCurrentRelease, ilookahead
+    aCompR compress2 aInR, aSideControl, kGateThresh, kLoKneeDb, kHiKneeDb, kCurrentRatio, kCurrentAttack, kCurrentRelease, ilookahead
+
+    ; --- Dry/Wet Mix ---
+    aOutL = (aInL * (1 - kMix)) + (aCompL * kMix)
+    aOutR = (aInR * (1 - kMix)) + (aCompR * kMix)
+
+    xout aOutL, aOutR
+endop
+
 
 ; FxChain to be used within each instrument before main send
-opcode FxChainInstr, aa, aakkkkkkkiikkkkkk
-    aLeft, aRight, kDistMix, kDistPregain, kDistPostgain, kDistShape1, kDistShape2,  kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq, kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes xin
-    ; Signal flow variables
+opcode FxChainInstr, aa, aakkkkkkiikkkkkkkkki
+    aLeft, aRight, kDistMix, kDistPregain, kDistPostgain, kDistCharacter,  kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq, kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes, kCompThreshDb, kCompHardness, kCompMix, iCompSideChain xin
+   
     aSigL = aLeft
     aSigR = aRight
 
     ; --- FX CHAIN ---
- ;   aSigL, aSigR PhaserFx    aSigL, aSigR, kPhaserMix, kPhaserRate, kPhaserFdbk, kPhaserStages
-    aSigL, aSigR DistortionFx aSigL, aSigR, kDistMix, kDistPregain, kDistPostgain, kDistShape1, kDistShape2
+    ;aSigL, aSigR PhaserFx    aSigL, aSigR, kPhaserMix, kPhaserRate, kPhaserFdbk, kPhaserStages
+    aSigL, aSigR DistortionFx aSigL, aSigR, kDistMix, kDistPregain, kDistPostgain, kDistCharacter
     aSigL, aSigR RingModFx    aSigL, aSigR, kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq
     aSigL, aSigR DjFilterFx   aSigL, aSigR, kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes
+    aSigL, aSigR CompressorLimiterFx aSigL, aSigR, kCompThreshDb, kCompHardness, kCompMix, iCompSideChain
 
     xout aSigL, aSigR
 endop
@@ -305,36 +387,54 @@ endop
 
 instr 1 ; Sampler
 
-p3 = filelen(p9)
+SFile = p28
+
+p3 = filelen(SFile)
 ivol = p4
 irev = p5
 idel = p6
 ipan = p7
 ichor = p8
+isidecomp = p9
+isidermod = p10
+kDistMix = p11 
+kDistPregain = p12 
+kDistPostgain = p13 
+kDistCharacter = p14 ;0.5; 0=soft, 0.5=hard, 1=fuzzy
+kRingModMix = p15 
+kRingModGain = p16 
+iRingModSource = p17 ; Oscillator by default
+iRingModWavetable = p18 
+kRingModFreq = p19 
+kDjFilterMix = 1 
+kFilterLpFreq = p20 
+kFilterLpRes = p21 ; 0 - 1 (usually) 
+kFilterHpFreq = p22
+kFilterHpRes = p23 ; 1 - 500 (better keep it lowish for more stability) 
+kCompThreshDb = p24 ;-18
+kCompHardness = p25 ;0.2
+kCompMix = p26
+iCompSideChain = p27 ;0 for disable, 1 for enable
 
-inchs = filenchnls(p9)
-kthreshold = p11
-iratio = p12
+iTune = p29
+
+inchs = filenchnls(SFile)
 
 if inchs == 1 then
 
-aLeft diskin2 p9, p10
+aLeft diskin2 SFile, p10
 aL, aR pan3 aLeft, aLeft, ipan, 1
 
 
 else
 
-aLeft, aRight diskin2 p9, p10
+aLeft, aRight diskin2 SFile, iTune
 
 aL, aR pan3 aLeft, aRight, ipan, 1
 
 endif
 
-icomp1 = 1/iratio
-irtime = 0.01
-iftime = 0.05
-aL dam aL, kthreshold, icomp1, 1, irtime, iftime
-aR dam aR, kthreshold, icomp1, 1, irtime, iftime
+aL, aR FxChainInstr aL, aR, kDistMix, kDistPregain, kDistPostgain, kDistCharacter,  kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq, kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes, kCompThreshDb, kCompHardness, kCompMix, iCompSideChain
 
 zawm ivol * aL, 1
 zawm ivol * aR, 2
@@ -348,26 +448,50 @@ zawm idel * aR, 8
 zawm ichor * aL, 11
 zawm ichor * aR, 12
 
+zawm isidecomp * aL, 17
+zawm isidecomp * aR, 18
+
+zawm isidermod * aL, 15
+zawm isidermod * aR, 16
 
 endin
 
 
 instr 2 ; Stutter
 
-idur = p3
+Sname = p28
+
+idur = p3 
 ivol = p4
 irev = p5
 idel = p6
 ipan = p7
 ichor = p8
-Sname = p9
-itune = p10  ; to be implemented
-kthreshold = p11
-iratio = p12
+isidecomp = p9
+isidermod = p10
+kDistMix = p11 
+kDistPregain = p12 
+kDistPostgain = p13 
+kDistCharacter = p14 ;0.5; 0=soft, 0.5=hard, 1=fuzzy
+kRingModMix = p15 
+kRingModGain = p16 
+iRingModSource = p17 ; Oscillator by default
+iRingModWavetable = p18 
+kRingModFreq = p19 
+kDjFilterMix = 1 
+kFilterLpFreq = p20 
+kFilterLpRes = p21 ; 0 - 1 (usually) 
+kFilterHpFreq = p22
+kFilterHpRes = p23 ; 1 - 500 (better keep it lowish for more stability) 
+kCompThreshDb = p24 ;-18
+kCompHardness = p25 ;0.2
+kCompMix = p26
+iCompSideChain = p27 ;0 for disable, 1 for enable
 
-i_divisor = p13
-i_pick = p14
-i_repeat = (p15 == 0) ? 1 : p15
+i_tune = p29
+i_divisor = p30
+i_pick = p31
+i_repeat = (p32 == 0) ? 1 : p32
 
 inchs = filenchnls(Sname)
 ilength = filelen(Sname)
@@ -394,11 +518,8 @@ endif
 aL = declick(aL)
 aR = declick(aR)
 
-icomp1 = 1/iratio
-irtime = 0.01
-iftime = 0.05
-aL dam aL, kthreshold, icomp1, 1, irtime, iftime
-aR dam aR, kthreshold, icomp1, 1, irtime, iftime
+aL, aR FxChainInstr aL, aR, kDistMix, kDistPregain, kDistPostgain, kDistCharacter,  kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq, kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes, kCompThreshDb, kCompHardness, kCompMix, iCompSideChain
+
 
 zawm ivol * aL, 1
 zawm ivol * aR, 2
@@ -411,6 +532,13 @@ zawm idel * aR, 8
 
 zawm ichor * aL, 11
 zawm ichor * aR, 12
+
+zawm isidermod * aL, 15
+zawm isidermod * aR, 16
+
+zawm isidecomp * aL, 17
+zawm isidecomp * aR, 18
+
 
 endin
 
@@ -424,11 +552,31 @@ irev = p5
 idel = p6
 ipan = p7
 ichor = p8
-ifreq = cpsmidinn(p9)
-icf = p10
-ires = p11
+isidecomp = p9
+isidermod = p10
+kDistMix = p11 
+kDistPregain = p12 
+kDistPostgain = p13 
+kDistCharacter = p14 ;0.5; 0=soft, 0.5=hard, 1=fuzzy
+kRingModMix = p15 
+kRingModGain = p16 
+iRingModSource = p17 ; Oscillator by default
+iRingModWavetable = p18 
+kRingModFreq = p19 
+kDjFilterMix = 1 
+kFilterLpFreq = p20 
+kFilterLpRes = p21 ; 0 - 1 (usually) 
+kFilterHpFreq = p22
+kFilterHpRes = p23 ; 1 - 500 (better keep it lowish for more stability) 
+kCompThreshDb = p24 ;-18
+kCompHardness = p25 ;0.2
+kCompMix = p26
+iCompSideChain = p27 ;0 for disable, 1 for enable
+ifreq = cpsmidinn(p28)
+icf = p29
+ires = p30
 
-imode = p12
+imode = p31
 
 acut = 200 + expon(1, idur, 0.001) * icf
 asig = vco2(1, ifreq, imode)
@@ -436,6 +584,8 @@ asig = diode_ladder(asig, acut, ires, 1, 4)
 asig = (tanh (asig * 4)) * 0.5
 asig declick asig
 aL, aR pan3 asig, asig, ipan, 1
+
+aL, aR FxChainInstr aL, aR, kDistMix, kDistPregain, kDistPostgain, kDistCharacter,  kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq, kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes, kCompThreshDb, kCompHardness, kCompMix, iCompSideChain 
 
 zawm ivol * aL, 1
 zawm ivol * aR, 2
@@ -449,6 +599,12 @@ zawm idel * aR, 8
 zawm ichor * aL, 11
 zawm ichor * aR, 12
 
+zawm isidermod * aL, 15
+zawm isidermod * aR, 16
+
+zawm isidecomp * aL, 17
+zawm isidecomp * aR, 18
+
 endin
 
 instr 4 ; Hoover Bass
@@ -459,10 +615,30 @@ irev = p5
 idel = p6
 ipan = p7
 ichor = p8
-ifreq = cpsmidinn(p9)
-icf = p10
-ires = p11
-iad = p12
+isidecomp = p9
+isidermod = p10
+kDistMix = p11 
+kDistPregain = p12 
+kDistPostgain = p13 
+kDistCharacter = p14 ;0.5; 0=soft, 0.5=hard, 1=fuzzy
+kRingModMix = p15 
+kRingModGain = p16 
+iRingModSource = p17 ; Oscillator by default
+iRingModWavetable = p18 
+kRingModFreq = p19 
+kDjFilterMix = 1 
+kFilterLpFreq = p20 
+kFilterLpRes = p21 ; 0 - 1 (usually) 
+kFilterHpFreq = p22
+kFilterHpRes = p23 ; 1 - 500 (better keep it lowish for more stability) 
+kCompThreshDb = p24 ;-18
+kCompHardness = p25 ;0.2
+kCompMix = p26
+iCompSideChain = p27 ;0 for disable, 1 for enable
+ifreq = cpsmidinn(p28)
+icf = p29
+ires = p30
+iad = p31
 
 ifEnvMax = 1.333*ifreq >= sr/2 ? ifreq : 1.333*ifreq
 
@@ -492,6 +668,8 @@ adecr = declick(ao+adel2*0.8)
 
 aL, aR pan3 adecl* aenv, adecl* aenv, ipan, 1
 
+aL, aR FxChainInstr aL, aR, kDistMix, kDistPregain, kDistPostgain, kDistCharacter,  kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq, kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes, kCompThreshDb, kCompHardness, kCompMix, iCompSideChain
+
 zawm ivol * aL, 1
 zawm ivol * aR, 2
 
@@ -504,6 +682,12 @@ zawm idel * aR, 8
 zawm ichor * aL, 11
 zawm ichor * aR, 12
 
+zawm isidermod * aL, 15
+zawm isidermod * aR, 16
+
+zawm isidecomp * aL, 17
+zawm isidecomp * aR, 18
+
 endin
 
 instr 5 ; HiHats 808
@@ -514,8 +698,28 @@ irev = p5
 idel = p6
 ipan = p7
 ichor = p8
-iopen = p9
-itune = p10
+isidecomp = p9
+isidermod = p10
+kDistMix = p11 
+kDistPregain = p12 
+kDistPostgain = p13 
+kDistCharacter = p14 ;0.5; 0=soft, 0.5=hard, 1=fuzzy
+kRingModMix = p15 
+kRingModGain = p16 
+iRingModSource = p17 ; Oscillator by default
+iRingModWavetable = p18 
+kRingModFreq = p19 
+kDjFilterMix = 1 
+kFilterLpFreq = p20 
+kFilterLpRes = p21 ; 0 - 1 (usually) 
+kFilterHpFreq = p22
+kFilterHpRes = p23 ; 1 - 500 (better keep it lowish for more stability) 
+kCompThreshDb = p24 ;-18
+kCompHardness = p25 ;0.2
+kCompMix = p26
+iCompSideChain = p27 ;0 for disable, 1 for enable
+iopen = p28
+itune = p29
 
 pa        =        (iopen >= 0.5 ? 1 : .15)   ; Select open or closed
 ifreq1    =        540*itune                     ; Tune
@@ -534,6 +738,8 @@ a808 =    butterhp(a808, 5270)
 
 aL, aR pan3 a808*aenv, a808*aenv, ipan, 1
 
+aL, aR FxChainInstr aL, aR, kDistMix, kDistPregain, kDistPostgain, kDistCharacter,  kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq, kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes, kCompThreshDb, kCompHardness, kCompMix, iCompSideChain
+
 zawm ivol * aL, 1
 zawm ivol * aR, 2
 
@@ -546,6 +752,12 @@ zawm idel * aR, 8
 zawm ichor * aL, 11
 zawm ichor * aR, 12
 
+zawm isidermod * aL, 15
+zawm isidermod * aR, 16
+
+zawm isidecomp * aL, 17
+zawm isidecomp * aR, 18
+
 endin
 
 instr 6 ; Simple subtractive-FM
@@ -556,6 +768,8 @@ irev = p5
 idel = p6
 ipan = p7
 ichor = p8
+isidecomp = 0
+isidermod = 0
 
 kindx = p15
 kcar = p13
@@ -584,6 +798,12 @@ zawm idel * aR, 8
 zawm ichor * aL, 11
 zawm ichor * aR, 12
 
+zawm isidermod * aL, 15
+zawm isidermod * aR, 16
+
+zawm isidecomp * aL, 17
+zawm isidecomp * aR, 18
+
 endin
 
 instr 7 ; SuperSaw
@@ -596,12 +816,35 @@ irev = p5
 idel = p6
 ipan = p7
 ichor = p8
-ifreq = cpsmidinn(p9)
-icf = p10
-ires = p11
-iad = p12
-idetune = p13
-imix = p14
+isidecomp = p9
+isidermod = p10
+kDistMix = p11 
+kDistPregain = p12 
+kDistPostgain = p13 
+kDistCharacter = p14 ;0.5; 0=soft, 0.5=hard, 1=fuzzy
+kRingModMix = p15 
+kRingModGain = p16 
+iRingModSource = p17 ; Oscillator by default
+iRingModWavetable = p18 
+kRingModFreq = p19 
+kDjFilterMix = 1 
+kFilterLpFreq = p20 
+kFilterLpRes = p21 ; 0 - 1 (usually) 
+kFilterHpFreq = p22
+kFilterHpRes = p23 ; 1 - 500 (better keep it lowish for more stability) 
+kCompThreshDb = p24 ;-18
+kCompHardness = p25 ;0.2
+kCompMix = p26
+iCompSideChain = p27 ;0 for disable, 1 for enable
+ifreq = cpsmidinn(p28)
+icf = p29
+ires = p30 ; 0.5 - 25 (?)
+iad = p31
+idetune = p32
+imix = p33
+
+isidecomp = 0
+isidermod = 0
 
 idetune *= idetune 
 
@@ -631,6 +874,8 @@ asig = declick(asig)
 
 aL, aR pan3 asig*aenv, asig*aenv, ipan, 1
 
+aL, aR FxChainInstr aL, aR, kDistMix, kDistPregain, kDistPostgain, kDistCharacter,  kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq, kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes, kCompThreshDb, kCompHardness, kCompMix, iCompSideChain
+
 zawm ivol * aL, 1
 zawm ivol * aR, 2
 
@@ -643,6 +888,12 @@ zawm idel * aR, 8
 zawm ichor * aL, 11
 zawm ichor * aR, 12
 
+zawm isidermod * aL, 15
+zawm isidermod * aR, 16
+
+zawm isidecomp * aL, 17
+zawm isidecomp * aR, 18
+
 endin
 
 instr 8	;String pad from Bay at Night, Diaz
@@ -652,6 +903,8 @@ irev = p5
 idel = p6
 ipan = p7
 ichor = p8
+isidecomp = 0 
+isidermod = 0
 
 ihz= cpsmidinn(p9)
 iamp = p4
@@ -683,6 +936,12 @@ zawm idel * aR, 8
 zawm ichor * aL, 11
 zawm ichor * aR, 12
 
+zawm isidermod * aL, 15
+zawm isidermod * aR, 16
+
+zawm isidecomp * aL, 17
+zawm isidecomp * aR, 18
+
 endin
 
 instr 9 ; Karplus - Strong
@@ -693,10 +952,33 @@ irev = p5
 idel = p6
 ipan = p7
 ichor = p8
+isidecomp = p9
+isidermod = p10
+kDistMix = p11 
+kDistPregain = p12 
+kDistPostgain = p13 
+kDistCharacter = p14 ;0.5; 0=soft, 0.5=hard, 1=fuzzy
+kRingModMix = p15 
+kRingModGain = p16 
+iRingModSource = p17 ; Oscillator by default
+iRingModWavetable = p18 
+kRingModFreq = p19 
+kDjFilterMix = 1 
+kFilterLpFreq = p20 
+kFilterLpRes = p21 ; 0 - 1 (usually) 
+kFilterHpFreq = p22
+kFilterHpRes = p23 ; 1 - 500 (better keep it lowish for more stability) 
+kCompThreshDb = p24 ;-18
+kCompHardness = p25 ;0.2
+kCompMix = p26
+iCompSideChain = p27 ;0 for disable, 1 for enable
+ipitch = cpsmidinn(p28)
+irough = p29
+istretch = p30
 
-kpitch = expseg:k(cpsmidinn(p9), p3, 432)
+kpitch = expseg:k(ipitch, idur, 432)
 
-asig = pluck(1, cpsmidinn(p9), 432, 0, 4, p10, (49*p11)+1) 
+asig = pluck(1, ipitch, 432, 0, 4, irough, (49*istretch)+1) 
 
 aL, aR pan3 asig, asig, ipan, 1
 
@@ -712,6 +994,12 @@ zawm idel * aR, 8
 zawm ichor * aL, 11
 zawm ichor * aR, 12
 
+zawm isidermod * aL, 15
+zawm isidermod * aR, 16
+
+zawm isidecomp * aL, 17
+zawm isidecomp * aR, 18
+
 endin
 
 instr 10 ; phaserSynth 
@@ -722,6 +1010,8 @@ irev = p5
 idel = p6
 ipan = p7
 ichor = p8
+isidecomp = 0 
+isidermod = 0
 
 inote = cpsmidinn(p9)
 
@@ -802,6 +1092,12 @@ zawm idel * aR, 8
 zawm ichor * aL, 11
 zawm ichor * aR, 12
 
+zawm isidermod * aL, 15
+zawm isidermod * aR, 16
+
+zawm isidecomp * aL, 17
+zawm isidecomp * aR, 18
+
 endin
 
 instr 11 ;DTMF
@@ -813,11 +1109,31 @@ irev = p5
 idel = p6
 ipan = p7
 ichor = p8
+isidecomp = p9
+isidermod = p10
+kDistMix = p11 
+kDistPregain = p12 
+kDistPostgain = p13 
+kDistCharacter = p14 ;0.5; 0=soft, 0.5=hard, 1=fuzzy
+kRingModMix = p15 
+kRingModGain = p16 
+iRingModSource = p17 ; Oscillator by default
+iRingModWavetable = p18 
+kRingModFreq = p19 
+kDjFilterMix = 1 
+kFilterLpFreq = p20 
+kFilterLpRes = p21 ; 0 - 1 (usually) 
+kFilterHpFreq = p22
+kFilterHpRes = p23 ; 1 - 500 (better keep it lowish for more stability) 
+kCompThreshDb = p24 ;-18
+kCompHardness = p25 ;0.2
+kCompMix = p26
+iCompSideChain = p27 ;0 for disable, 1 for enable
 
-SBut = p9
-iYAmp = p10
-iXAmp = p11
-iADRatio = p12
+SBut = p28
+iYAmp = p29
+iXAmp = p30
+iADRatio = p31
 
 aDTMF = dtmf(SBut, iXAmp, iYAmp)
 
@@ -826,6 +1142,8 @@ aenv = ADEnv(iADRatio, 0)
 aDTMF = aDTMF * aenv
 
 aL, aR pan3 aDTMF, aDTMF, ipan, 1
+
+aL, aR FxChainInstr aL, aR, kDistMix, kDistPregain, kDistPostgain, kDistCharacter,  kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq, kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes, kCompThreshDb, kCompHardness, kCompMix, iCompSideChain
 
 zawm ivol * aL, 1
 zawm ivol * aR, 2
@@ -838,6 +1156,12 @@ zawm idel * aR, 8
 
 zawm ichor * aL, 11
 zawm ichor * aR, 12
+
+zawm isidermod * aL, 15
+zawm isidermod * aR, 16
+
+zawm isidecomp * aL, 17
+zawm isidecomp * aR, 18
 
 endin
 
@@ -1034,4 +1358,3 @@ i 552 0 -1
 
 </CsScore>
 </CsoundSynthesizer>
-

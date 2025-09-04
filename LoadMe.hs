@@ -285,9 +285,14 @@ addI "rimshock" $ sampler rimshock
 mp = defPath "/iclc/mp.wav" 
 addI "mp" $ sampler mp
 dur "mp" [15] k
+addI "mpstut" $ stutter mp 
+dur "mpstut" [15] k
 ez = defPath "/iclc/cart.wav"
 addI "ez" $ sampler ez
 dur "ez" [1.5] k
+ec = defPath "/iclc/nic.wav"
+addI "tril" $ sampler ec 
+dur "tril" [1] k
 -- a lot of text
 fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
 f = fs 666
