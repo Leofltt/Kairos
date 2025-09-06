@@ -223,6 +223,11 @@ creek = defPath "/breaks/Creek.wav"
 orb = defPath "/breaks/Orb.wav"
 karate = defPath "/breaks/Karate.wav"
 wazo = defPath "/breaks/Wazo.wav"
+horn = defPath "/breaks/HornBreak.wav"
+jzy = defPath "/breaks/JazzyBreak9A.wav"
+mys = defPath "/breaks/Mystique.wav"
+jzn = defPath "/breaks/JazzNoteBreak2.wav"
+ohbre = defPath "/breaks/OhBreak1A.wav"
 addI "alzir" $ stutter alzir
 addI "back" $ stutter back
 addI "bad" $ stutter bad
@@ -256,6 +261,11 @@ addI "walk" $ stutter walk
 addI "rust" $ stutter rust
 addI "samurai" $ stutter samurai
 addI "wazo" $ stutter wazo
+addI "horn" $ stutter horn
+addI "jzy" $ stutter jzy
+addI "mys" $ stutter mys
+addI "jzn" $ stutter jzn
+addI "ohbre" $ stutter ohbre
 er1k = defPath "/ER1/kick04.wav"
 er1k2 = defPath "/ER1/kick03.wav"
 er1kl = defPath "/ER1/kick08.wav"
@@ -293,6 +303,64 @@ dur "ez" [1.5] k
 ec = defPath "/iclc/nic.wav"
 addI "tril" $ sampler ec 
 dur "tril" [1] k
+hhakubra = defPath "/ch/akubra.wav"
+hat2 = defPath "/ch/hat2.wav"
+hhbowler = defPath "/ch/bowler.wav"
+hhdurag = defPath "/ch/durag.wav"
+addI "hhakubra" $ sampler hhakubra
+addI "hat2" $ sampler hat2
+addI "hhbowler" $ sampler hhbowler
+addI "hhdurag" $ sampler hhdurag
+spaceperc1 = defPath "/spaceperc/spaceperc1.wav"
+spaceperc2 = defPath "/spaceperc/spaceperc2.wav"
+spaceperc3 = defPath "/spaceperc/spaceperc3.wav"
+spaceperc4 = defPath "/spaceperc/spaceperc4.wav"
+spaceperc5 = defPath "/spaceperc/spaceperc5.wav"
+spaceperc6 = defPath "/spaceperc/spaceperc6.wav"
+spaceperc7 = defPath "/spaceperc/spaceperc7.wav"
+spaceperc8 = defPath "/spaceperc/spaceperc8.wav"
+addI "spaceperc1" $ sampler spaceperc1
+addI "spaceperc2" $ sampler spaceperc2
+addI "spaceperc3" $ sampler spaceperc3
+addI "spaceperc4" $ sampler spaceperc4
+addI "spaceperc5" $ sampler spaceperc5  
+addI "spaceperc6" $ sampler spaceperc6
+addI "spaceperc7" $ sampler spaceperc7
+addI "spaceperc8" $ sampler spaceperc8
+hit1 = defPath "/Hits/Hit1.wav"
+hit2 = defPath "/Hits/Hit2.wav"
+hit3 = defPath "/Hits/Hit3.wav"
+hit4 = defPath "/Hits/Hit4.wav"
+hit5 = defPath "/Hits/Hit5.wav"
+hit6 = defPath "/Hits/Hit6.wav"
+hit7 = defPath "/Hits/Hit7.wav"
+addI "hit1" $ sampler hit1
+addI "hit2" $ sampler hit2
+addI "hit3" $ sampler hit3
+addI "hit4" $ sampler hit4
+addI "hit5" $ sampler hit5
+addI "hit6" $ sampler hit6
+addI "hit7" $ sampler hit7
+ptc = defPath "/vox/ProgramTheComputer.wav"
+addI "ptc" $ sampler ptc
+wat = defPath "/vox/wat.wav"
+addI "wat" $ sampler wat
+letthebeat = defPath "/vox/LetTheBeat.wav"
+addI "letthebeat" $ stutter letthebeat
+bongo1 = defPath "/bongo/Bongo1.wav"
+bongo2 = defPath "/bongo/Bongo2.wav"
+bongo3 = defPath "/bongo/Bongo3.wav"
+bongo4 = defPath "/bongo/Bongo4.wav"
+bongo5 = defPath "/bongo/Bongo5.wav"
+addI "bongo1" $ sampler bongo1
+addI "bongo2" $ sampler bongo2
+addI "bongo3" $ sampler bongo3
+addI "bongo4" $ sampler bongo4
+addI "bongo5" $ sampler bongo5
+wrdsn = defPath "/snares/weirdsnare1.wav"
+addI "wrdsn" $ sampler wrdsn
+cmksyn = defPath "/stabSynth/ChopCarmack.wav"
+addI "cmksyn" $ stutter cmksyn
 -- a lot of text
 fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
 f = fs 666

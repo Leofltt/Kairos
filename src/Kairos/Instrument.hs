@@ -82,11 +82,11 @@ hihat oc = do
           (newPfId 15 "ringMod", Pd 0),
           (newPfId 16 "rmGain", Pd 1),
           (newPfId 17 "rmSc", Pd 0),
-          (newPfId 18 "rmWt", Pd 0),
+          (newPfId 18 "rmWt", Pd 1),
           (newPfId 19 "rmFreq", Pd 44),
-          (newPfId 20 "lpFreq", Pd 20),
-          (newPfId 21 "lpRes", Pd 0.2),
-          (newPfId 22 "hpFreq", Pd 20000),
+          (newPfId 20 "lpFreq", Pd 20000),
+          (newPfId 21 "lpRes", Pd 5),
+          (newPfId 22 "hpFreq", Pd 20),
           (newPfId 23 "hpRes", Pd 5),
           (newPfId 24 "compThreshDb", Pd (-18)),
           (newPfId 25 "compHard", Pd 0.2),
@@ -128,18 +128,18 @@ sampler path = do
           (newPfId 15 "ringMod", Pd 0),
           (newPfId 16 "rmGain", Pd 1),
           (newPfId 17 "rmSc", Pd 0),
-          (newPfId 18 "rmWt", Pd 0),
+          (newPfId 18 "rmWt", Pd 1),
           (newPfId 19 "rmFreq", Pd 44),
-          (newPfId 20 "lpFreq", Pd 20),
-          (newPfId 21 "lpRes", Pd 0.2),
-          (newPfId 22 "hpFreq", Pd 20000),
+          (newPfId 20 "lpFreq", Pd 20000),
+          (newPfId 21 "lpRes", Pd 5),
+          (newPfId 22 "hpFreq", Pd 20),
           (newPfId 23 "hpRes", Pd 5),
           (newPfId 24 "compThreshDb", Pd (-18)),
           (newPfId 25 "compHard", Pd 0.2),
           (newPfId 26 "comp", Pd 0.25),
           (newPfId 27 "compSc", Pd 0),
           (newPfId 28 "sample", Ps path),
-          (newPfId 29 "cps", Pd 1)
+          (newPfId 29 "cps", Pd 0)
         ]
   emptyPat <- newTVarIO M.empty
   return $
@@ -174,11 +174,11 @@ acidBass = do
           (newPfId 15 "ringMod", Pd 0),
           (newPfId 16 "rmGain", Pd 1),
           (newPfId 17 "rmSc", Pd 0),
-          (newPfId 18 "rmWt", Pd 0),
+          (newPfId 18 "rmWt", Pd 1),
           (newPfId 19 "rmFreq", Pd 44),
-          (newPfId 20 "lpFreq", Pd 20),
-          (newPfId 21 "lpRes", Pd 0.2),
-          (newPfId 22 "hpFreq", Pd 20000),
+          (newPfId 20 "lpFreq", Pd 20000),
+          (newPfId 21 "lpRes", Pd 5),
+          (newPfId 22 "hpFreq", Pd 20),
           (newPfId 23 "hpRes", Pd 5),
           (newPfId 24 "compThreshDb", Pd (-18)),
           (newPfId 25 "compHard", Pd 0.2),
@@ -222,11 +222,11 @@ hoover = do
           (newPfId 15 "ringMod", Pd 0),
           (newPfId 16 "rmGain", Pd 1),
           (newPfId 17 "rmSc", Pd 0),
-          (newPfId 18 "rmWt", Pd 0),
+          (newPfId 18 "rmWt", Pd 1),
           (newPfId 19 "rmFreq", Pd 44),
-          (newPfId 20 "lpFreq", Pd 20),
-          (newPfId 21 "lpRes", Pd 0.2),
-          (newPfId 22 "hpFreq", Pd 20000),
+          (newPfId 20 "lpFreq", Pd 20000),
+          (newPfId 21 "lpRes", Pd 5),
+          (newPfId 22 "hpFreq", Pd 20),
           (newPfId 23 "hpRes", Pd 5),
           (newPfId 24 "compThreshDb", Pd (-18)),
           (newPfId 25 "compHard", Pd 0.2),
@@ -270,11 +270,11 @@ karp = do
           (newPfId 15 "ringMod", Pd 0),
           (newPfId 16 "rmGain", Pd 1),
           (newPfId 17 "rmSc", Pd 0),
-          (newPfId 18 "rmWt", Pd 0),
+          (newPfId 18 "rmWt", Pd 1),
           (newPfId 19 "rmFreq", Pd 44),
-          (newPfId 20 "lpFreq", Pd 20),
-          (newPfId 21 "lpRes", Pd 0.2),
-          (newPfId 22 "hpFreq", Pd 20000),
+          (newPfId 20 "lpFreq", Pd 20000),
+          (newPfId 21 "lpRes", Pd 5),
+          (newPfId 22 "hpFreq", Pd 20),
           (newPfId 23 "hpRes", Pd 5),
           (newPfId 24 "compThreshDb", Pd (-18)),
           (newPfId 25 "compHard", Pd 0.2),
@@ -308,13 +308,32 @@ fmSub = do
           (newPfId 6 "del", Pd 0),
           (newPfId 7 "pan", Pd 0.5),
           (newPfId 8 "chorus", Pd 0),
-          (newPfId 9 "pitch", Pd 60),
-          (newPfId 10 "cf", Pd 20000),
-          (newPfId 11 "res", Pd 2),
-          (newPfId 12 "adRatio", Pd 0.2),
-          (pfIdInt 13, Pd 1),
-          (pfIdInt 14, Pd 2000),
-          (pfIdInt 15, Pd 2.45)
+          (newPfId 9 "sideComp", Pd 0),
+          (newPfId 10 "sideRing", Pd 0),
+          (newPfId 11 "dist", Pd 0),
+          (newPfId 12 "distPreGain", Pd 1),
+          (newPfId 13 "distPostGain", Pd 1),
+          (newPfId 14 "distChar", Pd 0.3),
+          (newPfId 15 "ringMod", Pd 0),
+          (newPfId 16 "rmGain", Pd 1),
+          (newPfId 17 "rmSc", Pd 0),
+          (newPfId 18 "rmWt", Pd 1),
+          (newPfId 19 "rmFreq", Pd 44),
+          (newPfId 20 "lpFreq", Pd 20000),
+          (newPfId 21 "lpRes", Pd 5),
+          (newPfId 22 "hpFreq", Pd 20),
+          (newPfId 23 "hpRes", Pd 5),
+          (newPfId 24 "compThreshDb", Pd (-18)),
+          (newPfId 25 "compHard", Pd 0.2),
+          (newPfId 26 "comp", Pd 0.25),
+          (newPfId 27 "compSc", Pd 0),
+          (newPfId 28 "pitch", Pd 48),
+          (newPfId 29 "cf", Pd 5000),
+          (newPfId 30 "res", Pd 2), -- 0-17 (?) also it is "not" res but fb
+          (newPfId 31 "adRatio", Pd 0.2),
+          (newPfId 32 "fmCar", Pd 1),
+          (newPfId 33 "fmDepth", Pd 2000),
+          (newPfId 34 "fmIndx", Pd 2.45)
         ]
   emptyPat <- newTVarIO M.empty
   return $
@@ -349,11 +368,11 @@ superSaw = do
           (newPfId 15 "ringMod", Pd 0),
           (newPfId 16 "rmGain", Pd 1),
           (newPfId 17 "rmSc", Pd 0),
-          (newPfId 18 "rmWt", Pd 0),
+          (newPfId 18 "rmWt", Pd 1),
           (newPfId 19 "rmFreq", Pd 44),
-          (newPfId 20 "lpFreq", Pd 20),
-          (newPfId 21 "lpRes", Pd 0.2),
-          (newPfId 22 "hpFreq", Pd 20000),
+          (newPfId 20 "lpFreq", Pd 20000),
+          (newPfId 21 "lpRes", Pd 5),
+          (newPfId 22 "hpFreq", Pd 20),
           (newPfId 23 "hpRes", Pd 5),
           (newPfId 24 "compThreshDb", Pd (-18)),
           (newPfId 25 "compHard", Pd 0.2),
@@ -390,7 +409,26 @@ stringPad = do
           (newPfId 6 "del", Pd 0),
           (newPfId 7 "pan", Pd 0.5),
           (newPfId 8 "chorus", Pd 0),
-          (newPfId 9 "pitch", Pd 60)
+          (newPfId 9 "sideComp", Pd 0),
+          (newPfId 10 "sideRing", Pd 0),
+          (newPfId 11 "dist", Pd 0),
+          (newPfId 12 "distPreGain", Pd 1),
+          (newPfId 13 "distPostGain", Pd 1),
+          (newPfId 14 "distChar", Pd 0.3),
+          (newPfId 15 "ringMod", Pd 0),
+          (newPfId 16 "rmGain", Pd 1),
+          (newPfId 17 "rmSc", Pd 0),
+          (newPfId 18 "rmWt", Pd 1),
+          (newPfId 19 "rmFreq", Pd 44),
+          (newPfId 20 "lpFreq", Pd 20000),
+          (newPfId 21 "lpRes", Pd 5),
+          (newPfId 22 "hpFreq", Pd 20),
+          (newPfId 23 "hpRes", Pd 5),
+          (newPfId 24 "compThreshDb", Pd (-18)),
+          (newPfId 25 "compHard", Pd 0.2),
+          (newPfId 26 "comp", Pd 0.25),
+          (newPfId 27 "compSc", Pd 0),
+          (newPfId 28 "pitch", Pd 60)
         ]
   emptyPat <- newTVarIO M.empty
   return $
@@ -425,18 +463,18 @@ stutter path = do
           (newPfId 15 "ringMod", Pd 0),
           (newPfId 16 "rmGain", Pd 1),
           (newPfId 17 "rmSc", Pd 0),
-          (newPfId 18 "rmWt", Pd 0),
+          (newPfId 18 "rmWt", Pd 1),
           (newPfId 19 "rmFreq", Pd 44),
-          (newPfId 20 "lpFreq", Pd 20),
-          (newPfId 21 "lpRes", Pd 0.2),
-          (newPfId 22 "hpFreq", Pd 20000),
+          (newPfId 20 "lpFreq", Pd 20000),
+          (newPfId 21 "lpRes", Pd 5),
+          (newPfId 22 "hpFreq", Pd 20),
           (newPfId 23 "hpRes", Pd 5),
           (newPfId 24 "compThreshDb", Pd (-18)),
           (newPfId 25 "compHard", Pd 0.2),
           (newPfId 26 "comp", Pd 0.25),
           (newPfId 27 "compSc", Pd 0),
           (newPfId 28 "sample", Ps path),
-          (newPfId 29 "cps", Pd 1),
+          (newPfId 29 "cps", Pd 0),
           (newPfId 30 "divs", Pd 8),
           (newPfId 31 "pick", Pd 0),
           (newPfId 32 "stuts", Pd 1)
@@ -454,44 +492,44 @@ stutter path = do
         itype = Instrument
       }
 
-phax :: IO Instr
-phax = do
-  pfields <-
-    newTVarIO $
-      pfFromList
-        [ (newPfId 3 "dur", Pd 1),
-          (newPfId 4 "vol", Pd 1),
-          (newPfId 5 "rev", Pd 0),
-          (newPfId 6 "del", Pd 0),
-          (newPfId 7 "pan", Pd 0.5),
-          (newPfId 8 "chorus", Pd 0),
-          (newPfId 9 "pitch", Pd 48),
-          (pfIdInt 10, Pd 1100),
-          (pfIdInt 11, Pd 0.8),
-          (newPfId 12 "adRatio", Pd 0.33),
-          (pfIdInt 13, Pd 0),
-          (pfIdInt 14, Pd 1),
-          (pfIdInt 15, Pd 3),
-          (pfIdInt 16, Pd 2),
-          (pfIdInt 17, Pd 0.5),
-          (pfIdInt 18, Pd 0.5),
-          (pfIdInt 19, Pd 0.91),
-          (pfIdInt 20, Pd 1),
-          (pfIdInt 21, Pd 0.5),
-          (pfIdInt 22, Pd 0.9)
-        ]
-  emptyPat <- newTVarIO M.empty
-  return $
-    I
-      { insN = 10,
-        pf = pfields,
-        toPlay = Nothing,
-        status = Inactive,
-        timeF = "",
-        pats = emptyPat,
-        kind = Csound "11000",
-        itype = Instrument
-      }
+-- phax :: IO Instr
+-- phax = do
+--   pfields <-
+--     newTVarIO $
+--       pfFromList
+--         [ (newPfId 3 "dur", Pd 1),
+--           (newPfId 4 "vol", Pd 1),
+--           (newPfId 5 "rev", Pd 0),
+--           (newPfId 6 "del", Pd 0),
+--           (newPfId 7 "pan", Pd 0.5),
+--           (newPfId 8 "chorus", Pd 0),
+--           (newPfId 9 "pitch", Pd 48),
+--           (pfIdInt 10, Pd 1100),
+--           (pfIdInt 11, Pd 0.8),
+--           (newPfId 12 "adRatio", Pd 0.33),
+--           (pfIdInt 13, Pd 0),
+--           (pfIdInt 14, Pd 1),
+--           (pfIdInt 15, Pd 3),
+--           (pfIdInt 16, Pd 2),
+--           (pfIdInt 17, Pd 0.5),
+--           (pfIdInt 18, Pd 0.5),
+--           (pfIdInt 19, Pd 0.91),
+--           (pfIdInt 20, Pd 1),
+--           (pfIdInt 21, Pd 0.5),
+--           (pfIdInt 22, Pd 0.9)
+--         ]
+--   emptyPat <- newTVarIO M.empty
+--   return $
+--     I
+--       { insN = 10,
+--         pf = pfields,
+--         toPlay = Nothing,
+--         status = Inactive,
+--         timeF = "",
+--         pats = emptyPat,
+--         kind = Csound "11000",
+--         itype = Instrument
+--       }
 
 dtmf :: IO Instr
 dtmf = do
@@ -513,11 +551,11 @@ dtmf = do
           (newPfId 15 "ringMod", Pd 0),
           (newPfId 16 "rmGain", Pd 1),
           (newPfId 17 "rmSc", Pd 0),
-          (newPfId 18 "rmWt", Pd 0),
+          (newPfId 18 "rmWt", Pd 1),
           (newPfId 19 "rmFreq", Pd 44),
-          (newPfId 20 "lpFreq", Pd 20),
-          (newPfId 21 "lpRes", Pd 0.2),
-          (newPfId 22 "hpFreq", Pd 20000),
+          (newPfId 20 "lpFreq", Pd 20000),
+          (newPfId 21 "lpRes", Pd 5),
+          (newPfId 22 "hpFreq", Pd 20),
           (newPfId 23 "hpRes", Pd 5),
           (newPfId 24 "compThreshDb", Pd (-18)),
           (newPfId 25 "compHard", Pd 0.2),
@@ -693,7 +731,7 @@ defaultOrc = do
   lpFM <- fmSub
   sSaw <- superSaw
   strPad <- stringPad
-  phaxo <- phax
+  -- phaxo <- phax
   cycles1 <- models "11000" 1
   dtmfSynth <- dtmf
   -- mstab <- modelChord "11000" 2
@@ -714,7 +752,7 @@ defaultOrc = do
           ("strPad", strPad),
           ("mix", mix),
           ("chorus", choruss),
-          ("phax", phaxo),
+          -- ("phax", phaxo),
           ("dtmf", dtmfSynth),
           ("test", ot),
           -- ,("mstab",mstab)
@@ -722,9 +760,9 @@ defaultOrc = do
         ]
     )
 
--- returns all instruments that are not effects
-notEffect :: [String] -> [String]
-notEffect = filter (/= "rev") . filter (/= "del") . filter (/= "mix") . filter (/= "chorus")
+-- returns a map of all instruments that are not effects
+notEffectOrc :: M.Map [Char] Instr -> M.Map [Char] Instr
+notEffectOrc = M.filter (\i -> itype i == Instrument)
 
 -- | function to default a pfield pattern to the value of the pfield
 defaultPfpat :: Instr -> PfPat -> IO ()

@@ -64,8 +64,8 @@ divs i list fun = addPf i 30 "divs" (toPfs list) fun     -- stutter
 pick i list fun = addPf i 31 "pick" (toPfs list) fun     -- stutter
 stuts i list fun = addPf i 32 "stuts" (toPfs list) fun    -- stutter
 
-openclose i list fun = addPf i 9 "oc" (toPfs list) fun   -- hihat 808 open/close
-tuning i list fun = addPf i 10 "tuning" (toPfs list) fun   -- hihat 808 tuning
+openclose i list fun = addPf i 28 "oc" (toPfs list) fun   -- hihat 808 open/close
+tuning i list fun = addPf i 29 "tuning" (toPfs list) fun   -- hihat 808 tuning
 
 rough i list fun = addPf i 29 "rough" (toPfs list) fun    -- karp roughness (0 - 1)
 stretch i list fun = addPf i 30 "stretch" (toPfs list) fun  -- karp stretch (0 - 1)
@@ -74,20 +74,20 @@ detune i list fun = addPf i 32 "detune" (toPfs list) fun    -- superSaw
 sawmix i list fun = addPf i 33 "mix" (toPfs list) fun    -- superSaw
 
 adRatio i list fun = addPf i 31 "adRatio" (toPfs list) fun  -- lpFM, hoover, phax, superSaw, dtmf
-fmCar i list fun = addPf i 13 "fmCar" (toPfs list) fun    -- lpFM
-fmIndx i list fun = addPf i 15 "fmIndx" (toPfs list) fun   -- lpFM
-fmDepth i list fun = addPf i 14 "fmDepth" (toPfs list) fun  -- lpFM
+fmCar i list fun = addPf i 32 "fmCar" (toPfs list) fun    -- lpFM
+fmIndx i list fun = addPf i 34 "fmIndx" (toPfs list) fun   -- lpFM
+fmDepth i list fun = addPf i 33 "fmDepth" (toPfs list) fun  -- lpFM
 
-adP i list fun =  addPf i 13 "adP" (toPfs list) fun     -- phax
-simP i list fun =  addPf i 14 "simP" (toPfs list) fun    -- phax
-wt1 i list fun =  addPf i 15 "wt1" (toPfs list) fun     -- phax
-wt2 i list fun =  addPf i 16 "wt2" (toPfs list) fun     -- phax
-wtMix i list fun =  addPf i 17 "wtMix" (toPfs list) fun   -- phax
-oscTune i list fun =  addPf i 18 "oscTune" (toPfs list) fun -- phax
-sepP i list fun =  addPf i 19 "sepP" (toPfs list) fun    -- phax
-modeP i list fun =  addPf i 20 "modeP" (toPfs list) fun   -- phax
-edP i list fun =  addPf i 21 "edP" (toPfs list) fun     -- phax
-fbP i list fun =  addPf i 22 "fbP" (toPfs list) fun     -- phax
+-- adP i list fun =  addPf i 13 "adP" (toPfs list) fun     -- phax
+-- simP i list fun =  addPf i 14 "simP" (toPfs list) fun    -- phax
+-- wt1 i list fun =  addPf i 15 "wt1" (toPfs list) fun     -- phax
+-- wt2 i list fun =  addPf i 16 "wt2" (toPfs list) fun     -- phax
+-- wtMix i list fun =  addPf i 17 "wtMix" (toPfs list) fun   -- phax
+-- oscTune i list fun =  addPf i 18 "oscTune" (toPfs list) fun -- phax
+-- sepP i list fun =  addPf i 19 "sepP" (toPfs list) fun    -- phax
+-- modeP i list fun =  addPf i 20 "modeP" (toPfs list) fun   -- phax
+-- edP i list fun =  addPf i 21 "edP" (toPfs list) fun     -- phax
+-- fbP i list fun =  addPf i 22 "fbP" (toPfs list) fun     -- phax
 
 btn i list fun = addPf i 28 "button" (toPfs list) fun -- dtmf
 ampX i list fun = addPf i 30 "ampX" (toPfs list) fun -- dtmf 
@@ -141,6 +141,6 @@ wlmax i list fun =  addPf i 4 "maxwl" (toPfs list) fun -- waveloss max
 techno1 k s h = cPat "fourFloor" k >> cPat "downB" s >> cPat "upFour" h
 dnb1 k s h = cPat "dbk" k >> cPat "downB" s >> cPat "eightN" h
 
-runPfield i (b,a,c) = b i c a
+runPfield i (fun,upd,list) = fun i list upd
 prms i ls = mapM_ (runPfield i) ls
 
