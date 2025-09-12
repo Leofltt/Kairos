@@ -1,11 +1,13 @@
+{-# OPTIONS_GHC -Wno-type-defaults #-}
+
 module Kairos.Kit where
-    
-import Kairos.Pfield ( Pfield )
-import qualified Data.Map.Strict as M
+
+import Data.Map.Strict qualified as M
+import Kairos.Pfield (Pfield)
 
 type KitF a b = M.Map a b
 
-type Kit = KitF String Pfield
+type Kit = KitF Integer Pfield
 
 fromKit :: (Ord a, Show a) => KitF a b -> a -> b
 fromKit kit name = case M.lookup name kit of
@@ -15,7 +17,11 @@ fromKit kit name = case M.lookup name kit of
 newKit :: (Ord a, Show a) => [(a, b)] -> KitF a b
 newKit = M.fromList
 
-
 -- | convert a list of keys to a list of values given a kit
-fk :: (Ord a, Show a) => KitF a b -> [a] -> [b]
+fk :: Kit -> [Integer] -> [Pfield]
 fk k = map $ fromKit k
+
+showKit :: Kit -> IO ()
+showKit kit = putStrLn $ unlines $ map formatEntry $ M.toList kit
+  where
+    formatEntry (k, v) = show k ++ " - " ++ show v

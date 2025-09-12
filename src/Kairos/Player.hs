@@ -201,10 +201,10 @@ soloIns :: Performance -> String -> IO ()
 soloIns perf i = mapM_ (stop perf) . filter (/= i) . M.keys . notEffectOrc =<< readTVarIO (orc perf)
 
 -- | display all Time Patterns names and their content
-displayTPat :: Performance -> IO [String]
+displayTPat :: Performance -> IO ()
 displayTPat perf = do
   tpats <- readTVarIO (timePs perf)
-  return $ inter (M.keys tpats) (map (show . fromTP) (M.elems tpats))
+  mapM_ (\(name, pat) -> putStrLn $ show name ++ " - " ++ show (fromTP pat)) (M.toList tpats)
 
 updateInstrument :: Performance -> String -> (Instr -> Instr) -> IO ()
 updateInstrument perf k f = do

@@ -361,6 +361,10 @@ wrdsn = defPath "/snares/weirdsnare1.wav"
 addI "wrdsn" $ sampler wrdsn
 cmksyn = defPath "/stabSynth/ChopCarmack.wav"
 addI "cmksyn" $ stutter cmksyn
+snare34 = defPath $  "/snares/Snare34.wav" 
+snare41 = defPath $  "/snares/Snare41.wav"
+addI "snare34" $ sampler snare34 
+addI "snare41" $ sampler snare41 
 -- a lot of text
 fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
 f = fs 666

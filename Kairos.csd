@@ -795,8 +795,8 @@ iad = p31
 kres = p30
 aenv = ADEnv(iad, 0)
 
-amod = poscil(1, cpsmidinn(p9) * kindx, gisine)
-acar = poscil(1, cpsmidinn(p9) + amod * kdpth * sr/4, gisine)
+amod = poscil(1, cpsmidinn(ifreq) * kindx, gisine)
+acar = poscil(1, cpsmidinn(ifreq) + amod * kdpth * sr/4, gisine)
 
 audio = diode_ladder(acar, kfilt, kres , 1, 1.5)
 
