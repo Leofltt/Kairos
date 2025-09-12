@@ -38,7 +38,7 @@ import Kairos.TimePoint
     nextBeat,
     wrapBar,
   )
-import Kairos.Utilities (addToMap, inter, lookupMap, sameConstructor)
+import Kairos.Utilities (addToMap, lookupMap, sameConstructor)
 
 setChannel :: UDPPort -> String -> Pfield -> IO ()
 setChannel port chanName val = do
