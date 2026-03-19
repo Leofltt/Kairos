@@ -7,6 +7,7 @@ csd1 = "11000"
 :set -w 
 perf <- defaultPerformance
 displayIns = displayInstruments perf
+displayP = displayParams perf
 displayTP = displayTPat perf
 p = play perf
 s = stop perf

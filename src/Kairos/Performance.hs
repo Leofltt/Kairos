@@ -1,14 +1,14 @@
 {-# OPTIONS_GHC -Wno-missing-fields #-}
 module Kairos.Performance where
 
-import Kairos.Instrument ( Instr(pats), Orchestra, defaultOrc )
+import Kairos.Instrument ( Instr(..), Orchestra, defaultOrc )
 import Kairos.Clock
     ( TimeSignature(bpm, beatInMsr), Clock, defaultClock, currentTS )
 import Kairos.TimePoint ( TimePoint, notEmpty, defaultTPMap )
 import Kairos.Pfield
 import Kairos.PfPat
 import Kairos.Utilities ( addToMap, lookupMap, stringToDouble )
-import Control.Concurrent.STM ( newTVarIO, readTVarIO, TVar )
+import Control.Concurrent.STM ( newTVarIO, readTVarIO, TVar, atomically )
 import qualified Data.Map.Strict as M
 import Data.Maybe (fromJust, isNothing)
 
@@ -29,6 +29,18 @@ defaultPerformance = do
              , clock = c
              , timePs = t
              }
+
+-- | print the parameters of an instrument in a performance
+displayParams :: Performance -> String -> IO ()
+displayParams perf name = do
+  orch <- readTVarIO (orc perf)
+  case M.lookup name orch of
+    Nothing -> putStrLn "Instrument not found"
+    Just i -> do
+      pfs <- readTVarIO (pf i)
+      putStrLn $ "--- Parameters for " ++ name ++ " (Instr " ++ show (insN i) ++ ") ---"
+      let sortedPfs = M.toAscList pfs
+      mapM_ (\(pid, val) -> putStrLn $ "  p" ++ show (idInt pid) ++ " [" ++ idString pid ++ "]: " ++ show val) sortedPfs
 
 -- function to create a PfPat
 createPfPat :: Int -> String -> [Pfield] -> (PfPat -> IO Pfield) -> IO PfPat

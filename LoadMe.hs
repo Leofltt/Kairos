@@ -392,6 +392,40 @@ uzubs i list fun = addPf i 9 "uzubass" (toPfs list) fun
 uzuspread = setChannel csd1 "uzuspread"
 uzuspr i list fun = addPf i 10 "uzuspread" (toPfs list) fun
 
+-- Preset system
+-- Usage: presetName "instrumentName"
+-- Example: acid303 "303"
+
+type Preset = String -> IO ()
+
+-- 303 (acidBass)
+acid303 i = cf i [2000] keep >> res i [15] keep >> wf02 i [0] keep >> dist i [0.5] keep >> distChar i [0.2] keep
+deep303 i = cf i [600] keep >> res i [5] keep >> wf02 i [10] keep >> dist i [0.2] keep
+
+-- Hoover
+classicHov i = cf i [5000] keep >> res i [12] keep >> adRatio i [0.2] keep >> dist i [0.4] keep
+softHov i = cf i [1000] keep >> res i [2] keep >> adRatio i [0.8] keep >> dist i [0] keep
+
+-- superSaw
+brightSaw i = cf i [12000] keep >> res i [2] keep >> detune i [0.4] keep >> sawmix i [0.8] keep >> adRatio i [0.3] keep
+cloudSaw i = cf i [2500] keep >> res i [1] keep >> detune i [0.9] keep >> sawmix i [0.5] keep >> adRatio i [0.9] keep
+
+-- stringPad (using common filter parameters)
+silkPad i = lpFreq i [8000] keep >> lpRes i [1] keep >> chorus i [0.4] keep
+darkPad i = lpFreq i [800] keep >> lpRes i [10] keep >> chorus i [0.2] keep
+
+-- Karplus-Strong
+nylonKarp i = rough i [0.1] keep >> stretch i [0.1] keep >> lpFreq i [5000] keep
+metalKarp i = rough i [0.9] keep >> stretch i [0.01] keep >> dist i [0.6] keep
+
+-- lpFM
+bassFM i = cf i [400] keep >> res i [2] keep >> fmCar i [1] keep >> fmDepth i [600] keep >> fmIndx i [2.45] keep >> adRatio i [0.3] keep
+bellFM i = cf i [7000] keep >> res i [6] keep >> fmCar i [2] keep >> fmDepth i [2000] keep >> fmIndx i [1.5] keep >> adRatio i [0.1] keep
+
+-- DTMF
+dialing i = btn i ["1"] keep >> ampY i [1] keep >> ampX i [1] keep >> adRatio i [0.2] keep
+alienDial i = btn i ["#"] keep >> ampY i [0.6] keep >> ampX i [2.5] keep >> adRatio i [1.0] keep
+
 -- csv files with tables
 csv1 = markPath "/Test.csv"
 csv2 = markPath "/Test2.csv"
