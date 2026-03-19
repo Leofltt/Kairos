@@ -31,6 +31,7 @@ rev i list fun = addPf i 5 "rev" (toPfs list) fun
 del i list fun = addPf i 6 "del" (toPfs list) fun
 pan i list fun = addPf i 7 "pan" (toPfs list) fun
 chorus i list fun = addPf i 8 "chorus" (toPfs list) fun
+phaser i list fun = addPf i 28 "phaser" (toPfs list) fun
 sideComp i list fun = addPf i 9 "sideComp" (toPfs list) fun
 sideRing i list fun = addPf i 10 "sideRing" (toPfs list) fun
 dist i list fun = addPf i 11 "dist" (toPfs list) fun
@@ -52,31 +53,31 @@ comp i list fun = addPf i 26 "comp" (toPfs list) fun
 compSc i list fun = addPf i 27 "compSc" (toPfs list) fun
 
 -- instrument specific parameters (try to keep the consistent for ease of use)
-pitch i list fun = addPf i 28 "pitch" (toPfs list) fun     -- 303, hoover, karp, lpFM, superSaw, stringPad
-cf i list fun = addPf i 29 "cf" (toPfs list) fun       -- 303, hoover, lpFM, superSaw
-res i list fun = addPf i 30 "res" (toPfs list) fun      -- 303, hoover, lpFM, superSaw
-wf02 i list fun = addPf i  31 "wf02" (toPfs list) fun    -- 303 : 0 is saw, 2 or 10 is square, 12 is triangle
+pitch i list fun = addPf i 29 "pitch" (toPfs list) fun     -- 303, hoover, karp, lpFM, superSaw, stringPad
+cf i list fun = addPf i 30 "cf" (toPfs list) fun       -- 303, hoover, lpFM, superSaw
+res i list fun = addPf i 31 "res" (toPfs list) fun      -- 303, hoover, lpFM, superSaw
+wf02 i list fun = addPf i 32 "wf02" (toPfs list) fun    -- 303 : 0 is saw, 2 or 10 is square, 12 is triangle
 
-cps i list fun = addPf i 29 "cps" (toPfs list) fun      -- sampler, stutter
-sample i list fun = addPf i 28 "sample" (toPfs list) fun    -- sampler, stutter
+cps i list fun = addPf i 30 "cps" (toPfs list) fun      -- sampler, stutter
+sample i list fun = addPf i 29 "sample" (toPfs list) fun    -- sampler, stutter
 
-divs i list fun = addPf i 30 "divs" (toPfs list) fun     -- stutter
-pick i list fun = addPf i 31 "pick" (toPfs list) fun     -- stutter
-stuts i list fun = addPf i 32 "stuts" (toPfs list) fun    -- stutter
+divs i list fun = addPf i 31 "divs" (toPfs list) fun     -- stutter
+pick i list fun = addPf i 32 "pick" (toPfs list) fun     -- stutter
+stuts i list fun = addPf i 33 "stuts" (toPfs list) fun    -- stutter
 
-openclose i list fun = addPf i 28 "oc" (toPfs list) fun   -- hihat 808 open/close
-tuning i list fun = addPf i 29 "tuning" (toPfs list) fun   -- hihat 808 tuning
+openclose i list fun = addPf i 29 "oc" (toPfs list) fun   -- hihat 808 open/close
+tuning i list fun = addPf i 30 "tuning" (toPfs list) fun   -- hihat 808 tuning
 
-rough i list fun = addPf i 29 "rough" (toPfs list) fun    -- karp roughness (0 - 1)
-stretch i list fun = addPf i 30 "stretch" (toPfs list) fun  -- karp stretch (0 - 1)
+rough i list fun = addPf i 30 "rough" (toPfs list) fun    -- karp roughness (0 - 1)
+stretch i list fun = addPf i 31 "stretch" (toPfs list) fun  -- karp stretch (0 - 1)
 
-detune i list fun = addPf i 32 "detune" (toPfs list) fun    -- superSaw
-sawmix i list fun = addPf i 33 "mix" (toPfs list) fun    -- superSaw
+detune i list fun = addPf i 33 "detune" (toPfs list) fun    -- superSaw
+sawmix i list fun = addPf i 34 "mix" (toPfs list) fun    -- superSaw
 
-adRatio i list fun = addPf i 31 "adRatio" (toPfs list) fun  -- lpFM, hoover, phax, superSaw, dtmf
-fmCar i list fun = addPf i 32 "fmCar" (toPfs list) fun    -- lpFM
-fmIndx i list fun = addPf i 34 "fmIndx" (toPfs list) fun   -- lpFM
-fmDepth i list fun = addPf i 33 "fmDepth" (toPfs list) fun  -- lpFM
+adRatio i list fun = addPf i 32 "adRatio" (toPfs list) fun  -- lpFM, hoover, phax, superSaw, dtmf
+fmCar i list fun = addPf i 33 "fmCar" (toPfs list) fun    -- lpFM
+fmIndx i list fun = addPf i 35 "fmIndx" (toPfs list) fun   -- lpFM
+fmDepth i list fun = addPf i 34 "fmDepth" (toPfs list) fun  -- lpFM
 
 -- adP i list fun =  addPf i 13 "adP" (toPfs list) fun     -- phax
 -- simP i list fun =  addPf i 14 "simP" (toPfs list) fun    -- phax
@@ -89,9 +90,9 @@ fmDepth i list fun = addPf i 33 "fmDepth" (toPfs list) fun  -- lpFM
 -- edP i list fun =  addPf i 21 "edP" (toPfs list) fun     -- phax
 -- fbP i list fun =  addPf i 22 "fbP" (toPfs list) fun     -- phax
 
-btn i list fun = addPf i 28 "button" (toPfs list) fun -- dtmf
-ampX i list fun = addPf i 30 "ampX" (toPfs list) fun -- dtmf 
-ampY i list fun = addPf i 29 "ampY" (toPfs list) fun -- dtmf 
+btn i list fun = addPf i 29 "button" (toPfs list) fun -- dtmf
+ampX i list fun = addPf i 31 "ampX" (toPfs list) fun -- dtmf 
+ampY i list fun = addPf i 30 "ampY" (toPfs list) fun -- dtmf 
 
 chan i list fun = addPf i 8 "chan" (toPfs list) fun      -- model:cycles
 vel i list fun = addPf i 10 "vel" (toPfs list) fun      -- model:cycles
@@ -137,6 +138,27 @@ dropwl = setChannel csd1 "dropwl"
 wldrop i list fun =  addPf i 3 "dropwl" (toPfs list) fun -- waveloss drop
 maxwl = setChannel csd1 "maxwl"
 wlmax i list fun =  addPf i 4 "maxwl" (toPfs list) fun -- waveloss max
+
+voluzu = setChannel csd1 "voluzu"
+uzuvol i list fun = addPf i 1 "voluzu" (toPfs list) fun
+uzuwidth = setChannel csd1 "uzuwidth"
+uzuwd i list fun = addPf i 2 "uzuwidth" (toPfs list) fun
+uzuoffset = setChannel csd1 "uzuoffset"
+uzuoff i list fun = addPf i 3 "uzuoffset" (toPfs list) fun
+uzudepth = setChannel csd1 "uzudepth"
+uzudp i list fun = addPf i 4 "uzudepth" (toPfs list) fun
+uzuspeed = setChannel csd1 "uzuspeed"
+uzusp i list fun = addPf i 5 "uzuspeed" (toPfs list) fun
+uzublur = setChannel csd1 "uzublur"
+uzubl i list fun = addPf i 6 "uzublur" (toPfs list) fun
+uzumix = setChannel csd1 "uzumix"
+uzumx i list fun = addPf i 7 "uzumix" (toPfs list) fun
+uzuhzmode = setChannel csd1 "uzuhzmode"
+uzuhz i list fun = addPf i 8 "uzuhzmode" (toPfs list) fun
+uzubass = setChannel csd1 "uzubass"
+uzubs i list fun = addPf i 9 "uzubass" (toPfs list) fun
+uzuspread = setChannel csd1 "uzuspread"
+uzuspr i list fun = addPf i 10 "uzuspread" (toPfs list) fun
 
 techno1 k s h = cPat "fourFloor" k >> cPat "downB" s >> cPat "upFour" h
 dnb1 k s h = cPat "dbk" k >> cPat "downB" s >> cPat "eightN" h

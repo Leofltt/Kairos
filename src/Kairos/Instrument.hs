@@ -92,8 +92,9 @@ hihat oc = do
           (newPfId 25 "compHard", Pd 0.2),
           (newPfId 26 "comp", Pd 0.25),
           (newPfId 27 "compSc", Pd 0),
-          (newPfId 28 "oc", Pd oc),
-          (newPfId 29 "tuning", Pd 1)
+          (newPfId 29 "oc", Pd oc),
+          (newPfId 30 "tuning", Pd 1),
+          (newPfId 28 "phaser", Pd 0)
         ]
   emptyPat <- newTVarIO M.empty
   return $
@@ -138,8 +139,9 @@ sampler path = do
           (newPfId 25 "compHard", Pd 0.2),
           (newPfId 26 "comp", Pd 0.25),
           (newPfId 27 "compSc", Pd 0),
-          (newPfId 28 "sample", Ps path),
-          (newPfId 29 "cps", Pd 0)
+          (newPfId 29 "sample", Ps path),
+          (newPfId 30 "cps", Pd 0),
+          (newPfId 28 "phaser", Pd 0)
         ]
   emptyPat <- newTVarIO M.empty
   return $
@@ -184,10 +186,11 @@ acidBass = do
           (newPfId 25 "compHard", Pd 0.2),
           (newPfId 26 "comp", Pd 0.25),
           (newPfId 27 "compSc", Pd 0),
-          (newPfId 28 "pitch", Pd 60),
-          (newPfId 29 "cf", Pd 5000),
-          (newPfId 30 "res", Pd 2),
-          (newPfId 31 "wf02", Pd 0)
+          (newPfId 29 "pitch", Pd 60),
+          (newPfId 30 "cf", Pd 5000),
+          (newPfId 31 "res", Pd 2),
+          (newPfId 32 "wf02", Pd 0),
+          (newPfId 28 "phaser", Pd 0)
         ]
   emptyPat <- newTVarIO M.empty
   return $
@@ -232,10 +235,11 @@ hoover = do
           (newPfId 25 "compHard", Pd 0.2),
           (newPfId 26 "comp", Pd 0.25),
           (newPfId 27 "compSc", Pd 0),
-          (newPfId 28 "pitch", Pd 48),
-          (newPfId 29 "cf", Pd 5000),
-          (newPfId 30 "res", Pd 2), -- 0-17 (?) also it is "not" res but fb
-          (newPfId 31 "adRatio", Pd 0.2)
+          (newPfId 29 "pitch", Pd 48),
+          (newPfId 30 "cf", Pd 5000),
+          (newPfId 31 "res", Pd 2), -- 0-17 (?) also it is "not" res but fb
+          (newPfId 32 "adRatio", Pd 0.2),
+          (newPfId 28 "phaser", Pd 0)
         ]
   emptyPat <- newTVarIO M.empty
   return $
@@ -280,9 +284,10 @@ karp = do
           (newPfId 25 "compHard", Pd 0.2),
           (newPfId 26 "comp", Pd 0.25),
           (newPfId 27 "compSc", Pd 0),
-          (newPfId 28 "pitch", Pd 48),
-          (newPfId 29 "rough", Pd 0.1),
-          (newPfId 30 "stretch", Pd 0.1)
+          (newPfId 29 "pitch", Pd 48),
+          (newPfId 30 "rough", Pd 0.1),
+          (newPfId 31 "stretch", Pd 0.1),
+          (newPfId 28 "phaser", Pd 0)
         ]
   emptyPat <- newTVarIO M.empty
   return $
@@ -327,13 +332,14 @@ fmSub = do
           (newPfId 25 "compHard", Pd 0.2),
           (newPfId 26 "comp", Pd 0.25),
           (newPfId 27 "compSc", Pd 0),
-          (newPfId 28 "pitch", Pd 48),
-          (newPfId 29 "cf", Pd 5000),
-          (newPfId 30 "res", Pd 2), -- 0-17 (?) also it is "not" res but fb
-          (newPfId 31 "adRatio", Pd 0.2),
-          (newPfId 32 "fmCar", Pd 1),
-          (newPfId 33 "fmDepth", Pd 2000),
-          (newPfId 34 "fmIndx", Pd 2.45)
+          (newPfId 29 "pitch", Pd 48),
+          (newPfId 30 "cf", Pd 5000),
+          (newPfId 31 "res", Pd 2), -- 0-17 (?) also it is "not" res but fb
+          (newPfId 32 "adRatio", Pd 0.2),
+          (newPfId 33 "fmCar", Pd 1),
+          (newPfId 34 "fmDepth", Pd 2000),
+          (newPfId 35 "fmIndx", Pd 2.45),
+          (newPfId 28 "phaser", Pd 0)
         ]
   emptyPat <- newTVarIO M.empty
   return $
@@ -378,12 +384,13 @@ superSaw = do
           (newPfId 25 "compHard", Pd 0.2),
           (newPfId 26 "comp", Pd 0.25),
           (newPfId 27 "compSc", Pd 0),
-          (newPfId 28 "pitch", Pd 60),
-          (newPfId 29 "cf", Pd 5000),
-          (newPfId 30 "res", Pd 2),
-          (newPfId 31 "adRatio", Pd 0.2),
-          (newPfId 32 "detune", Pd 0.3),
-          (newPfId 33 "mix", Pd 0.44)
+          (newPfId 29 "pitch", Pd 60),
+          (newPfId 30 "cf", Pd 5000),
+          (newPfId 31 "res", Pd 2),
+          (newPfId 32 "adRatio", Pd 0.2),
+          (newPfId 33 "detune", Pd 0.3),
+          (newPfId 34 "mix", Pd 0.44),
+          (newPfId 28 "phaser", Pd 0)
         ]
   emptyPat <- newTVarIO M.empty
   return $
@@ -428,7 +435,8 @@ stringPad = do
           (newPfId 25 "compHard", Pd 0.2),
           (newPfId 26 "comp", Pd 0.25),
           (newPfId 27 "compSc", Pd 0),
-          (newPfId 28 "pitch", Pd 60)
+          (newPfId 29 "pitch", Pd 60),
+          (newPfId 28 "phaser", Pd 0)
         ]
   emptyPat <- newTVarIO M.empty
   return $
@@ -473,11 +481,12 @@ stutter path = do
           (newPfId 25 "compHard", Pd 0.2),
           (newPfId 26 "comp", Pd 0.25),
           (newPfId 27 "compSc", Pd 0),
-          (newPfId 28 "sample", Ps path),
-          (newPfId 29 "cps", Pd 0),
-          (newPfId 30 "divs", Pd 8),
-          (newPfId 31 "pick", Pd 0),
-          (newPfId 32 "stuts", Pd 1)
+          (newPfId 29 "sample", Ps path),
+          (newPfId 30 "cps", Pd 0),
+          (newPfId 31 "divs", Pd 8),
+          (newPfId 32 "pick", Pd 0),
+          (newPfId 33 "stuts", Pd 1),
+          (newPfId 28 "phaser", Pd 0)
         ]
   emptyPat <- newTVarIO M.empty
   return $
@@ -561,10 +570,11 @@ dtmf = do
           (newPfId 25 "compHard", Pd 0.2),
           (newPfId 26 "comp", Pd 0.25),
           (newPfId 27 "compSc", Pd 0),
-          (newPfId 28 "button", Ps "3"),
-          (newPfId 29 "ampY", Pd 1.0),
-          (newPfId 30 "ampX", Pd 1.0),
-          (newPfId 31 "adRatio", Pd 0.33)
+          (newPfId 29 "button", Ps "3"),
+          (newPfId 30 "ampY", Pd 1.0),
+          (newPfId 31 "ampX", Pd 1.0),
+          (newPfId 32 "adRatio", Pd 0.33),
+          (newPfId 28 "phaser", Pd 0)
         ]
   emptyPat <- newTVarIO M.empty
   return $
@@ -683,6 +693,35 @@ chorus = do
         itype = Effect
       }
 
+phaser :: IO Instr
+phaser = do
+  pfields <-
+    newTVarIO $
+      pfFromList
+        [ (newPfId 1 "voluzu", Pd 1),
+          (newPfId 2 "uzuwidth", Pd 1.2),
+          (newPfId 3 "uzuoffset", Pd 0),
+          (newPfId 4 "uzudepth", Pd 0.98),
+          (newPfId 5 "uzuspeed", Pd 0.05),
+          (newPfId 6 "uzublur", Pd 0.7),
+          (newPfId 7 "uzumix", Pd 1),
+          (newPfId 8 "uzuhzmode", Pd 1),
+          (newPfId 9 "uzubass", Pd 0.5),
+          (newPfId 10 "uzuspread", Pd 0.1)
+        ]
+  emptyPat <- newTVarIO M.empty
+  return $
+    I
+      { insN = 553,
+        pf = pfields,
+        toPlay = Nothing,
+        status = Inactive,
+        timeF = "",
+        pats = emptyPat,
+        kind = Csound "11000",
+        itype = Effect
+      }
+
 master :: IO Instr
 master = do
   pfields <- newTVarIO $ pfFromList [(newPfId 1 "m_vol", Pd 0.8), (pfIdInt 2, Pd 0), (pfIdInt 3, Pd 0), (pfIdInt 4, Pd 50)]
@@ -736,6 +775,7 @@ defaultOrc = do
   dtmfSynth <- dtmf
   -- mstab <- modelChord "11000" 2
   choruss <- chorus
+  phz <- phaser
   mix <- master
   ot <- oscInstr 666 "11100" [(pfIdInt 3, Pd 0.8), (pfIdInt 2, Ps "Test")]
   newTVarIO
@@ -752,6 +792,7 @@ defaultOrc = do
           ("strPad", strPad),
           ("mix", mix),
           ("chorus", choruss),
+          ("phaser", phz),
           -- ("phax", phaxo),
           ("dtmf", dtmfSynth),
           ("test", ot),

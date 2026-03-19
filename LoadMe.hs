@@ -368,6 +368,30 @@ addI "snare41" $ sampler snare41
 -- a lot of text
 fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
 f = fs 666
+-- phaser convenience functions
+phaser i list fun = addPf i 28 "phaser" (toPfs list) fun
+
+voluzu = setChannel csd1 "voluzu"
+uzuvol i list fun = addPf i 1 "voluzu" (toPfs list) fun
+uzuwidth = setChannel csd1 "uzuwidth"
+uzuwd i list fun = addPf i 2 "uzuwidth" (toPfs list) fun
+uzuoffset = setChannel csd1 "uzuoffset"
+uzuoff i list fun = addPf i 3 "uzuoffset" (toPfs list) fun
+uzudepth = setChannel csd1 "uzudepth"
+uzudp i list fun = addPf i 4 "uzudepth" (toPfs list) fun
+uzuspeed = setChannel csd1 "uzuspeed"
+uzusp i list fun = addPf i 5 "uzuspeed" (toPfs list) fun
+uzublur = setChannel csd1 "uzublur"
+uzubl i list fun = addPf i 6 "uzublur" (toPfs list) fun
+uzumix = setChannel csd1 "uzumix"
+uzumx i list fun = addPf i 7 "uzumix" (toPfs list) fun
+uzuhzmode = setChannel csd1 "uzuhzmode"
+uzuhz i list fun = addPf i 8 "uzuhzmode" (toPfs list) fun
+uzubass = setChannel csd1 "uzubass"
+uzubs i list fun = addPf i 9 "uzubass" (toPfs list) fun
+uzuspread = setChannel csd1 "uzuspread"
+uzuspr i list fun = addPf i 10 "uzuspread" (toPfs list) fun
+
 -- csv files with tables
 csv1 = markPath "/Test.csv"
 csv2 = markPath "/Test2.csv"

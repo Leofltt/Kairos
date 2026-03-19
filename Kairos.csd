@@ -33,6 +33,10 @@ zakinit 50,50
 ; 13, 14 : chorus out
 ; 15, 16 : SideChain RingMod in (TODO)
 ; 17, 18 : Sidechain Comp in (TODO)
+; 19, 20 : UzuPhaser in
+; 21, 22 : UzuPhaser out
+
+#define M_PI #3.141592653589793#
 
 ; common p-fields :
 ; p4 : amplitude (0 - 1)
@@ -105,6 +109,31 @@ gkvolWaveloss chnexport "wl", 1, 2, 1, 0, 1
 gkdropWaveloss chnexport "dropwl", 1, 2, 1, 0, 1
 gkmaxWaveloss chnexport "maxwl", 1, 2, 5, 1, 100
 gkmodeWaveloss chnexport "modewl", 1, 2, 0, 0, 1
+
+; UzuPhaser
+
+gkuzuWidth init 1.2
+gkuzuOffset init 0
+gkuzuDepth init 0.98
+giuzuFFTSize init 4096
+gkuzuSpeed init 0.05
+gkuzuBlur init 0.7
+gkuzuMix init 1
+gkuzuHzMode init 1
+gkuzuBassProtect init 0.5
+gkuzuSpread init 0.1
+gkvolUzu init 1
+
+gkuzuWidth chnexport "uzuwidth", 1, 2, 1.2, 0, 10
+gkuzuOffset chnexport "uzuoffset", 1, 2, 0, 0, 1
+gkuzuDepth chnexport "uzudepth", 1, 2, 0.98, 0, 1
+gkuzuSpeed chnexport "uzuspeed", 1, 2, 0.05, 0, 2
+gkuzuBlur chnexport "uzublur", 1, 2, 0.7, 0, 1
+gkuzuMix chnexport "uzumix", 1, 2, 1, 0, 1
+gkuzuHzMode chnexport "uzuhzmode", 1, 2, 1, 0, 1
+gkuzuBassProtect chnexport "uzubass", 1, 2, 0.5, 0, 1
+gkuzuSpread chnexport "uzuspread", 1, 2, 0.1, 0, 1
+gkvolUzu chnexport "voluzu", 1, 2, 1, 0, 1
 
 ;opcode for declicking an audio signal.
 ;Should only be used in instruments that have positive p3 duration.
@@ -366,6 +395,86 @@ opcode CompressorLimiterFx, aa, aakkki
     xout aOutL, aOutR
 endop
 
+; ==============================================================================
+; UDO: UzuPhaser
+; Signature: aakkkikkkkkk
+; ==============================================================================
+opcode UzuPhaser, aa, aakkkikkkkkk
+    ; Inputs: 2 Audio, 3 K-rate, 1 I-rate, 6 K-rate
+    aInL, aInR, kWidth, kOffset, kDepth, iFFTSize, kSpeed, kBlur, kMix, kHzMode, kBassProtect, kSpread xin
+
+    ; 1. FFT Setup
+    iOverlap  = iFFTSize / 4
+    iWinSize  = iFFTSize
+    iWinType  = 1 ; Von Hann
+    
+    fSrcL     pvsanal aInL, iFFTSize, iOverlap, iWinSize, iWinType
+    fSrcR     pvsanal aInR, iFFTSize, iOverlap, iWinSize, iWinType
+
+    ; 2. LFO & Movement
+    ; Create a ramp LFO that wraps around 0-1
+    kLFO      phasor  kSpeed
+    kBaseOff  =       kOffset + kLFO
+
+    ; 3. Generate Masks (Stereo)
+    iTableLen =       (iFFTSize / 2) + 1
+    iMaskL    ftgen   0, 0, iTableLen, 2, 0 
+    iMaskR    ftgen   0, 0, iTableLen, 2, 0 
+
+    ; Loop through bins to draw the filter curve
+    kIdx      =       0
+    while kIdx < iTableLen do
+        kNormIdx  = kIdx / iTableLen
+        
+        ; --- HERTZ vs OCTAVE MODE ---
+        if kHzMode == 1 then
+            kMapIdx = kNormIdx
+        else
+            ; Logarithmic mapping
+            kMapIdx = log(kNormIdx * 100 + 1) / log(101)
+        endif
+
+        ; --- BASS PROTECTION ---
+        kProtect  = (kIdx < 10 + (kBassProtect * 50)) ? (kIdx / (10 + (kBassProtect * 50))) : 1.0
+
+        ; --- CALCULATE SHAPE ---
+        kFreq     = kWidth * 150
+        
+        ; Left Channel
+        kAngleL   = (kMapIdx * kFreq) + (kBaseOff * $M_PI * 2)
+        kSineL    = sin(kAngleL)
+        kAmpL     = 1 - (kDepth * kProtect * (0.5 + (0.5 * kSineL)))
+        
+        ; Right Channel (Add Spread)
+        kAngleR   = (kMapIdx * kFreq) + ((kBaseOff + kSpread) * $M_PI * 2)
+        kSineR    = sin(kAngleR)
+        kAmpR     = 1 - (kDepth * kProtect * (0.5 + (0.5 * kSineR)))
+
+        ; Write to tables
+        tablew    kAmpL, kIdx, iMaskL
+        tablew    kAmpR, kIdx, iMaskR
+
+        kIdx      += 1
+    od
+
+    ; 4. Apply Processing
+    fMaskedL  pvsmaska fSrcL, iMaskL, 1
+    fMaskedR  pvsmaska fSrcR, iMaskR, 1
+
+    ; Blur
+    fBlurL    pvsblur  fMaskedL, kBlur, 1
+    fBlurR    pvsblur  fMaskedR, kBlur, 1
+
+    ; 5. Resynthesis
+    aWetL     pvsynth  fBlurL
+    aWetR     pvsynth  fBlurR
+    
+    aOutL     ntrpol   aInL, aWetL, kMix
+    aOutR     ntrpol   aInR, aWetR, kMix
+
+    xout      aOutL, aOutR
+endop
+
 
 ; FxChain to be used within each instrument before main send
 opcode FxChainInstr, aa, aakkkkkkiikkkkkkkkki
@@ -387,7 +496,7 @@ endop
 
 instr 1 ; Sampler
 
-SFile = p28
+SFile = p29
 
 p3 = filelen(SFile)
 ivol = p4
@@ -415,7 +524,8 @@ kCompThreshDb = p24 ;-18
 kCompHardness = p25 ;0.2
 kCompMix = p26
 iCompSideChain = p27 ;0 for disable, 1 for enable
-iTune = 2^(p29 / 12)
+iphaser = p28
+iTune = 2^(p30 / 12)
 
 inchs = filenchnls(SFile)
 
@@ -451,12 +561,15 @@ zawm isidecomp * aR, 18
 zawm isidermod * aL, 15
 zawm isidermod * aR, 16
 
+zawm iphaser * aL, 19
+zawm iphaser * aR, 20
+
 endin
 
 
 instr 2 ; Stutter
 
-Sname = p28
+Sname = p29
 
 idur = p3 
 ivol = p4
@@ -484,11 +597,12 @@ kCompThreshDb = p24 ;-18
 kCompHardness = p25 ;0.2
 kCompMix = p26
 iCompSideChain = p27 ;0 for disable, 1 for enable
+iphaser = p28
 
-i_tune = 2^(p29 / 12)
-i_divisor = p30
-i_pick = p31
-i_repeat = (p32 == 0) ? 1 : p32
+i_tune = 2^(p30 / 12)
+i_divisor = p31
+i_pick = p32
+i_repeat = (p33 == 0) ? 1 : p33
 
 inchs = filenchnls(Sname)
 ilength = filelen(Sname)
@@ -536,6 +650,8 @@ zawm isidermod * aR, 16
 zawm isidecomp * aL, 17
 zawm isidecomp * aR, 18
 
+zawm iphaser * aL, 19
+zawm iphaser * aR, 20
 
 endin
 
@@ -569,11 +685,12 @@ kCompThreshDb = p24 ;-18
 kCompHardness = p25 ;0.2
 kCompMix = p26
 iCompSideChain = p27 ;0 for disable, 1 for enable
-ifreq = cpsmidinn(p28)
-icf = p29
-ires = p30
+iphaser = p28
+ifreq = cpsmidinn(p29)
+icf = p30
+ires = p31
 
-imode = p31
+imode = p32
 
 acut = 200 + expon(1, idur, 0.001) * icf
 asig = vco2(1, ifreq, imode)
@@ -601,6 +718,9 @@ zawm isidermod * aR, 16
 
 zawm isidecomp * aL, 17
 zawm isidecomp * aR, 18
+
+zawm iphaser * aL, 19
+zawm iphaser * aR, 20
 
 endin
 
@@ -632,10 +752,11 @@ kCompThreshDb = p24 ;-18
 kCompHardness = p25 ;0.2
 kCompMix = p26
 iCompSideChain = p27 ;0 for disable, 1 for enable
-ifreq = cpsmidinn(p28)
-icf = p29
-ires = p30
-iad = p31
+iphaser = p28
+ifreq = cpsmidinn(p29)
+icf = p30
+ires = p31
+iad = p32
 
 ifEnvMax = 1.333*ifreq >= sr/2 ? ifreq : 1.333*ifreq
 
@@ -685,6 +806,9 @@ zawm isidermod * aR, 16
 zawm isidecomp * aL, 17
 zawm isidecomp * aR, 18
 
+zawm iphaser * aL, 19
+zawm iphaser * aR, 20
+
 endin
 
 instr 5 ; HiHats 808
@@ -715,8 +839,9 @@ kCompThreshDb = p24 ;-18
 kCompHardness = p25 ;0.2
 kCompMix = p26
 iCompSideChain = p27 ;0 for disable, 1 for enable
-iopen = p28
-itune = p29
+iphaser = p28
+iopen = p29
+itune = p30
 
 pa        =        (iopen >= 0.5 ? 1 : .15)   ; Select open or closed
 ifreq1    =        540*itune                     ; Tune
@@ -755,6 +880,9 @@ zawm isidermod * aR, 16
 zawm isidecomp * aL, 17
 zawm isidecomp * aR, 18
 
+zawm iphaser * aL, 19
+zawm iphaser * aR, 20
+
 endin
 
 instr 6 ; Simple subtractive-FM
@@ -785,14 +913,15 @@ kCompThreshDb = p24 ;-18
 kCompHardness = p25 ;0.2
 kCompMix = p26
 iCompSideChain = p27 ;0 for disable, 1 for enable
-ifreq = cpsmidinn(p28)
+iphaser = p28
+ifreq = cpsmidinn(p29)
 
-kindx = p34
-kcar = p32
-kfilt = p29
-kdpth = p33
-iad = p31
-kres = p30
+kindx = p35
+kcar = p33
+kfilt = p30
+kdpth = p34
+iad = p32
+kres = p31
 aenv = ADEnv(iad, 0)
 
 amod = poscil(1, cpsmidinn(ifreq) * kindx, gisine)
@@ -821,6 +950,9 @@ zawm isidermod * aR, 16
 
 zawm isidecomp * aL, 17
 zawm isidecomp * aR, 18
+
+zawm iphaser * aL, 19
+zawm iphaser * aR, 20
 
 endin
 
@@ -854,12 +986,13 @@ kCompThreshDb = p24 ;-18
 kCompHardness = p25 ;0.2
 kCompMix = p26
 iCompSideChain = p27 ;0 for disable, 1 for enable
-ifreq = cpsmidinn(p28)
-icf = p29
-ires = p30 ; 0.5 - 25 (?)
-iad = p31
-idetune = p32
-imix = p33
+iphaser = p28
+ifreq = cpsmidinn(p29)
+icf = p30
+ires = p31 ; 0.5 - 25 (?)
+iad = p32
+idetune = p33
+imix = p34
 
 isidecomp = 0
 isidermod = 0
@@ -912,6 +1045,9 @@ zawm isidermod * aR, 16
 zawm isidecomp * aL, 17
 zawm isidecomp * aR, 18
 
+zawm iphaser * aL, 19
+zawm iphaser * aR, 20
+
 endin
 
 instr 8	;String pad from Bay at Night, Diaz
@@ -942,7 +1078,8 @@ kCompThreshDb = p24 ;-18
 kCompHardness = p25 ;0.2
 kCompMix = p26
 iCompSideChain = p27 ;0 for disable, 1 for enable
-ihz = cpsmidinn(p28)
+iphaser = p28
+ihz = cpsmidinn(p29)
 
 kctrl = linseg(0, p3*.3, iamp, idur*.3, iamp, idur*.4, 0)
 anoise = rand(kctrl)
@@ -978,6 +1115,9 @@ zawm isidermod * aR, 16
 zawm isidecomp * aL, 17
 zawm isidecomp * aR, 18
 
+zawm iphaser * aL, 19
+zawm iphaser * aR, 20
+
 endin
 
 instr 9 ; Karplus - Strong
@@ -1008,9 +1148,10 @@ kCompThreshDb = p24 ;-18
 kCompHardness = p25 ;0.2
 kCompMix = p26
 iCompSideChain = p27 ;0 for disable, 1 for enable
-ipitch = cpsmidinn(p28)
-irough = p29
-istretch = p30
+iphaser = p28
+ipitch = cpsmidinn(p29)
+irough = p30
+istretch = p31
 
 kpitch = expseg:k(ipitch, idur, 432)
 
@@ -1037,6 +1178,9 @@ zawm isidermod * aR, 16
 
 zawm isidecomp * aL, 17
 zawm isidecomp * aR, 18
+
+zawm iphaser * aL, 19
+zawm iphaser * aR, 20
 
 endin
 
@@ -1164,11 +1308,12 @@ kCompThreshDb = p24 ;-18
 kCompHardness = p25 ;0.2
 kCompMix = p26
 iCompSideChain = p27 ;0 for disable, 1 for enable
+iphaser = p28
 
-SBut = p28
-iYAmp = p29
-iXAmp = p30
-iADRatio = p31
+SBut = p29
+iYAmp = p30
+iXAmp = p31
+iADRatio = p32
 
 aDTMF = dtmf(SBut, iXAmp, iYAmp)
 
@@ -1197,6 +1342,9 @@ zawm isidermod * aR, 16
 
 zawm isidecomp * aL, 17
 zawm isidecomp * aR, 18
+
+zawm iphaser * aL, 19
+zawm iphaser * aR, 20
 
 endin
 
@@ -1339,7 +1487,7 @@ instr 552	;Spectral Chorus
  fsiglBlur pvsblur fsigl, kblurtime, 5
  aBlurL pvsynth fsiglBlur
  
- fsigr pvsanal aoutl, 512, 128, 1024, 0  
+ fsigr pvsanal aoutr, 512, 128, 1024, 0  
  fsigrBlur pvsblur fsigr, kblurtime, 5
  aBlurR pvsynth fsigrBlur
 
@@ -1349,6 +1497,16 @@ instr 552	;Spectral Chorus
  zawm aL, 13
  zawm aR, 14
 
+endin
+
+instr 553 ; UzuPhaser
+    aInL zar 19
+    aInR zar 20
+
+    aOutL, aOutR UzuPhaser aInL, aInR, gkuzuWidth, gkuzuOffset, gkuzuDepth, giuzuFFTSize, gkuzuSpeed, gkuzuBlur, gkuzuMix, gkuzuHzMode, gkuzuBassProtect, gkuzuSpread
+
+    zawm aOutL * gkvolUzu, 21
+    zawm aOutR * gkvolUzu, 22
 endin
 
 
@@ -1362,6 +1520,8 @@ adelL zar 9
 adelR zar 10
 achoL zar 13
 achoR zar 14
+auzuL zar 21
+auzuR zar 22
 
 aL += arvbL
 aR += arvbR
@@ -1369,6 +1529,9 @@ aL += adelL
 aR += adelR
 aL += achoL
 aR += achoR
+aL += auzuL
+aR += auzuR
+
 aLW waveloss aL * gkvolWaveloss, gkdropWaveloss * gkmaxWaveloss, gkmaxWaveloss, 0
 arW waveloss aR * gkvolWaveloss, gkdropWaveloss * gkmaxWaveloss, gkmaxWaveloss, 0
 aL *= (1-gkvolWaveloss)
@@ -1390,6 +1553,7 @@ i 999 0 -1
 i 550 0 -1
 i 551 0 -1
 i 552 0 -1
+i 553 0 -1
 
 </CsScore>
 </CsoundSynthesizer>
