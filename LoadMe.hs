@@ -154,6 +154,8 @@ sn808cl = defPath "/808/808_snare_9_TL.wav"
 addI "sn808cl" $ sampler sn808cl
 sn808d = defPath "/808/808_snare_34_TL.wav"
 addI "sn808d" $ sampler sn808d
+glsn = defPath "/snares/Snare Prism2.wav"
+addI "glsn" $ sampler glsn
 ride626 = defPath "/626/ride.wav"
 shkr626 = defPath "/626/shaker.wav"
 sn1626 = defPath "/626/snare1.wav"
@@ -228,6 +230,12 @@ jzy = defPath "/breaks/JazzyBreak9A.wav"
 mys = defPath "/breaks/Mystique.wav"
 jzn = defPath "/breaks/JazzNoteBreak2.wav"
 ohbre = defPath "/breaks/OhBreak1A.wav"
+pboi = defPath "/breaks/Playboy Break - 6B.wav"
+beb = defPath "/breaks/Wheel Up 2 Bad.wav"
+hoco = defPath "/breaks/horny_conga.wav"
+addI "hoco" $ stutter hoco 
+addI "beb" $ stutter beb
+addI "pboi" $ stutter pboi
 addI "alzir" $ stutter alzir
 addI "back" $ stutter back
 addI "bad" $ stutter bad
@@ -268,20 +276,20 @@ addI "jzn" $ stutter jzn
 addI "ohbre" $ stutter ohbre
 er1k = defPath "/ER1/kick04.wav"
 er1k2 = defPath "/ER1/kick03.wav"
+er1k3 = defPath "/ER1/kick14.wav"
 er1kl = defPath "/ER1/kick08.wav"
 er1mhh = defPath "/ER1/MicroHat.wav"
 er1cr1 = defPath "/ER1/CrashCymbal1.wav"
 er1cr2 = defPath "/ER1/CrashCymbal2.wav"
 er1r = defPath "/ER1/rim01.wav"
-er1kd = defPath "/ER1/kick14.wav"
 addI "er1k" $ sampler er1k
 addI "er1k2" $ sampler er1k2
+addI "er1k3" $ sampler er1k3
 addI "er1kl" $ sampler er1kl
 addI "er1mhh" $ sampler er1mhh
 addI "er1cr1" $ sampler er1cr1
 addI "er1cr2" $ sampler er1cr2
 addI "er1r" $ sampler er1r
-addI "er1kd" $ sampler er1kd
 ch886 = defPath "/raveshaped/CH886.wav"
 addI "ch886" $ sampler ch886
 chdb = defPath "/raveshaped/CHDigiboy.wav"
@@ -292,6 +300,8 @@ ohmlfx = defPath "/raveshaped/OHMalefix.wav"
 addI "ohmlfx" $ sampler ohmlfx
 rimshock = defPath "/raveshaped/RimShock.wav"
 addI "rimshock" $ sampler rimshock
+chxtan = defPath "/raveshaped/CHExtraTan.wav"
+addI "chxtan" $ sampler chxtan 
 mp = defPath "/iclc/mp.wav" 
 addI "mp" $ sampler mp
 dur "mp" [15] k
@@ -368,71 +378,70 @@ addI "snare41" $ sampler snare41
 -- a lot of text
 fs n string | n <= 0 = [] | otherwise = string ++ " " ++ fs (n-1) string
 f = fs 666
--- phaser convenience functions
-phaser i list fun = addPf i 28 "phaser" (toPfs list) fun
-
-voluzu = setChannel csd1 "voluzu"
-uzuvol i list fun = addPf i 1 "voluzu" (toPfs list) fun
-uzuwidth = setChannel csd1 "uzuwidth"
-uzuwd i list fun = addPf i 2 "uzuwidth" (toPfs list) fun
-uzuoffset = setChannel csd1 "uzuoffset"
-uzuoff i list fun = addPf i 3 "uzuoffset" (toPfs list) fun
-uzudepth = setChannel csd1 "uzudepth"
-uzudp i list fun = addPf i 4 "uzudepth" (toPfs list) fun
-uzuspeed = setChannel csd1 "uzuspeed"
-uzusp i list fun = addPf i 5 "uzuspeed" (toPfs list) fun
-uzublur = setChannel csd1 "uzublur"
-uzubl i list fun = addPf i 6 "uzublur" (toPfs list) fun
-uzumix = setChannel csd1 "uzumix"
-uzumx i list fun = addPf i 7 "uzumix" (toPfs list) fun
-uzuhzmode = setChannel csd1 "uzuhzmode"
-uzuhz i list fun = addPf i 8 "uzuhzmode" (toPfs list) fun
-uzubass = setChannel csd1 "uzubass"
-uzubs i list fun = addPf i 9 "uzubass" (toPfs list) fun
-uzuspread = setChannel csd1 "uzuspread"
-uzuspr i list fun = addPf i 10 "uzuspread" (toPfs list) fun
 
 -- Preset system
 -- Usage: presetName "instrumentName"
 -- Example: acid303 "303"
 
 type Preset = String -> IO ()
-
 -- 303 (acidBass)
+classic303 i = cf i [1200] keep >> res i [10] keep >> wf02 i [10] keep >> dist i [0.3] keep
 acid303 i = cf i [2000] keep >> res i [15] keep >> wf02 i [0] keep >> dist i [0.5] keep >> distChar i [0.2] keep
 deep303 i = cf i [600] keep >> res i [5] keep >> wf02 i [10] keep >> dist i [0.2] keep
-
+drex303 i = cf i [4000] keep >> res i [20] keep >> wf02 i [0] keep >> dist i [0.7] keep >> distChar i [0.8] keep >> phaser i [0.4] keep
+electro303 i = cf i [800] keep >> res i [25] keep >> wf02 i [10] keep >> dist i [0.4] keep >> dur i [0.15] keep
 -- Hoover
 classicHov i = cf i [5000] keep >> res i [12] keep >> adRatio i [0.2] keep >> dist i [0.4] keep
 softHov i = cf i [1000] keep >> res i [2] keep >> adRatio i [0.8] keep >> dist i [0] keep
-
+aggroHov i = cf i [8000] keep >> res i [18] keep >> adRatio i [0.1] keep >> dist i [0.8] keep >> distChar i [0.9] keep
+darkHov i = cf i [400] keep >> res i [25] keep >> adRatio i [0.5] keep
 -- superSaw
 brightSaw i = cf i [12000] keep >> res i [2] keep >> detune i [0.4] keep >> sawmix i [0.8] keep >> adRatio i [0.3] keep
 cloudSaw i = cf i [2500] keep >> res i [1] keep >> detune i [0.9] keep >> sawmix i [0.5] keep >> adRatio i [0.9] keep
-
+stabbySaw i = cf i [8000] keep >> res i [8] keep >> detune i [0.2] keep >> sawmix i [0.6] keep >> adRatio i [0.05] keep >> dur i [0.1] keep
+tranceSaw i = cf i [6000] keep >> res i [4] keep >> detune i [0.8] keep >> sawmix i [0.9] keep >> adRatio i [0.3] keep >> phaser i [0.3] keep
 -- stringPad (using common filter parameters)
 silkPad i = lpFreq i [8000] keep >> lpRes i [1] keep >> chorus i [0.4] keep
 darkPad i = lpFreq i [800] keep >> lpRes i [10] keep >> chorus i [0.2] keep
-
 -- Karplus-Strong
 nylonKarp i = rough i [0.1] keep >> stretch i [0.1] keep >> lpFreq i [5000] keep
 metalKarp i = rough i [0.9] keep >> stretch i [0.01] keep >> dist i [0.6] keep
-
 -- lpFM
-bassFM i = cf i [400] keep >> res i [2] keep >> fmCar i [1] keep >> fmDepth i [600] keep >> fmIndx i [2.45] keep >> adRatio i [0.3] keep
+bassFM i = cf i [400] keep >> res i [1] keep >> fmCar i [1] keep >> fmDepth i [600] keep >> fmIndx i [2.45] keep >> adRatio i [0.3] keep
+deepFM i = cf i [300] keep >> res i [1] keep >> fmCar i [1] keep >> fmDepth i [1000] keep >> fmIndx i [2] keep >> adRatio i [0.2] keep
 bellFM i = cf i [7000] keep >> res i [6] keep >> fmCar i [2] keep >> fmDepth i [2000] keep >> fmIndx i [1.5] keep >> adRatio i [0.1] keep
-
+harshFM i = cf i [15000] keep >> res i [10] keep >> fmCar i [4.33] keep >> fmDepth i [5000] keep >> fmIndx i [10] keep >> adRatio i [0.4] keep >> dist i [0.5] keep
+leadFM i = cf i [8000] keep >> res i [4] keep >> fmCar i [1] keep >> fmDepth i [1200] keep >> fmIndx i [2] keep >> adRatio i [0.1] keep
+hornFM i = cf i [1500] keep >> res i [3] keep >> fmCar i [1.5] keep >> fmDepth i [800] keep >> fmIndx i [1.0] keep >> adRatio i [0.2] keep
+stringFM i = cf i [3000] keep >> res i [1] keep >> fmCar i [1] keep >> fmDepth i [300] keep >> fmIndx i [1] keep >> adRatio i [0.8] keep
 -- DTMF
 dialing i = btn i ["1"] keep >> ampY i [1] keep >> ampX i [1] keep >> adRatio i [0.2] keep
 alienDial i = btn i ["#"] keep >> ampY i [0.6] keep >> ampX i [2.5] keep >> adRatio i [1.0] keep
 
 -- csv files with tables
+
 csv1 = markPath "/Test.csv"
 csv2 = markPath "/Test2.csv"
 csv3 = markPath "/Test3.csv"
+csvTechno = markPath "/Techno.csv"
+csvAcid = markPath "/Acid.csv"
+csvElectro = markPath "/Electro.csv"
+csvJungle = markPath "/Jungle.csv"
+csvIDM = markPath "/IDM.csv"
+csvTrance = markPath "/Trance.csv"
+csvBreakDnB = markPath "/Break_DnB.csv"
+csvBreakJungle = markPath "/Break_Jungle.csv"
+csvBreakVsnare = markPath "/Break_Vsnare.csv"
+csvBreakAe = markPath "/Break_Ae.csv"
+csvStutsDnB = markPath "/Stuts_DnB.csv"
+csvStutsVsnare = markPath "/Stuts_Vsnare.csv"
+csvStutsAe = markPath "/Stuts_Ae.csv"
+
 -- prms "lpFM" [ (keep, vol, [Pd 0.7]),(keep, rev, [Pd 0.5]),((percentNext 73), pitch, toPfs [53, 56, 58, 53, 48]),(keep, fmIndx, [Pd 12.3]), (keep, fmDepth, [Pd 987.23]),(keep,cf,[Pd 3880]),( keep, rev, [Pd 0.6]),(keep, adRatio,[Pd 0.7]),(randomize,pan,toPfs[0.4,0.6,0.75,0.35])]
 -- prms "303" [ (keep,dur,toPfs [0.25]),(keep,res,[Pd 4]),(keep, vol, [Pd 0.5]),(keep, cf, [Pd 3500]),((runMarkovCSV csv3), pitch, toPfs (withScale 41 dorian)),(keep, rev, [Pd 0.4])]
 -- prms "hov" [ (keep,dur,toPfs [1.2]),(keep, vol, [Pd 0.3]),(keep, cf, [Pd 800]),((runMarkovCSV csv3), pitch, toPfs (withScale 41 dorian)),(keep, rev, [Pd 0.7])]
 -- let plucky = cf "303" [Pd 5000] keep >> res "303" [Pd 6] keep >> dur "303" [Pd 0.17] keep
 -- plucky
+-- prms "303" [(runMarkovCSV csvAcid, pitch, toPfs (withScale 41 aeolian))]
+
 :! clear

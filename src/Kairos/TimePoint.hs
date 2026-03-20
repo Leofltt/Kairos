@@ -166,7 +166,11 @@ defaultTPMap = do
         ("fwk2", fwk2),
         ("adb", adb),
         ("adk", adk),
-        ("dbk2", dbk2)
+        ("dbk2", dbk2),
+        ("j16", j16),
+        ("idm16", idm16),
+        ("teclong", teclong),
+        ("pol3_16", pol3_16)
       ]
 
 -- a few time patterns in 4/4
@@ -259,3 +263,19 @@ adk = toTP [0, 1, 2, 2.5, 3, 4, 5, 5.5, 6, 7, 8, 8.5, 9, 10, 11, 11.5]
 
 adb :: [TimePoint]
 adb = toTP [0, 1, 2, 3, 4.5, 5, 6, 7, 8, 9.5, 10]
+
+-- | 16-beat (4-bar) Jungle/DnB variation pattern
+j16 :: [TimePoint]
+j16 = toTP [0, 1.75, 2.5, 3.5, 4, 5.75, 6.25, 7.5, 8, 9.75, 10, 11.5, 12, 13.75, 14.25, 15.5]
+
+-- | 16-beat (4-bar) syncopated IDM/Glitch pattern
+idm16 :: [TimePoint]
+idm16 = toTP [0, 0.25, 1.5, 1.75, 2, 3.5, 4, 4.25, 5.75, 6, 7.25, 8, 8.75, 9, 10.5, 11, 12, 13.5, 14, 15.25]
+
+-- | 16-beat (4-bar) Techno pattern with 8-beat syncopation
+teclong :: [TimePoint]
+teclong = toTP $ takeWhile (< 16) [0, 1, 2, 2.75, 3, 4, 5, 6, 6.75, 7, 8, 9, 10, 10.75, 11, 12, 13, 14, 14.75, 15]
+
+-- | 16-beat cross-rhythm (3 beats over 4/4) pattern
+pol3_16 :: [TimePoint]
+pol3_16 = toTP $ takeWhile (< 16) [0, 1.5, 3, 4.5, 6, 7.5, 9, 10.5, 12, 13.5, 15]

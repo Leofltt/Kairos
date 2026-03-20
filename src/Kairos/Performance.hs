@@ -1,23 +1,29 @@
 {-# OPTIONS_GHC -Wno-missing-fields #-}
+
 module Kairos.Performance where
 
-import Kairos.Instrument ( Instr(..), Orchestra, defaultOrc )
-import Kairos.Clock
-    ( TimeSignature(bpm, beatInMsr), Clock, defaultClock, currentTS )
-import Kairos.TimePoint ( TimePoint, notEmpty, defaultTPMap )
-import Kairos.Pfield
-import Kairos.PfPat
-import Kairos.Utilities ( addToMap, lookupMap, stringToDouble )
-import Control.Concurrent.STM ( newTVarIO, readTVarIO, TVar, atomically )
-import qualified Data.Map.Strict as M
+import Control.Concurrent.STM (TVar, newTVarIO, readTVarIO)
+import Data.Map.Strict qualified as M
 import Data.Maybe (fromJust, isNothing)
+import Kairos.Clock
+  ( Clock,
+    TimeSignature (beatInMsr, bpm),
+    currentTS,
+    defaultClock,
+  )
+import Kairos.Instrument (Instr (..), Orchestra, defaultOrc)
+import Kairos.PfPat
+import Kairos.Pfield
+import Kairos.TimePoint (TimePoint, defaultTPMap, notEmpty)
+import Kairos.Utilities (addToMap, lookupMap, stringToDouble)
 
 -- | the Performance is the scope of the composition
-data Performance = P { orc :: Orchestra
-                     , clock :: Clock
-                     , timePs :: TVar (M.Map [Char] [TimePoint]) -- a map of time patterns with their names
-                     -- TODO: gotta add Musical Key in here
-                     }
+data Performance = P
+  { orc :: Orchestra,
+    clock :: Clock,
+    timePs :: TVar (M.Map [Char] [TimePoint]) -- a map of time patterns with their names
+    -- TODO: gotta add Musical Key in here
+  }
 
 -- | create a default performance
 defaultPerformance :: IO Performance
@@ -25,10 +31,12 @@ defaultPerformance = do
   o <- defaultOrc
   c <- defaultClock
   t <- defaultTPMap
-  return $ P { orc = o
-             , clock = c
-             , timePs = t
-             }
+  return $
+    P
+      { orc = o,
+        clock = c,
+        timePs = t
+      }
 
 -- | print the parameters of an instrument in a performance
 displayParams :: Performance -> String -> IO ()
@@ -46,13 +54,15 @@ displayParams perf name = do
 createPfPat :: Int -> String -> [Pfield] -> (PfPat -> IO Pfield) -> IO PfPat
 createPfPat num name pfields updtr = do
   ptrn <- newTVarIO pfields
-  return $ PfPat { pfId = Either num name
-                 , pat = ptrn
-                 , updater = updtr
-                 }
+  return $
+    PfPat
+      { pfId = Either num name,
+        pat = ptrn,
+        updater = updtr
+      }
 
 addPfPath :: Instr -> Int -> PfPat -> IO ()
-addPfPath i num pfPat = addToMap (pats i) (num,pfPat)
+addPfPath i num pfPat = addToMap (pats i) (num, pfPat)
 
 addPfPath' :: Performance -> [Char] -> Int -> PfPat -> IO ()
 addPfPath' e insname num pfPat = do
@@ -61,20 +71,20 @@ addPfPath' e insname num pfPat = do
 
 displayInstruments :: Performance -> IO String
 displayInstruments perf = do
-   ins <- readTVarIO (orc perf)
-   return $ unwords $ M.keys ins
+  ins <- readTVarIO (orc perf)
+  return $ unwords $ M.keys ins
 
 withTimeSignature :: Performance -> [Pfield] -> IO [Pfield]
 withTimeSignature perf l = do
   ts <- currentTS $ clock perf
-  let oneSecond = 60/bpm ts
+  let oneSecond = 60 / bpm ts
   let oneBarSecond = beatInMsr ts * oneSecond
-  let beatsInSeconds = map (*oneBarSecond) (stringToDouble $ map show l)
+  let beatsInSeconds = map (* oneBarSecond) (stringToDouble $ map show l)
   return $ toPfs beatsInSeconds
 
 -- to add instruments
 addInstrument :: Performance -> String -> Instr -> IO ()
-addInstrument perf name instr = addToMap (orc perf) (name,instr)
+addInstrument perf name instr = addToMap (orc perf) (name, instr)
 
 getTimePoint :: Performance -> String -> IO [TimePoint]
 getTimePoint perf s = do
@@ -83,9 +93,11 @@ getTimePoint perf s = do
 
 -- add a named pattern of timepoints to a performance
 addTPf :: Performance -> String -> [TimePoint] -> IO ()
-addTPf e n ts = addToMap (timePs e) (n,ts)
+addTPf e n ts = addToMap (timePs e) (n, ts)
 
 maybeAddTPf :: Performance -> String -> [TimePoint] -> IO ()
-maybeAddTPf e n ts | isNothing mts = putStrLn "Pattern is empty"
-                   | otherwise = addTPf e n $ fromJust mts
-                   where mts = notEmpty ts
+maybeAddTPf e n ts
+  | isNothing mts = putStrLn "Pattern is empty"
+  | otherwise = addTPf e n $ fromJust mts
+  where
+    mts = notEmpty ts
