@@ -40,6 +40,16 @@ instance PfAble Double where
     fromPf (Pd x) = x
     fromPf (Ps _) = error "pfield is a string, not a double"
 
+instance PfAble Int where
+    toPf = Pd . fromIntegral
+    fromPf (Pd x) = round x
+    fromPf (Ps _) = error "pfield is a string, not an int"
+
+instance PfAble Integer where
+    toPf = Pd . fromIntegral
+    fromPf (Pd x) = round x
+    fromPf (Ps _) = error "pfield is a string, not an integer"
+
 instance PfAble String where
     toPf = Ps
     fromPf (Ps x) = x

@@ -12,5 +12,9 @@ import Kairos.Utilities as K
 import Kairos.Scales as K
 import Kairos.Markov as K
     ( runMarkov,
-      runMarkovCSV )
+      runMarkovCSV,
+      runMarkovSimple,
+      runMarkovSimpleCSV,
+      rMkvS,
+      rMkvSCSV )
 import Kairos.Kit as K

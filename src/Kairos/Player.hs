@@ -8,7 +8,7 @@ import Control.Concurrent.STM (TVar, readTVarIO)
 import Control.Exception (SomeException, catch)
 import Control.Monad (void, when)
 import Data.Map.Strict qualified as M
-import Data.Maybe (fromJust, isJust, isNothing)
+import Data.Maybe (fromJust, isJust)
 import Kairos.Clock
   ( TimeSignature (beatInMsr),
     beatInBar,
@@ -39,7 +39,7 @@ import Kairos.TimePoint
     nextBeat,
     wrapBar,
   )
-import Kairos.Utilities (addToMap, lookupMap, sameConstructor, safeHead)
+import Kairos.Utilities (addToMap, lookupMap, sameConstructor)
 
 setChannel :: UDPPort -> String -> Pfield -> IO ()
 setChannel port chanName val = do
@@ -113,8 +113,10 @@ playOne perf i tp = catch (do
 playNow :: Performance -> String -> IO ()
 playNow perf i = do
   tp <- beatInBar (clock perf)
-  Just p <- lookupMap (orc perf) i
-  playOne perf p (pure tp)
+  mIns <- lookupMap (orc perf) i
+  case mIns of
+    Just p' -> playOne perf p' (pure tp)
+    Nothing -> putStrLn $ "Error: Instrument " ++ i ++ " not found"
 
 -- | start the play loop of an instrument
 -- inspired by Conductive, R. Bell https://lac.linuxaudio.org/2011/papers/35.pdf
@@ -140,7 +142,6 @@ playLoop perf pn Active = catch (do
       now <- timeD (clock perf)
       cb <- currentBeat (clock perf)
       ts <- currentTS (clock perf)
-      let pb = toPlay p
       if timeF p == ""
         then do
           changeStatus perf pn Stopping
@@ -149,7 +150,7 @@ playLoop perf pn Active = catch (do
             Just p' -> playLoop perf pn $ status p'
             Nothing -> return ()
         else do
-          case pb of
+          case toPlay p of
             Nothing -> do
                putStrLn $ "Warning: toPlay is Nothing for " ++ pn ++ " in Active state. Resetting..."
                changeStatus perf pn Init
@@ -191,7 +192,6 @@ playLoop perf i Init = catch (do
   case mP of
     Nothing -> putStrLn $ "Error: Instrument " ++ i ++ " not found in Init"
     Just p -> do
-      let pb = toPlay p
       if (timeF p == "")
         then do
           changeStatus perf i Stopping
@@ -283,7 +283,7 @@ changeTimeF e k newF = do
   pl <- lookupMap (orc e) k
   case pl of
     Nothing -> putStrLn "Instrument not found"
-    Just i -> do
+    Just _ -> do
       tp <- lookupMap (timePs e) newF
       case tp of
         Nothing -> putStrLn "Time Pattern not found"

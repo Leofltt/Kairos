@@ -5,7 +5,6 @@ module Kairos.Markov where
 import Control.Concurrent.STM (atomically, readTVarIO, writeTVar)
 import Data.Char (isNumber, isSymbol)
 import Data.List (elemIndex)
-import Data.Maybe (fromJust)
 import Kairos.PfPat (PfPat (pat), Updater)
 import Kairos.Pfield (Pfield)
 import Kairos.Utilities (randF, stringToDouble)
@@ -69,6 +68,12 @@ rMkv = runMarkov
 
 rMkvCSV :: String -> Updater
 rMkvCSV = runMarkovCSV
+
+rMkvS :: [[Double]] -> [Pfield] -> IO [Pfield]
+rMkvS = runMarkovSimple
+
+rMkvSCSV :: String -> [Pfield] -> IO [Pfield]
+rMkvSCSV = runMarkovSimpleCSV
 
 pickProb4Index :: Double -> [Double] -> Double
 pickProb4Index perc list = go perc list (length list)

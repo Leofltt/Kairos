@@ -85,6 +85,16 @@ offset i = map (+ i)
 modifyList :: (t -> a) -> [t] -> [a]
 modifyList f l = [f x | x <- l]
 
+genSeqU :: Int -> ([a] -> IO [a]) -> [a] -> IO [a]
+genSeqU n f initial = go n initial []
+  where
+    go 0 _ acc = return (reverse acc)
+    go i state acc = do
+      newState <- f state
+      if null newState
+        then return (reverse acc)
+        else go (i - 1) newState (head newState : acc)
+
 --adapted from: https://stackoverflow.com/questions/27095647/convert-a-string-list-to-a-double-list-in-haskell
 stringToDouble :: [String] -> [Double]
 stringToDouble [x] = [read x :: Double]

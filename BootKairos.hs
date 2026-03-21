@@ -23,6 +23,8 @@ getTP = getTimePoint perf
 addPf' = addPfPath' perf
 addPf i pfnum pfname list fun = addPf' i pfnum =<< createPfPat pfnum pfname list fun
 
+gSU = genSeqU
+
 -- common parameters
 dur i list fun = addPf i 3 "dur" (toPfs list) fun      -- in seconds
 d' i fun list = dur i (fromPfsD list) fun
@@ -169,3 +171,5 @@ dnb1 k s h = cPat "dbk" k >> cPat "downB" s >> cPat "eightN" h
 runPfield i (fun,upd,list) = fun i list upd
 prms i ls = mapM_ (runPfield i) ls
 
+-- | Shorthand for Kit remapping with current performance resolver
+withK' kit upd = withK kit (resolvePfield perf) upd

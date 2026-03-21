@@ -122,6 +122,7 @@ test-suite Kairos-test
        Test.Kit, 
        Test.PfPat, 
        Test.TimePoint,
+       Test.Utilities
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:

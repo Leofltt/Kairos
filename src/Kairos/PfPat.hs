@@ -1,7 +1,7 @@
 module Kairos.PfPat where
 
-import Control.Concurrent.STM (TVar, atomically, readTVarIO, writeTVar)
-import Kairos.Pfield (PfId, Pfield (Pd))
+import Control.Concurrent.STM (TVar, atomically, newTVarIO, readTVarIO, writeTVar)
+import Kairos.Pfield (PfAble, PfId (Either), Pfield (Pd), pDouble, toPfs)
 import Kairos.Utilities (checkPercentNext, randI, safeHead, safeTail)
 
 -- | pattern of pfields and related update function
@@ -90,3 +90,22 @@ aup n = do
       k n
     else do
       nv n
+
+-- | Generate a list of values using any Updater (like runMarkovCSV)
+genU :: PfAble a => Int -> Updater -> [a] -> IO [Pfield]
+genU n upd initial = do
+  p <- newTVarIO (toPfs initial)
+  let patrn = PfPat (Either 0 "") p upd
+  let go 0 = return []
+      go i = do
+        r <- upd patrn
+        rs <- go (i - 1)
+        return (r : rs)
+  go n
+
+-- | Remap an updater's output (indices) to a Scale
+withS :: [Double] -> Updater -> Updater
+withS sc upd n = do
+  res <- upd n
+  let idx = round (pDouble res) `mod` length sc :: Int
+  return $ Pd (sc !! idx)

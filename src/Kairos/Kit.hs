@@ -35,3 +35,11 @@ runKitMarkovR :: String -> Kit -> (Pfield -> IO Pfield) -> Updater
 runKitMarkovR csv kit resolver n = do
   idxPf <- runMarkovCSV csv n
   resolver $ fromKit kit (round $ pDouble idxPf)
+
+-- | Remap an updater's output (indices) to a Kit (with path resolution)
+withK :: Kit -> (Pfield -> IO Pfield) -> Updater -> Updater
+withK kit resolver upd n = do
+  res <- upd n
+  let names = M.elems kit
+  let idx = round (pDouble res) `mod` length names :: Int
+  resolver (names !! idx)

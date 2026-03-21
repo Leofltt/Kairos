@@ -54,10 +54,6 @@ deep303 "303"
 
 pitch "303" (withScale 41 dorian) $ runMarkovCSV csvAcid
 
--- =============================================================================
--- PERFORMANCE SETUP (143 BPM / D Dorian)
--- =============================================================================
-
 -- Main performance kit
 -- 1-3: Kicks, 4-7: Snares/Claps, 8-11: Hats, 12-14: Percs, 15-17: Cymbals/FX
 
@@ -76,7 +72,10 @@ addI "strings" $ stringPad
 -- D3 = 50, D2 = 38
 
 let dDorian = withScale 50 dorian
-let d2Dorian = withScale 38 dorian
+let d2Dorian = withScale 38 dorian 
+scal = [38.0, 40.0, 41.0, 43.0, 45.0, 48.0]
+
+
 
 -- Kit Markov Variations
 
@@ -148,8 +147,6 @@ sample "kit" (toPfs [1..17]) kitJ
 addC "kit" "amen" $ textToTP 16 "x-x"
 
 -- =============================================================================
--- SECTION 3: UKG / IDM VARIATIONS
--- =============================================================================
 
 -- Strings: Ambience & Pads
 
@@ -172,12 +169,9 @@ pitch "sSaw" [62, 65, 69, 72] nv >> cPat "sixteenN" "sSaw"
 
 -- Lead 2: Chopped Vocal Hook
 pitch "sSaw" [57, 57, 55, 53] nv >> addC "sSaw" "vocal" [0, 0.5, 2, 2.5]
-
--- Kit: Glitch / IDM Markov
-
+ 
 sample "glitch" (toPfs [1..17]) kitI 
 addC "glitch" "idm" $ textToTP 8 "adhejf" 
 
-
--- Kit 2: Micro Glitch
-prms "glitch" [(stuts, rnd, [1, 2, 8, 16]), (durTS, k, [0.0625])] >> addC "glitch" "micro" $ euclid (13, 32) 4 32
+prms "glitch" [(stuts, rnd, [1, 2, 8, 16]), (durTS, k, [0.0625])]  
+addC "glitch" "micro" $ euclid (13, 32) 4 32 

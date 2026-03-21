@@ -436,6 +436,8 @@ csvBreakAe = markPath "/Break_Ae.csv"
 csvStutsDnB = markPath "/Stuts_DnB.csv"
 csvStutsVsnare = markPath "/Stuts_Vsnare.csv"
 csvStutsAe = markPath "/Stuts_Ae.csv"
+csvKitT = markPath "/Kit_Techno.csv"
+csvKitJ = markPath "/Kit_Jungle.csv"
 
 -- prms "lpFM" [ (keep, vol, [Pd 0.7]),(keep, rev, [Pd 0.5]),((percentNext 73), pitch, toPfs [53, 56, 58, 53, 48]),(keep, fmIndx, [Pd 12.3]), (keep, fmDepth, [Pd 987.23]),(keep,cf,[Pd 3880]),( keep, rev, [Pd 0.6]),(keep, adRatio,[Pd 0.7]),(randomize,pan,toPfs[0.4,0.6,0.75,0.35])]
 -- prms "303" [ (keep,dur,toPfs [0.25]),(keep,res,[Pd 4]),(keep, vol, [Pd 0.5]),(keep, cf, [Pd 3500]),((runMarkovCSV csv3), pitch, toPfs (withScale 41 dorian)),(keep, rev, [Pd 0.4])]
