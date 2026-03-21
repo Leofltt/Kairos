@@ -109,6 +109,8 @@ silence = stopAll perf
 playA = playAll perf
 solo = soloIns perf
 
+runKitMarkov csv kit = runKitMarkovR csv kit (resolvePfield perf)
+
 fbdel = setChannel csd1 "fbdel"
 delfb i list fun =  addPf i 3 "fbdel" (toPfs list) fun -- delay fb
 dtdel = setChannel csd1 "dtdel"

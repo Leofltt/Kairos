@@ -5,6 +5,7 @@ module Kairos.Player where
 
 import Control.Concurrent (forkIO)
 import Control.Concurrent.STM (TVar, readTVarIO)
+import Control.Exception (SomeException, catch)
 import Control.Monad (void, when)
 import Data.Map.Strict qualified as M
 import Data.Maybe (fromJust, isJust, isNothing)
@@ -38,7 +39,7 @@ import Kairos.TimePoint
     nextBeat,
     wrapBar,
   )
-import Kairos.Utilities (addToMap, lookupMap, sameConstructor)
+import Kairos.Utilities (addToMap, lookupMap, sameConstructor, safeHead)
 
 setChannel :: UDPPort -> String -> Pfield -> IO ()
 setChannel port chanName val = do
@@ -88,7 +89,7 @@ playInstr instr = do
           error "Error: Unknown instrument destination kind"
 
 playOne :: Performance -> Instr -> TimePoint -> IO ()
-playOne perf i tp = do
+playOne perf i tp = catch (do
   ts <- currentTS (clock perf)
   cb <- currentBeat (clock perf)
   now <- timeD (clock perf)
@@ -100,12 +101,13 @@ playOne perf i tp = do
       waitT toWait
       playOne perf i tp
     else
-      if cb - toBePlayed <= 0.010
+      if cb - toBePlayed <= 0.020
         then do
           updatePfields i
           playInstr i
         else do
-          return ()
+          return ())
+  (\e -> putStrLn $ "Error in playOne for instr " ++ show (insN i) ++ ": " ++ show (e :: SomeException))
 
 -- | play an instrument once immediately
 playNow :: Performance -> String -> IO ()
@@ -119,62 +121,106 @@ playNow perf i = do
 play :: Performance -> String -> IO ()
 play perf pn =
   let checkStatus _ Inactive = void (forkIO $ playLoop perf pn Inactive)
-      checkStatus _ Stopping = void (playLoop perf pn Stopping)
-      checkStatus _ Init = void (playLoop perf pn Init)
+      checkStatus _ Stopping = void (forkIO $ playLoop perf pn Stopping)
+      checkStatus _ Init = void (forkIO $ playLoop perf pn Init)
       checkStatus _ Active = putStrLn $ "the instrument " ++ pn ++ " is already Active!"
    in do
-        Just i <- lookupMap (orc perf) pn
-        checkStatus i $ status i
+        mIns <- lookupMap (orc perf) pn
+        case mIns of
+          Nothing -> putStrLn $ "Error: Instrument " ++ pn ++ " not found"
+          Just i -> checkStatus i $ status i
 
 -- | play loop callBack
 playLoop :: Performance -> String -> Status -> IO ()
-playLoop perf pn Active = do
-  Just p <- lookupMap (orc perf) pn
-  now <- timeD (clock perf)
-  cb <- currentBeat (clock perf)
-  ts <- currentTS (clock perf)
-  let pb = toPlay p
-  if timeF p == ""
-    then do
-      changeStatus perf pn Stopping
-      Just p' <- lookupMap (orc perf) pn
-      playLoop perf pn $ status p'
-    else do
-      let tp = fromJust pb
-      Just timeString <- lookupMap (timePs perf) (timeF p)
-      let nb = nextBeat tp timeString
-      let nextToPlay
-            | whenTP nb > whenTP tp = (whenTP (wrapBar ts nb) / beatInMsr ts) + thisBar cb + (fromIntegral . floor $ whenTP nb / beatInMsr ts - whenTP tp / beatInMsr ts)
-            | whenTP nb <= whenTP tp = (whenTP nb / beatInMsr ts) + nextBar cb
-            | otherwise = error "This shouldn't be happening"
-      nextTime <- timeAtBeat (clock perf) nextToPlay
-      _ <- forkIO $ playOne perf p (wrapBar ts tp)
-      updateToPlay perf pn (Just nb)
-      let toWait = realToFrac (floor ((nextTime - now) * 10000)) / 10000
-      waitT toWait
-      Just p' <- lookupMap (orc perf) pn
-      playLoop perf pn $ status p'
+playLoop perf pn Active = catch (do
+  mP <- lookupMap (orc perf) pn
+  case mP of
+    Nothing -> putStrLn $ "Error: Instrument " ++ pn ++ " disappeared from orchestra"
+    Just p -> do
+      now <- timeD (clock perf)
+      cb <- currentBeat (clock perf)
+      ts <- currentTS (clock perf)
+      let pb = toPlay p
+      if timeF p == ""
+        then do
+          changeStatus perf pn Stopping
+          mP' <- lookupMap (orc perf) pn
+          case mP' of
+            Just p' -> playLoop perf pn $ status p'
+            Nothing -> return ()
+        else do
+          case pb of
+            Nothing -> do
+               putStrLn $ "Warning: toPlay is Nothing for " ++ pn ++ " in Active state. Resetting..."
+               changeStatus perf pn Init
+               playLoop perf pn Init
+            Just tp -> do
+               mts <- lookupMap (timePs perf) (timeF p)
+               case mts of
+                 Nothing -> do
+                    putStrLn $ "Error: Time Pattern " ++ timeF p ++ " not found for " ++ pn
+                    changeStatus perf pn Stopping
+                    playLoop perf pn Stopping
+                 Just timeString -> do
+                    if null timeString
+                      then do
+                        putStrLn $ "Error: Time Pattern " ++ timeF p ++ " is empty for " ++ pn
+                        changeStatus perf pn Stopping
+                        playLoop perf pn Stopping
+                      else do
+                        let nb = nextBeat tp timeString
+                        let nextToPlay
+                              | whenTP nb > whenTP tp = (whenTP (wrapBar ts nb) / beatInMsr ts) + thisBar cb + (fromIntegral . floor $ whenTP nb / beatInMsr ts - whenTP tp / beatInMsr ts)
+                              | whenTP nb <= whenTP tp = (whenTP nb / beatInMsr ts) + nextBar cb
+                              | otherwise = error "This shouldn't be happening"
+                        nextTime <- timeAtBeat (clock perf) nextToPlay
+                        _ <- forkIO $ playOne perf p (wrapBar ts tp)
+                        updateToPlay perf pn (Just nb)
+                        let toWait = realToFrac (floor ((nextTime - now) * 10000)) / 10000
+                        waitT toWait
+                        mP'' <- lookupMap (orc perf) pn
+                        case mP'' of
+                          Just p'' -> playLoop perf pn $ status p''
+                          Nothing -> return ()
+  ) (\e -> putStrLn $ "Error in playLoop for " ++ pn ++ ": " ++ show (e :: SomeException))
 playLoop perf p Inactive = do
   changeStatus perf p Init
   playLoop perf p Init
-playLoop perf i Init = do
-  Just p <- lookupMap (orc perf) i
-  -- n <- beatInBar (clock perf)
-  let pb = toPlay p
-  if isNothing pb && (timeF p == "")
-    then do
-      changeStatus perf i Stopping
-      Just p' <- lookupMap (orc perf) i
-      playLoop perf i $ status p'
-    else do
-      -- let tp = fromJust pb
-      Just timeString <- lookupMap (timePs perf) (timeF p)
-      -- quantize start to first beat in the pattern
-      let nb = head timeString -- legacy version (unquantized)= nextBeat (max tp (TP n) ) timeString
-      updateToPlay perf i (Just nb)
-      changeStatus perf i Active
-      Just p' <- lookupMap (orc perf) i
-      playLoop perf i $ status p'
+playLoop perf i Init = catch (do
+  mP <- lookupMap (orc perf) i
+  case mP of
+    Nothing -> putStrLn $ "Error: Instrument " ++ i ++ " not found in Init"
+    Just p -> do
+      let pb = toPlay p
+      if (timeF p == "")
+        then do
+          changeStatus perf i Stopping
+          mP' <- lookupMap (orc perf) i
+          case mP' of
+            Just p' -> playLoop perf i $ status p'
+            Nothing -> return ()
+        else do
+          mts <- lookupMap (timePs perf) (timeF p)
+          case mts of
+            Nothing -> do
+              putStrLn $ "Error in Init: Time Pattern " ++ timeF p ++ " not found for " ++ i
+              changeStatus perf i Stopping
+              playLoop perf i Stopping
+            Just timeString -> do
+              if null timeString
+                then do
+                  putStrLn $ "Error in Init: Time Pattern " ++ timeF p ++ " is empty for " ++ i
+                  changeStatus perf i Stopping
+                  playLoop perf i Stopping
+                else do
+                  let nb = head timeString
+                  updateToPlay perf i (Just nb)
+                  changeStatus perf i Active
+                  mP'' <- lookupMap (orc perf) i
+                  case mP'' of
+                    Just p'' -> playLoop perf i $ status p''
+                    Nothing -> return ()
+  ) (\e -> putStrLn $ "Error in playLoop (Init) for " ++ i ++ ": " ++ show (e :: SomeException))
 playLoop perf p Stopping = do
   changeStatus perf p Inactive
   putStrLn $ "instrument " ++ p ++ " is now Inactive."
@@ -183,22 +229,28 @@ playLoop perf p Stopping = do
 -- | stop an instrument
 stop :: Performance -> String -> IO ()
 stop perf i = do
-  Just p <- lookupMap (orc perf) i
-  when (status p == Active) $ do
-    changeStatus perf i Stopping
-    return ()
+  mP <- lookupMap (orc perf) i
+  case mP of
+    Just p -> when (status p == Active) $ void $ changeStatus perf i Stopping
+    Nothing -> return ()
 
 -- | stop all instruments that are not effects
 stopAll :: Performance -> IO ()
-stopAll perf = mapM_ (stop perf) . M.keys . notEffectOrc =<< readTVarIO (orc perf)
+stopAll perf = do
+  o <- readTVarIO (orc perf)
+  mapM_ (stop perf) . M.keys $ notEffectOrc o
 
 -- | plays all instruments that are not effects
 playAll :: Performance -> IO ()
-playAll perf = mapM_ (play perf) . M.keys . notEffectOrc =<< readTVarIO (orc perf)
+playAll perf = do
+  o <- readTVarIO (orc perf)
+  mapM_ (play perf) . M.keys $ notEffectOrc o
 
 -- | solo an instrument
 soloIns :: Performance -> String -> IO ()
-soloIns perf i = mapM_ (stop perf) . filter (/= i) . M.keys . notEffectOrc =<< readTVarIO (orc perf)
+soloIns perf i = do
+  o <- readTVarIO (orc perf)
+  mapM_ (stop perf) . filter (/= i) . M.keys $ notEffectOrc o
 
 -- | display all Time Patterns names and their content
 displayTPat :: Performance -> IO ()
@@ -208,8 +260,10 @@ displayTPat perf = do
 
 updateInstrument :: Performance -> String -> (Instr -> Instr) -> IO ()
 updateInstrument perf k f = do
-  Just i <- lookupMap (orc perf) k
-  addToMap (orc perf) (k, f i)
+  mI <- lookupMap (orc perf) k
+  case mI of
+    Just i -> addToMap (orc perf) (k, f i)
+    Nothing -> return ()
 
 updatePfields :: Instr -> IO ()
 updatePfields i = do
@@ -227,34 +281,38 @@ changeStatus e k newS = updateInstrument e k (\x -> x {status = newS})
 changeTimeF :: Performance -> String -> String -> IO ()
 changeTimeF e k newF = do
   pl <- lookupMap (orc e) k
-  if isNothing pl
-    then putStrLn "Instrument not found"
-    else do
+  case pl of
+    Nothing -> putStrLn "Instrument not found"
+    Just i -> do
       tp <- lookupMap (timePs e) newF
-      if isNothing tp
-        then putStrLn "Time Pattern not found"
-        else do
-          let Just ts = tp
+      case tp of
+        Nothing -> putStrLn "Time Pattern not found"
+        Just ts -> do
           val <- closertoNow e k ts
           updateToPlay e k (Just val)
           updateInstrument e k (\x -> x {timeF = newF})
 
 closertoNow :: Performance -> String -> [TimePoint] -> IO TimePoint
 closertoNow e k ts = do
-  Just pl <- lookupMap (orc e) k
-  if isJust (toPlay pl)
-    then do
-      let toP = fromJust (toPlay pl)
-      let tp
-            | takeWhile (<= toP) ts /= [] = last $ takeWhile (<= toP) ts
-            | otherwise = head ts
-      return tp
-    else do
-      now <- beatInBar (clock e)
-      let tp
-            | takeWhile (<= TP now) ts /= [] = last $ takeWhile (<= TP now) ts
-            | otherwise = head ts
-      return tp
+  mPl <- lookupMap (orc e) k
+  case mPl of
+    Nothing -> return (TP 0) -- Should not happen
+    Just pl ->
+      if isJust (toPlay pl)
+        then do
+          let toP = fromJust (toPlay pl)
+          let tp
+                | null ts = toP
+                | not (any (<= toP) ts) = head ts
+                | otherwise = last $ filter (<= toP) ts
+          return tp
+        else do
+          now <- beatInBar (clock e)
+          let tp
+                | null ts = TP now
+                | not (any (<= TP now) ts) = head ts
+                | otherwise = last $ filter (<= TP now) ts
+          return tp
 
 updateToPlay :: Performance -> String -> Maybe TimePoint -> IO ()
 updateToPlay e k newTP = updateInstrument e k (\x -> x {toPlay = newTP})

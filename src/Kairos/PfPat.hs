@@ -1,8 +1,8 @@
 module Kairos.PfPat where
 
 import Control.Concurrent.STM (TVar, atomically, readTVarIO, writeTVar)
-import Kairos.Pfield (PfId, Pfield)
-import Kairos.Utilities (checkPercentNext, randI)
+import Kairos.Pfield (PfId, Pfield (Pd))
+import Kairos.Utilities (checkPercentNext, randI, safeHead, safeTail)
 
 -- | pattern of pfields and related update function
 data PfPat = PfPat
@@ -21,14 +21,14 @@ type Updater = PfPat -> IO Pfield
 keep :: Updater
 keep n = do
   pats <- readTVarIO (pat n)
-  return $ head pats
+  return $ safeHead (Pd 0) pats
 
 -- | next value in the list
 nextVal :: Updater
 nextVal n = do
   patrn <- readTVarIO (pat n)
-  let res = head patrn
-  let pat' = tail patrn ++ [head patrn]
+  let res = safeHead (Pd 0) patrn
+  let pat' = if null patrn then [] else safeTail patrn ++ [safeHead (Pd 0) patrn]
   atomically $ writeTVar (pat n) pat'
   return res
 
@@ -36,25 +36,31 @@ nextVal n = do
 retrograde :: Updater
 retrograde n = do
   patrn <- readTVarIO (pat n)
-  let res = head patrn
-  let pat' = last patrn : init patrn
-  atomically $ writeTVar (pat n) pat'
-  return res
+  if null patrn
+    then return (Pd 0)
+    else do
+      let res = head patrn
+      let pat' = last patrn : init patrn
+      atomically $ writeTVar (pat n) pat'
+      return res
 
 -- | pick a random value from the list
 randomize :: Updater
 randomize n = do
   p <- readTVarIO (pat n)
-  let l = length p - 1
-  ran <- randI l
-  return $ (!!) p ran
+  if null p
+    then return (Pd 0)
+    else do
+      let l = length p - 1
+      ran <- randI l
+      return $ p !! ran
 
 -- | go to next value a certain % of times
 percentNext :: Int -> Updater
 percentNext i n = do
   val <- randI 100
   p <- readTVarIO (pat n)
-  let res = head p
+  let res = safeHead (Pd 0) p
   let result = checkPercentNext val i p
   atomically $ writeTVar (pat n) result
   return res

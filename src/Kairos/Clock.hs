@@ -6,6 +6,7 @@ import Control.Concurrent.STM
     ( atomically, newTVarIO, readTVarIO, writeTVar, TVar )
 import Data.Time.Clock.POSIX ( getPOSIXTime )
 import Control.Monad.IO.Class ( MonadIO(..) )
+import Kairos.Utilities ( safeHead )
 
 -- | clock
 data Clock = Clock { startAt :: Time
@@ -76,7 +77,7 @@ changeTempo :: Clock -> Double -> IO ()
 changeTempo c t = do
   cts <- currentTS c
   tss <- addTS c $ newTS t (beatInMsr cts) 1 -- 1: tempo is changed on the next bar
-  putStrLn $ "Current bpm: " ++ show (bpm $ head tss)
+  putStrLn $ "Current bpm: " ++ show (bpm $ safeHead cts tss)
 
 -- | given a clock and a TS, prepends the TS to the list of current ts in the clock, correcting the start time appropriately
 addTS :: Clock -> TimeSignature -> IO [TimeSignature]
@@ -85,7 +86,7 @@ addTS c t = do
   curBeat <- currentBeat c
   curTS <- currentTS c
   beatCurTs <- beatAt c (startTime curTS)
-  atomically $ writeTVar (timeSig c) (newTS (bpm t) (beatInMsr t) (max (beatToTime (thisBar curBeat - beatCurTs) (bpm curTS) (beatInMsr curTS) + startTime curTS) (startTime $ head ts) + beatToTime (startTime t) (bpm t) (beatInMsr t)):ts)
+  atomically $ writeTVar (timeSig c) (newTS (bpm t) (beatInMsr t) (max (beatToTime (thisBar curBeat - beatCurTs) (bpm curTS) (beatInMsr curTS) + startTime curTS) (startTime $ safeHead curTS ts) + beatToTime (startTime t) (bpm t) (beatInMsr t)):ts)
   readTVarIO $ timeSig c
 
 currentTS :: Clock -> IO TimeSignature
@@ -95,11 +96,13 @@ currentTS c = do
   return $ checkTimeSig now tms
 
 checkTimeSig :: Time -> [TimeSignature] ->  TimeSignature
-checkTimeSig now tms = head $ possible tms now
+checkTimeSig now tms = case possible tms now of
+  [] -> TS 4 120 0 -- default fallback
+  (x:_) -> x
 
 possible :: [TimeSignature] -> Time -> [TimeSignature]
 possible (t:ts) now
-  | startTime t == head (filter (<= now) (starts (t:ts))) = t : possible ts now
+  | startTime t == safeHead (startTime t) (filter (<= now) (starts (t:ts))) = t : possible ts now
   | otherwise = possible ts now
 possible [] _ = []
 
@@ -133,7 +136,7 @@ timeToBeat :: Time -> TimeSignature -> Beats
 timeToBeat delta ts = delta * (bpm ts/ 60.00) / beatInMsr ts
 
 timeDelta :: [TimeSignature] -> [Time] -> Beats
-timeDelta (x:xs) (now:sts) = timeToBeat (now  - head sts) x + timeDelta xs sts
+timeDelta (x:xs) (now:sts) = timeToBeat (now  - safeHead now sts) x + timeDelta xs sts
 timeDelta [] _ = 0
 timeDelta _ [] = 0 -- this should never happen tbh 
 

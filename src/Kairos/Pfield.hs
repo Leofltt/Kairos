@@ -45,6 +45,10 @@ instance PfAble String where
     fromPf (Ps x) = x
     fromPf (Pd x) = show x
 
+instance PfAble Pfield where
+    toPf = id
+    fromPf = id
+
 toPfs :: PfAble a => [a] -> [Pfield]
 toPfs = map toPf
 

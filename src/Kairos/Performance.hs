@@ -101,3 +101,14 @@ maybeAddTPf e n ts
   | otherwise = addTPf e n $ fromJust mts
   where
     mts = notEmpty ts
+
+-- | resolve instrument name to its sample path (p29)
+resolvePfield :: Performance -> Pfield -> IO Pfield
+resolvePfield perf (Ps name) = do
+  orch <- readTVarIO (orc perf)
+  case M.lookup name orch of
+    Nothing -> return (Ps name)
+    Just i -> do
+      pfields <- readTVarIO (pf i)
+      return $ M.findWithDefault (Ps name) (newPfId 29 "sample") pfields
+resolvePfield _ pf = return pf

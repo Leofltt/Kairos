@@ -48,8 +48,16 @@ randF = do
   x <- randI 100
   return $ fromIntegral x / 100
 
+safeHead :: a -> [a] -> a
+safeHead d [] = d
+safeHead _ (x:_) = x
+
+safeTail :: [a] -> [a]
+safeTail [] = []
+safeTail (_:xs) = xs
+
 checkPercentNext :: Int -> Int -> [a] -> [a]
-checkPercentNext v i p | v < i = tail p++[head p]
+checkPercentNext v i p | v < i = safeTail p ++ [safeHead (error "checkPercentNext: empty list") p]
                        | otherwise = p
 
 genNRandomValues :: Int -> Int -> [Int]

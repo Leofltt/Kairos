@@ -3,7 +3,9 @@
 module Kairos.Kit where
 
 import Data.Map.Strict qualified as M
-import Kairos.Pfield (Pfield)
+import Kairos.PfPat (Updater)
+import Kairos.Pfield (Pfield, pDouble)
+import Kairos.Markov (runMarkovCSV)
 
 type KitF a b = M.Map a b
 
@@ -25,3 +27,11 @@ showKit :: Kit -> IO ()
 showKit kit = putStrLn $ unlines $ map formatEntry $ M.toList kit
   where
     formatEntry (k, v) = show k ++ " - " ++ show v
+
+runKitMarkov :: String -> Kit -> Updater
+runKitMarkov csv kit = runKitMarkovR csv kit return
+
+runKitMarkovR :: String -> Kit -> (Pfield -> IO Pfield) -> Updater
+runKitMarkovR csv kit resolver n = do
+  idxPf <- runMarkovCSV csv n
+  resolver $ fromKit kit (round $ pDouble idxPf)

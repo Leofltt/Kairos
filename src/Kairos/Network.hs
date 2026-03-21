@@ -23,11 +23,13 @@ type UDPPort = String
 sendMsg :: UDPPort -> String -> IO ()
 sendMsg m n = do
   addrinfos <- getAddrInfo Nothing (Just "127.0.0.1") (Just m)
-  let serveraddr = head addrinfos
-  sock <- socket (addrFamily serveraddr) Datagram defaultProtocol
-  connect sock (addrAddress serveraddr)
-  sendAll sock $ C.pack n
-  close sock
+  case addrinfos of
+    (serveraddr:_) -> do
+      sock <- socket (addrFamily serveraddr) Datagram defaultProtocol
+      connect sock (addrAddress serveraddr)
+      sendAll sock $ C.pack n
+      close sock
+    [] -> putStrLn $ "Error: Could not resolve address for port " ++ m
 
 sendCsound :: UDPPort -> String -> IO ()
 sendCsound = sendMsg
@@ -51,11 +53,13 @@ sendOSC p i l = sendMsgOSC p $ createOSC i l
 sendMsgOSC :: UDPPort -> OSC -> IO ()
 sendMsgOSC m n = do
   addrinfos <- getAddrInfo Nothing (Just "127.0.0.1") (Just m)
-  let serveraddr = head addrinfos
-  sock <- socket (addrFamily serveraddr) Datagram defaultProtocol
-  connect sock (addrAddress serveraddr)
-  _ <- send sock $ V.encodeOSC n
-  close sock
+  case addrinfos of
+    (serveraddr:_) -> do
+      sock <- socket (addrFamily serveraddr) Datagram defaultProtocol
+      connect sock (addrAddress serveraddr)
+      _ <- send sock $ V.encodeOSC n
+      close sock
+    [] -> putStrLn $ "Error: Could not resolve address for port " ++ m
 
 pfieldToOSCDatum :: Pfield -> OSCDatum
 pfieldToOSCDatum (Pd x) = OSC_F $ doubleToFloat x

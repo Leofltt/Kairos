@@ -16,6 +16,7 @@ import Kairos.Utilities
     intToDouble,
     numSeqFromBin,
     numSeqFromText,
+    safeHead,
   )
 
 -- | a point in time
@@ -58,8 +59,9 @@ fromTP = map whenTP
 
 nextBeat :: TimePoint -> [TimePoint] -> TimePoint
 nextBeat b xs
-  | not (any (b <) xs) = head xs
-  | otherwise = head $ filter (b <) xs
+  | null xs = b
+  | not (any (b <) xs) = safeHead b xs
+  | otherwise = safeHead b $ filter (b <) xs
 
 catTP :: Double -> [TimePoint] -> [TimePoint] -> [TimePoint]
 catTP measure a b = a ++ sumdb where sumdb = map (+ TP measure) b
