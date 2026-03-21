@@ -69,6 +69,8 @@ addI "sub" $ fmSub
 addI "stabs" $ superSaw
 addI "kit" $ sampler ""
 addI "glitch" $ stutter ""
+addI "hov" $ hoover
+addI "strings" $ stringPad
 
 -- Scale Definition (D Dorian)
 -- D3 = 50, D2 = 38
@@ -94,6 +96,14 @@ cPat "sixteenN" "303"
 pitch "303" [38] k 
 addC "303" "drone" [0]
 
+-- Hoover: Subs & Low End Beds
+
+pitch "hov" [26, 38] rnd >> cf "hov" [400] k >> res "hov" [10] k >> adRatio "hov" [0.8] k
+addC "hov" "sub_bed" [0]
+
+pitch "hov" [38, 41, 43] nv >> cf "hov" [800] k >> vol "hov" [0.6] k
+addC "hov" "low_roll" $ euclid (5, 16) 0 32
+
 -- Leads
 
 pitch "sSaw" [57, 60, 57] nv >> addC "sSaw" "qa" [0, 4.5, 7]
@@ -105,45 +115,65 @@ pitch "sSaw" [50, 53, 57, 53] nv >> cPat "sixteenN" "sSaw"
 sample "kit" (toPfs [1..17]) kitT 
 addC "kit" "t_kit" $ toTP [0..3]
 
--- Kit 2: Syncopated Techno
+-- Kit 2: Syncopated
 
 sample "kit" (toPfs [1..17]) kitT 
 addC "kit" "t_sync" $ euclid (9, 16) 0 32
 
 -- =============================================================================
 
--- Bass 1: Two-Note Roll (configured)
-pitch "sub" [38, 45, 38] nv >> addC "sub" "roll" [0, 0.75, 1]
+-- Bass Two-Note Roll (configured)
 
--- Bass 2: The Dub Line
-pitch "sub" [38, 45, 48] nv >> addC "sub" "dub" [0, 1.5, 2]
+pitch "sub" [38, 45, 38] nv 
+addC "sub" "roll" $ toTP [0, 0.75, 1]
 
--- Bass 3: 808 Sub Boom (Long)
-pitch "sub" [38, 43] nv >> addC "sub" "boom" [0, 4]
+-- Bass  Dub Line
+
+pitch "sub" [38, 45, 48] nv 
+addC "sub" "dub"  $ toTP [0, 1.5, 2]
+
+-- 808 Sub Boom (Long)
+
+pitch "sub" [38, 43] nv 
+addC "sub" "boom" $ toTP [0, 4]
 
 -- Stabs: Reggae Skank (configured)
-pitch "stabs" [50, 53, 57, 60] k >> addC "stabs" "skank" [1, 3]
+
+pitch "stabs" [50, 53, 57, 60] k 
+addC "stabs" "skank" $ toTP [1, 3]
 
 -- Kit 1: Amen-ish Markov
-sample "kit" (toPfs [1..17]) kitJ >> addC "kit" "amen" $ textToTP 16 "x-x--x-x-x--x-x-"
+
+sample "kit" (toPfs [1..17]) kitJ 
+addC "kit" "amen" $ textToTP 16 "x-x"
 
 -- =============================================================================
 -- SECTION 3: UKG / IDM VARIATIONS
 -- =============================================================================
 
+-- Strings: Ambience & Pads
+
+pitch "strings" [62, 65, 69] rnd >> vol "strings" [0.4] k >> rev "strings" [0.8] k
+addC "strings" "ambience" [0, 4]
+
+-- Strings: Soft Arps
+
+pitch "strings" (withScale 62 dorian) nv >> dur "strings" [0.2] k
+addC "strings" "soft_arp" $ euclid (11, 32) 0 32
+
 -- Bass 1: Two-Step Sub
 pitch "sub" [38, 36] nv >> addC "sub" "2step" [0, 2]
 
--- Bass 2: Rolling 8th Note
+-- Bass: Rolling 8th 
 pitch "sub" [38, 38, 41, 43, 41, 38, 38] nv >> cPat "eightN" "sub"
 
--- Lead 1: Euphoric Arp (Rising 16ths)
+-- Lead: Arp (Rising)
 pitch "sSaw" [62, 65, 69, 72] nv >> cPat "sixteenN" "sSaw"
 
 -- Lead 2: Chopped Vocal Hook
 pitch "sSaw" [57, 57, 55, 53] nv >> addC "sSaw" "vocal" [0, 0.5, 2, 2.5]
 
--- Kit 1: Glitch / IDM Markov
+-- Kit: Glitch / IDM Markov
 
 sample "glitch" (toPfs [1..17]) kitI 
 addC "glitch" "idm" $ textToTP 8 "adhejf" 
@@ -151,4 +181,3 @@ addC "glitch" "idm" $ textToTP 8 "adhejf"
 
 -- Kit 2: Micro Glitch
 prms "glitch" [(stuts, rnd, [1, 2, 8, 16]), (durTS, k, [0.0625])] >> addC "glitch" "micro" $ euclid (13, 32) 4 32
-

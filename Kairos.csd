@@ -9,8 +9,8 @@
 -odac1
 --port=11000
 -d
--B 512 
--b 256 
+-B 1024 
+-b 512 
 --opcode-lib=~/Users/$USER/Library/csound/7.0/plugins64
 
 
@@ -18,7 +18,7 @@
 <CsInstruments>
 
 sr = 48000
-ksmps = 32
+ksmps = 64
 nchnls = 2
 0dbfs = 1.0
 
@@ -89,6 +89,7 @@ gkdivchorus init 30
 
 gkvolchorus chnexport "volchorus", 1, 2, 1, 0, 1
 gkdelchorus chnexport "delchorus", 1, 2, 0, 0, 500
+gkdivchorus init 30
 gkdivchorus chnexport "divchorus", 1, 2, 30, 1, 60
 
 ; Mixer / Master
@@ -138,6 +139,26 @@ opcode declick, a, a
 ain xin
 aenv = linseg:a(0, 0.01, 1, p3 - 0.02, 1, 0.01, 0)
 xout ain * aenv
+endop
+
+/* UDO: SafeOut
+  Input: asig (The audio signal to process)
+  Output: asig (The cleaned/limited signal)
+*/
+opcode SafeOut, a, a
+  ain xin
+  
+  ; 1. Fix Denormals
+  ; Adds a microscopic amount of DC offset or noise 
+  ; to prevent CPU-intensive tiny numbers.
+  denorm ain
+  
+  ; 2. Prevent Out of Range
+  ; Using 'clip' with method 1 (Bramblett algorithm) 
+  ; It smoothly compresses the signal as it approaches 0dbfs.
+  a_safe clip ain, 1, 0dbfs
+  
+  xout a_safe
 endop
 
 ;opcode to load an audio file into a table.
@@ -527,7 +548,6 @@ kCompHardness = p25 ;0.2
 kCompMix = p26
 iCompSideChain = p27 ;0 for disable, 1 for enable
 iphaser = p28
-iphaser = p28
 iTune = 2^(p30 / 12)
 
 inchs = filenchnls(SFile)
@@ -546,6 +566,9 @@ endif
 
 aL, aR FxChainInstr aL, aR, kDistMix, kDistPregain, kDistPostgain, kDistCharacter,  kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq, kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes, kCompThreshDb, kCompHardness, kCompMix, iCompSideChain
 aL, aR UzuPhaser aL, aR, gkuzuWidth, gkuzuOffset, gkuzuDepth, giuzuFFTSize, gkuzuSpeed, gkuzuBlur, iphaser, gkuzuHzMode, gkuzuBassProtect, gkuzuSpread
+
+aL = SafeOut(aL)
+aR = SafeOut(aR)
 
 zawm ivol * aL, 1
 zawm ivol * aR, 2
@@ -634,6 +657,8 @@ aR = declick(aR)
 aL, aR FxChainInstr aL, aR, kDistMix, kDistPregain, kDistPostgain, kDistCharacter,  kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq, kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes, kCompThreshDb, kCompHardness, kCompMix, iCompSideChain
 aL, aR UzuPhaser aL, aR, gkuzuWidth, gkuzuOffset, gkuzuDepth, giuzuFFTSize, gkuzuSpeed, gkuzuBlur, iphaser, gkuzuHzMode, gkuzuBassProtect, gkuzuSpread
 
+aL = SafeOut(aL)
+aR = SafeOut(aR)
 
 zawm ivol * aL, 1
 zawm ivol * aR, 2
@@ -702,6 +727,9 @@ aL, aR pan3 asig, asig, ipan, 1
 
 aL, aR FxChainInstr aL, aR, kDistMix, kDistPregain, kDistPostgain, kDistCharacter,  kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq, kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes, kCompThreshDb, kCompHardness, kCompMix, iCompSideChain
 aL, aR UzuPhaser aL, aR, gkuzuWidth, gkuzuOffset, gkuzuDepth, giuzuFFTSize, gkuzuSpeed, gkuzuBlur, iphaser, gkuzuHzMode, gkuzuBassProtect, gkuzuSpread
+
+aL = SafeOut(aL)
+aR = SafeOut(aR)
 
 zawm ivol * aL, 1
 zawm ivol * aR, 2
@@ -789,6 +817,9 @@ aL, aR pan3 adecl* aenv, adecl* aenv, ipan, 1
 aL, aR FxChainInstr aL, aR, kDistMix, kDistPregain, kDistPostgain, kDistCharacter,  kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq, kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes, kCompThreshDb, kCompHardness, kCompMix, iCompSideChain
 aL, aR UzuPhaser aL, aR, gkuzuWidth, gkuzuOffset, gkuzuDepth, giuzuFFTSize, gkuzuSpeed, gkuzuBlur, iphaser, gkuzuHzMode, gkuzuBassProtect, gkuzuSpread
 
+aL = SafeOut(aL)
+aR = SafeOut(aR)
+
 zawm ivol * aL, 1
 zawm ivol * aR, 2
 
@@ -862,6 +893,9 @@ aL, aR pan3 a808*aenv, a808*aenv, ipan, 1
 aL, aR FxChainInstr aL, aR, kDistMix, kDistPregain, kDistPostgain, kDistCharacter,  kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq, kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes, kCompThreshDb, kCompHardness, kCompMix, iCompSideChain
 aL, aR UzuPhaser aL, aR, gkuzuWidth, gkuzuOffset, gkuzuDepth, giuzuFFTSize, gkuzuSpeed, gkuzuBlur, iphaser, gkuzuHzMode, gkuzuBassProtect, gkuzuSpread
 
+aL = SafeOut(aL)
+aR = SafeOut(aR)
+
 zawm ivol * aL, 1
 zawm ivol * aR, 2
 
@@ -931,6 +965,9 @@ aL, aR pan3 audio*aenv, audio*aenv, ipan, 1
 
 aL, aR FxChainInstr aL, aR, kDistMix, kDistPregain, kDistPostgain, kDistCharacter,  kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq, kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes, kCompThreshDb, kCompHardness, kCompMix, iCompSideChain
 aL, aR UzuPhaser aL, aR, gkuzuWidth, gkuzuOffset, gkuzuDepth, giuzuFFTSize, gkuzuSpeed, gkuzuBlur, iphaser, gkuzuHzMode, gkuzuBassProtect, gkuzuSpread
+
+aL = SafeOut(aL)
+aR = SafeOut(aR)
 
 zawm ivol * aL, 1
 zawm ivol * aR, 2
@@ -1025,6 +1062,9 @@ aL, aR pan3 asig*aenv, asig*aenv, ipan, 1
 aL, aR FxChainInstr aL, aR, kDistMix, kDistPregain, kDistPostgain, kDistCharacter,  kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq, kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes, kCompThreshDb, kCompHardness, kCompMix, iCompSideChain
 aL, aR UzuPhaser aL, aR, gkuzuWidth, gkuzuOffset, gkuzuDepth, giuzuFFTSize, gkuzuSpeed, gkuzuBlur, iphaser, gkuzuHzMode, gkuzuBassProtect, gkuzuSpread
 
+aL = SafeOut(aL)
+aR = SafeOut(aR)
+
 zawm ivol * aL, 1
 zawm ivol * aR, 2
 
@@ -1094,6 +1134,9 @@ aL, aR pan3 asig, asig, ipan, 1
 aL, aR FxChainInstr aL, aR, kDistMix, kDistPregain, kDistPostgain, kDistCharacter,  kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq, kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes, kCompThreshDb, kCompHardness, kCompMix, iCompSideChain
 aL, aR UzuPhaser aL, aR, gkuzuWidth, gkuzuOffset, gkuzuDepth, giuzuFFTSize, gkuzuSpeed, gkuzuBlur, iphaser, gkuzuHzMode, gkuzuBassProtect, gkuzuSpread
 
+aL = SafeOut(aL)
+aR = SafeOut(aR)
+
 zawm  aL, 1
 zawm  aR, 2
 
@@ -1156,6 +1199,9 @@ aL, aR pan3 asig, asig, ipan, 1
 
 aL, aR FxChainInstr aL, aR, kDistMix, kDistPregain, kDistPostgain, kDistCharacter,  kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq, kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes, kCompThreshDb, kCompHardness, kCompMix, iCompSideChain
 aL, aR UzuPhaser aL, aR, gkuzuWidth, gkuzuOffset, gkuzuDepth, giuzuFFTSize, gkuzuSpeed, gkuzuBlur, iphaser, gkuzuHzMode, gkuzuBassProtect, gkuzuSpread
+
+aL = SafeOut(aL)
+aR = SafeOut(aR)
 
 zawm ivol * aL, 1
 zawm ivol * aR, 2
@@ -1319,6 +1365,9 @@ aL, aR pan3 aDTMF, aDTMF, ipan, 1
 
 aL, aR FxChainInstr aL, aR, kDistMix, kDistPregain, kDistPostgain, kDistCharacter,  kRingModMix, kRingModGain, iRingModSource, iRingModWavetable, kRingModFreq, kDjFilterMix, kFilterLpFreq, kFilterLpRes, kFilterHpFreq, kFilterHpRes, kCompThreshDb, kCompHardness, kCompMix, iCompSideChain
 aL, aR UzuPhaser aL, aR, gkuzuWidth, gkuzuOffset, gkuzuDepth, giuzuFFTSize, gkuzuSpeed, gkuzuBlur, iphaser, gkuzuHzMode, gkuzuBassProtect, gkuzuSpread
+
+aL = SafeOut(aL)
+aR = SafeOut(aR)
 
 zawm ivol * aL, 1
 zawm ivol * aR, 2
@@ -1522,7 +1571,7 @@ aR += arW
 aL *= gkvolMaster
 aR *= gkvolMaster
 
-outs aL, aR
+outs SafeOut(aL), SafeOut(aR)
 zacl 0, 50
 
 endin
