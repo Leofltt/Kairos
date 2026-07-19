@@ -391,7 +391,7 @@ deep303 i = cf i [600] keep >> res i [5] keep >> wf02 i [10] keep >> dist i [0.2
 drex303 i = cf i [4000] keep >> res i [20] keep >> wf02 i [0] keep >> dist i [0.7] keep >> distChar i [0.8] keep >> phaser i [0.4] keep
 electro303 i = cf i [800] keep >> res i [25] keep >> wf02 i [10] keep >> dist i [0.4] keep >> dur i [0.15] keep
 -- Hoover
-classicHov i = cf i [5000] keep >> res i [12] keep >> adRatio i [0.2] keep >> dist i [0.4] keep
+classicHov i = cf i [5000] keep >> res i [4] keep >> adRatio i [0.2] keep >> dist i [0.4] keep
 softHov i = cf i [1000] keep >> res i [2] keep >> adRatio i [0.8] keep >> dist i [0] keep
 aggroHov i = cf i [8000] keep >> res i [18] keep >> adRatio i [0.1] keep >> dist i [0.8] keep >> distChar i [0.9] keep
 darkHov i = cf i [400] keep >> res i [25] keep >> adRatio i [0.5] keep
