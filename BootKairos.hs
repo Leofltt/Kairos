@@ -2,7 +2,8 @@ import Kairos.Lib
 
 -- | init the library
 
-csd1 = "11000"
+-- csd1 = "11000"
+aillenPort = "8000"
 :set prompt "κ> "
 :set -w 
 perf <- defaultPerformance
@@ -100,6 +101,95 @@ ampY i list fun = addPf i 30 "ampY" (toPfs list) fun -- dtmf
 chan i list fun = addPf i 8 "chan" (toPfs list) fun      -- model:cycles
 vel i list fun = addPf i 10 "vel" (toPfs list) fun      -- model:cycles
 
+-- Aillen Mixer & General Track Controls
+masterFilter i list fun = addPf i 50 "/mixer/master/filter" (toPfs list) fun
+masterLimiterGain i list fun = addPf i 51 "/mixer/master/limiter/gain" (toPfs list) fun
+masterLimiterRelease i list fun = addPf i 52 "/mixer/master/limiter/release" (toPfs list) fun
+masterLimiterCeiling i list fun = addPf i 53 "/mixer/master/limiter/ceiling" (toPfs list) fun
+mute i list fun = addPf i 54 "/track/mute" (toPfs list) fun
+sidechainSource i list fun = addPf i 55 "/track/sidechain/source" (toPfs list) fun
+
+-- Aillen Return Delay Controls
+delayMode i list fun = addPf i 56 "/mixer/return/delay/mode" (toPfs list) fun
+delayPingpong i list fun = addPf i 57 "/mixer/return/delay/pingpong" (toPfs list) fun
+delayDrive i list fun = addPf i 58 "/mixer/return/delay/drive" (toPfs list) fun
+delayGrainSize i list fun = addPf i 59 "/mixer/return/delay/grain_size" (toPfs list) fun
+delayDensity i list fun = addPf i 60 "/mixer/return/delay/density" (toPfs list) fun
+delaySpray i list fun = addPf i 61 "/mixer/return/delay/spray" (toPfs list) fun
+delayPitch i list fun = addPf i 62 "/mixer/return/delay/pitch" (toPfs list) fun
+
+-- Aillen Track FX Chain Controls
+fxFilter i list fun = addPf i 63 "/track/fx/filter/position" (toPfs list) fun
+fxRingModMode i list fun = addPf i 64 "/track/fx/ring_mod/mode" (toPfs list) fun
+fxRingModSource i list fun = addPf i 65 "/track/fx/ring_mod/source" (toPfs list) fun
+fxRingModDepth i list fun = addPf i 66 "/track/fx/ring_mod/depth" (toPfs list) fun
+fxRingModFreq i list fun = addPf i 67 "/track/fx/ring_mod/freq" (toPfs list) fun
+fxDistMode i list fun = addPf i 68 "/track/fx/distortion/mode" (toPfs list) fun
+fxDistDrive i list fun = addPf i 69 "/track/fx/distortion/drive" (toPfs list) fun
+fxDistMix i list fun = addPf i 70 "/track/fx/distortion/mix" (toPfs list) fun
+fxCompRatio i list fun = addPf i 71 "/track/fx/compressor/ratio" (toPfs list) fun
+fxCompThreshold i list fun = addPf i 72 "/track/fx/compressor/threshold" (toPfs list) fun
+fxCompAttack i list fun = addPf i 73 "/track/fx/compressor/attack" (toPfs list) fun
+fxCompRelease i list fun = addPf i 74 "/track/fx/compressor/release" (toPfs list) fun
+fxCompMakeup i list fun = addPf i 75 "/track/fx/compressor/makeup" (toPfs list) fun
+fxCompSidechain i list fun = addPf i 76 "/track/fx/compressor/sidechain" (toPfs list) fun
+
+-- Aillen TwoOp Synth specific parameters
+realtime i list fun = addPf i 77 "/track/realtime" (toPfs list) fun
+legato i list fun = addPf i 78 "/track/legato" (toPfs list) fun
+twopMode i list fun = addPf i 79 "/track/mode" (toPfs list) fun
+twopOsc1Waveform i list fun = addPf i 80 "/track/osc1/waveform" (toPfs list) fun
+twopOsc2Waveform i list fun = addPf i 81 "/track/osc2/waveform" (toPfs list) fun
+twopModParams i list fun = addPf i 82 "/track/mod/params" (toPfs list) fun
+twopOsc1Adsr i list fun = addPf i 83 "/track/osc1/adsr" (toPfs list) fun
+twopOsc2Adsr i list fun = addPf i 84 "/track/osc2/adsr" (toPfs list) fun
+twopFilterAdsr i list fun = addPf i 85 "/track/filter/adsr" (toPfs list) fun
+twopFilterParams i list fun = addPf i 86 "/track/filter/params" (toPfs list) fun
+twopFilterMod i list fun = addPf i 87 "/track/filter/mod" (toPfs list) fun
+twopFeedback i list fun = addPf i 88 "/track/feedback" (toPfs list) fun
+twopWavefold i list fun = addPf i 89 "/track/wavefold" (toPfs list) fun
+twopNoise i list fun = addPf i 90 "/track/noise" (toPfs list) fun
+twopPitchSweep i list fun = addPf i 91 "/track/pitch/sweep" (toPfs list) fun
+twopLfo i list fun = addPf i 92 "/track/lfo" (toPfs list) fun
+
+-- Aillen Sampler specific parameters
+sampleMode i list fun = addPf i 93 "/track/sample/mode" (toPfs list) fun
+samplePitch i list fun = addPf i 94 "/track/sample/pitch" (toPfs list) fun
+sampleSpeed i list fun = addPf i 95 "/track/sample/speed" (toPfs list) fun
+sampleStretch i list fun = addPf i 96 "/track/sample/mode/stretch" (toPfs list) fun
+sampleGrainSize i list fun = addPf i 97 "/track/sample/grain_size" (toPfs list) fun
+sampleOverlap i list fun = addPf i 98 "/track/sample/overlap" (toPfs list) fun
+sampleFilter i list fun = addPf i 99 "/track/filter" (toPfs list) fun
+aillenSliceMode i list fun = addPf i 100 "/track/sample/slice/mode" (toPfs list) fun
+aillenSliceCount i list fun = addPf i 101 "/track/sample/slice/count" (toPfs list) fun
+aillenSliceSelect i list fun = addPf i 102 "/track/sample/slice/select" (toPfs list) fun
+aillenSliceStutter i list fun = addPf i 103 "/track/sample/slice/stutter" (toPfs list) fun
+
+-- Aillen Synth303 specific parameters
+waveform303 i list fun = addPf i 104 "/track/6/303/waveform" (toPfs list) fun
+ampAdsr303 i list fun = addPf i 105 "/track/6/303/amp/adsr" (toPfs list) fun
+filterAdsr303 i list fun = addPf i 106 "/track/6/303/filter/adsr" (toPfs list) fun
+pitchAdsr303 i list fun = addPf i 107 "/track/6/303/pitch/adsr" (toPfs list) fun
+filter303 i list fun = addPf i 108 "/track/6/303/filter/params" (toPfs list) fun
+filterMod303 i list fun = addPf i 109 "/track/6/303/filter/mod" (toPfs list) fun
+pitchMod303 i list fun = addPf i 110 "/track/6/303/pitch/mod" (toPfs list) fun
+pwm303 i list fun = addPf i 111 "/track/6/303/pwm/params" (toPfs list) fun
+glide303 i list fun = addPf i 112 "/track/6/303/glide" (toPfs list) fun
+legato303 i list fun = addPf i 113 "/track/6/303/legato" (toPfs list) fun
+
+-- Aillen SynthHubass specific parameters
+ampAdsrHubass i list fun = addPf i 114 "/track/7/hubass/amp/adsr" (toPfs list) fun
+hubassFilterParams i list fun = addPf i 115 "/track/7/hubass/filter/params" (toPfs list) fun
+unison i list fun = addPf i 116 "/track/7/hubass/osc/unison" (toPfs list) fun
+subHubass i list fun = addPf i 117 "/track/7/hubass/osc/sub" (toPfs list) fun
+noiseHubass i list fun = addPf i 118 "/track/7/hubass/osc/noise" (toPfs list) fun
+hubassFilterMode i list fun = addPf i 119 "/track/7/hubass/filter/mode" (toPfs list) fun
+hubassDriveMode i list fun = addPf i 120 "/track/7/hubass/drive/mode" (toPfs list) fun
+hubassLfo1 i list fun = addPf i 121 "/track/7/hubass/lfo/1" (toPfs list) fun
+chorusHubass i list fun = addPf i 122 "/track/7/hubass/chorus/params" (toPfs list) fun
+legatoHubass i list fun = addPf i 123 "/track/7/hubass/legato" (toPfs list) fun
+gainHubass i list fun = addPf i 124 "/track/7/hubass/gain" (toPfs list) fun
+
 -- mc_pitch i list fun = addPf i 11 "pitch" (toPfs list) fun -- model:cycles
 -- decay i list fun = addPf i 12 "decay" (toPfs list) fun    -- model:cycles
 -- color i list fun = addPf i 13 "color" (toPfs list) fun    -- model:cycles
@@ -113,57 +203,73 @@ solo = soloIns perf
 
 runKitMarkov csv kit = runKitMarkovR csv kit (resolvePfield perf)
 
-fbdel = setChannel csd1 "fbdel"
-delfb i list fun =  addPf i 3 "fbdel" (toPfs list) fun -- delay fb
-dtdel = setChannel csd1 "dtdel"
-delt i list fun =  addPf i 2 "dtdel" (toPfs list) fun -- delay time
-voldel = setChannel csd1 "voldel"
-delvol i list fun =  addPf i 1 "voldel" (toPfs list) fun -- delay volume
+-- fbdel = setChannel csd1 "fbdel"
+-- delfb i list fun =  addPf i 3 "fbdel" (toPfs list) fun -- delay fb
+fbdel = sendAillenParam aillenPort "/mixer/return/delay/feedback"
+delfb i list fun =  addPf i 3 "/mixer/return/delay/feedback" (toPfs list) fun
 
-fbrev = setChannel csd1 "fbrev"
-revfb i list fun =  addPf i 3 "fbrev" (toPfs list) fun -- rev fb
-cfrev = setChannel csd1 "cfrev"
-revcf i list fun =  addPf i 2 "cfrev" (toPfs list) fun -- rev cf
-volrev = setChannel csd1 "volrev"
-revvol i list fun =  addPf i 1 "volrev" (toPfs list) fun -- rev volume
+-- dtdel = setChannel csd1 "dtdel"
+-- delt i list fun =  addPf i 2 "dtdel" (toPfs list) fun -- delay time
+dtdel = sendAillenParam aillenPort "/mixer/return/delay/time"
+delt i list fun =  addPf i 2 "/mixer/return/delay/time" (toPfs list) fun
 
-volchorus = setChannel csd1 "volchorus"
-chorvol i list fun =  addPf i 1 "volchorus" (toPfs list) fun -- chorus volume
-delchorus = setChannel csd1 "delchorus"
-chordt i list fun =  addPf i 2 "delchorus" (toPfs list) fun -- chorus delay time
-divchorus = setChannel csd1 "divchorus"
-chordiv i list fun =  addPf i 3 "divchorus" (toPfs list) fun -- chorus divisor
+-- voldel = setChannel csd1 "voldel"
+-- delvol i list fun =  addPf i 1 "voldel" (toPfs list) fun -- delay volume
 
-m_vol = setChannel csd1 "m_vol"
-mixvol i list fun =  addPf i 1 "m_vol" (toPfs list) fun -- mix volume
+-- fbrev = setChannel csd1 "fbrev"
+-- revfb i list fun =  addPf i 3 "fbrev" (toPfs list) fun -- rev fb
+-- cfrev = setChannel csd1 "cfrev"
+-- revcf i list fun =  addPf i 2 "cfrev" (toPfs list) fun -- rev cf
+-- volrev = setChannel csd1 "volrev"
+-- revvol i list fun =  addPf i 1 "volrev" (toPfs list) fun -- rev volume
 
-wl = setChannel csd1 "wl"
-wlvol i list fun =  addPf i 2 "wl" (toPfs list) fun -- waveloss volume
-dropwl = setChannel csd1 "dropwl"
-wldrop i list fun =  addPf i 3 "dropwl" (toPfs list) fun -- waveloss drop
-maxwl = setChannel csd1 "maxwl"
-wlmax i list fun =  addPf i 4 "maxwl" (toPfs list) fun -- waveloss max
+-- volchorus = setChannel csd1 "volchorus"
+-- chorvol i list fun =  addPf i 1 "volchorus" (toPfs list) fun -- chorus volume
+-- delchorus = setChannel csd1 "delchorus"
+-- chordt i list fun =  addPf i 2 "delchorus" (toPfs list) fun -- chorus delay time
+-- divchorus = setChannel csd1 "divchorus"
+-- chordiv i list fun =  addPf i 3 "divchorus" (toPfs list) fun -- chorus divisor
 
-voluzu = setChannel csd1 "voluzu"
-uzuvol i list fun = addPf i 1 "voluzu" (toPfs list) fun
-uzuwidth = setChannel csd1 "uzuwidth"
-uzuwd i list fun = addPf i 2 "uzuwidth" (toPfs list) fun
-uzuoffset = setChannel csd1 "uzuoffset"
-uzuoff i list fun = addPf i 3 "uzuoffset" (toPfs list) fun
-uzudepth = setChannel csd1 "uzudepth"
-uzudp i list fun = addPf i 4 "uzudepth" (toPfs list) fun
-uzuspeed = setChannel csd1 "uzuspeed"
-uzusp i list fun = addPf i 5 "uzuspeed" (toPfs list) fun
-uzublur = setChannel csd1 "uzublur"
-uzubl i list fun = addPf i 6 "uzublur" (toPfs list) fun
-uzumix = setChannel csd1 "uzumix"
-uzumx i list fun = addPf i 7 "uzumix" (toPfs list) fun
-uzuhzmode = setChannel csd1 "uzuhzmode"
-uzuhz i list fun = addPf i 8 "uzuhzmode" (toPfs list) fun
-uzubass = setChannel csd1 "uzubass"
-uzubs i list fun = addPf i 9 "uzubass" (toPfs list) fun
-uzuspread = setChannel csd1 "uzuspread"
-uzuspr i list fun = addPf i 10 "uzuspread" (toPfs list) fun
+-- m_vol = setChannel csd1 "m_vol"
+-- mixvol i list fun =  addPf i 1 "m_vol" (toPfs list) fun -- mix volume
+m_vol = sendAillenParam aillenPort "/mixer/master/volume"
+mixvol i list fun =  addPf i 1 "/mixer/master/volume" (toPfs list) fun
+
+-- wl = setChannel csd1 "wl"
+-- wlvol i list fun =  addPf i 2 "wl" (toPfs list) fun -- waveloss volume
+wl = sendAillenParam aillenPort "/mixer/master/waveloss/mode"
+wlvol i list fun =  addPf i 2 "/mixer/master/waveloss/mode" (toPfs list) fun
+
+-- dropwl = setChannel csd1 "dropwl"
+-- wldrop i list fun =  addPf i 3 "dropwl" (toPfs list) fun -- waveloss drop
+dropwl = sendAillenParam aillenPort "/mixer/master/waveloss/drop"
+wldrop i list fun =  addPf i 3 "/mixer/master/waveloss/drop" (toPfs list) fun
+
+-- maxwl = setChannel csd1 "maxwl"
+-- wlmax i list fun =  addPf i 4 "maxwl" (toPfs list) fun -- waveloss max
+maxwl = sendAillenParam aillenPort "/mixer/master/waveloss/outof"
+wlmax i list fun =  addPf i 4 "/mixer/master/waveloss/outof" (toPfs list) fun
+
+-- voluzu = setChannel csd1 "voluzu"
+-- uzuvol i list fun = addPf i 1 "voluzu" (toPfs list) fun
+-- uzuwidth = setChannel csd1 "uzuwidth"
+-- uzuwd i list fun = addPf i 2 "uzuwidth" (toPfs list) fun
+-- uzuoffset = setChannel csd1 "uzuoffset"
+-- uzuoff i list fun = addPf i 3 "uzuoffset" (toPfs list) fun
+-- uzudepth = setChannel csd1 "uzudepth"
+-- uzudp i list fun = addPf i 4 "uzudepth" (toPfs list) fun
+-- uzuspeed = setChannel csd1 "uzuspeed"
+-- uzusp i list fun = addPf i 5 "uzuspeed" (toPfs list) fun
+-- uzublur = setChannel csd1 "uzublur"
+-- uzubl i list fun = addPf i 6 "uzublur" (toPfs list) fun
+-- uzumix = setChannel csd1 "uzumix"
+-- uzumx i list fun = addPf i 7 "uzumix" (toPfs list) fun
+-- uzuhzmode = setChannel csd1 "uzuhzmode"
+-- uzuhz i list fun = addPf i 8 "uzuhzmode" (toPfs list) fun
+-- uzubass = setChannel csd1 "uzubass"
+-- uzubs i list fun = addPf i 9 "uzubass" (toPfs list) fun
+-- uzuspread = setChannel csd1 "uzuspread"
+-- uzuspr i list fun = addPf i 10 "uzuspread" (toPfs list) fun
 
 techno1 k s h = cPat "fourFloor" k >> cPat "downB" s >> cPat "upFour" h
 dnb1 k s h = cPat "dbk" k >> cPat "downB" s >> cPat "eightN" h

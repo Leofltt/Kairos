@@ -11,7 +11,7 @@ import Kairos.Clock
     currentTS,
     defaultClock,
   )
-import Kairos.Instrument (Instr (..), Orchestra, defaultOrc)
+import Kairos.Instrument (Instr (..), Orchestra, aillenOrc)
 import Kairos.PfPat
 import Kairos.Pfield
 import Kairos.TimePoint (TimePoint, defaultTPMap, notEmpty)
@@ -28,7 +28,7 @@ data Performance = P
 -- | create a default performance
 defaultPerformance :: IO Performance
 defaultPerformance = do
-  o <- defaultOrc
+  o <- aillenOrc
   c <- defaultClock
   t <- defaultTPMap
   return $
