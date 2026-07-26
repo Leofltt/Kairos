@@ -18,7 +18,7 @@
 <CsInstruments>
 
 sr = 48000
-ksmps = 64
+ksmps = 128 
 nchnls = 2
 0dbfs = 1.0
 
@@ -31,8 +31,8 @@ zakinit 50,50
 ; 9, 10 : del out
 ; 11, 12 : chorus in
 ; 13, 14 : chorus out
-; 15, 16 : SideChain RingMod in (TODO)
-; 17, 18 : Sidechain Comp in (TODO)
+; 15, 16 : SideChain RingMod in 
+; 17, 18 : Sidechain Comp in
 
 #define M_PI #3.141592653589793#
 

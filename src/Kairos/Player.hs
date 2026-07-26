@@ -23,15 +23,16 @@ import Kairos.Clock
 import Kairos.Instrument
   ( Instr (insN, itype, kind, pats, pf, status, timeF, toPlay),
     InstrType (Effect, Instrument),
-    MessageTo (Csound, OSC),
+    MessageTo (Csound, OSC, Aillen),
     Status (..),
     getPort,
     notEffectOrc,
   )
-import Kairos.Network (UDPPort, sendEvent, sendOSC, setChan)
+import Kairos.Network (UDPPort, sendEvent, sendOSC, setChan, sendAillenSynthNote, sendAillenSamplerSelect, sendAillenSamplerLoad, sendAillenSamplerNote, sendAillenParam)
+import Data.List (isPrefixOf)
 import Kairos.Performance (Performance (clock, orc, timePs))
 import Kairos.PfPat (PfPat (pfId, updater))
-import Kairos.Pfield (PfId, PfMap, Pfield, idString, pfToString)
+import Kairos.Pfield (PfId, PfMap, Pfield(..), idString, pfToString)
 import Kairos.TimePoint
   ( TimePoint,
     TimePointf (TP, whenTP),
@@ -85,8 +86,75 @@ playInstr instr = do
         then do
           -- send to OSC target
           sendOSC (getPort (kind instr)) (insN instr) pfs
-        else do
-          error "Error: Unknown instrument destination kind"
+        else
+          if sameConstructor (kind instr) (Aillen "")
+            then do
+              playAillen instr
+            else do
+              error "Error: Unknown instrument destination kind"
+
+playAillen :: Instr -> IO ()
+playAillen instr = do
+  pfields <- readTVarIO $ pf instr
+  let trackId = insN instr
+      port = getPort (kind instr)
+      
+      -- Find pfield by its name
+      lookupByName name = case filter (\(k, _) -> idString k == name) (M.toList pfields) of
+        ((_, v):_) -> Just v
+        _ -> Nothing
+
+      -- Send standard parameter mappings
+      sendParamIfPresent name addr = case lookupByName name of
+        Just v -> sendAillenParam port addr v
+        Nothing -> return ()
+
+  -- Send standard parameters if it's an instrument
+  when (itype instr == Instrument) $ do
+    sendParamIfPresent "vol" ("/track/" ++ show trackId ++ "/volume")
+    sendParamIfPresent "pan" ("/track/" ++ show trackId ++ "/pan")
+    sendParamIfPresent "del" ("/track/" ++ show trackId ++ "/send/delay")
+
+  -- Send custom parameters starting with "/"
+  mapM_ (\(k, v) -> when ("/" `isPrefixOf` idString k) (sendAillenParam port (rewriteTrackAddr trackId (idString k)) v)) (M.toList pfields)
+
+  when (itype instr == Instrument) $ do
+    let lookupDouble name def = case lookupByName name of
+          Just (Pd x) -> x
+          _ -> def
+        lookupString name def = case lookupByName name of
+          Just (Ps x) -> x
+          _ -> def
+        vol = lookupDouble "vol" 0.5
+        dur = lookupDouble "dur" 1.0
+        pitchVal = lookupDouble "pitch" 60.0
+        samplePath = lookupString "sample" ""
+        cpsVal = lookupDouble "cps" 0.0
+        durMs = dur * 1000.0
+        midiToHz m = 440.0 * (2.0 ** ((m - 69.0) / 12.0))
+        freq = if pitchVal <= 127.0 then midiToHz pitchVal else pitchVal
+    if trackId `elem` [1, 2, 3, 5]
+      then do
+        -- Sampler track
+        when (not (null samplePath)) $ do
+          let prefix = "/Users/leofltt/Desktop/KairosSamples/"
+          if prefix `isPrefixOf` samplePath
+            then sendAillenSamplerSelect port trackId (drop (length prefix) samplePath)
+            else sendAillenSamplerLoad port trackId samplePath
+        let samplerFreq = if cpsVal > 0.0 then (if cpsVal <= 127.0 then midiToHz cpsVal else cpsVal) else 261.63
+        sendAillenSamplerNote port trackId samplerFreq vol
+      else do
+        -- Synth track
+        sendAillenSynthNote port trackId freq durMs vol
+
+rewriteTrackAddr :: Int -> String -> String
+rewriteTrackAddr trackId addr =
+  if "/track/" `isPrefixOf` addr
+    then case drop 7 addr of
+           ('/':_) -> "/track/" ++ show trackId ++ drop 7 addr
+           (c:_) | c >= '0' && c <= '9' -> addr -- already has track ID
+           remainder -> "/track/" ++ show trackId ++ "/" ++ remainder
+    else addr
 
 playOne :: Performance -> Instr -> TimePoint -> IO ()
 playOne perf i tp = catch (do

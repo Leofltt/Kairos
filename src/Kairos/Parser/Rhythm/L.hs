@@ -39,6 +39,8 @@ normSumInner (L xs) = L $ map ((* (1/x)) . (+ (-1))) $ filter (/=0) $ zipWith (*
 kindaMult :: LList Double -> LList Double -> LList Double
 kindaMult (E x) (E y) = E (x*y)
 kindaMult (L xs) (E y) = L (map (+y) xs)
+kindaMult (E x) (L ys) = L (map (+x) ys)
+kindaMult (L xs) (L ys) = L (zipWith (*) xs ys)
 
 flatten :: [LList a] -> [a]
 flatten = concatMap flatten'

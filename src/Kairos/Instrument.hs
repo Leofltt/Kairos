@@ -47,11 +47,12 @@ type InstrumentID = Int
 data Status = Init | Active | Inactive | Stopping deriving (Show, Eq)
 
 -- | where are we sending the data
-data MessageTo a = Csound a | OSC a deriving (Show, Eq, Typeable, Data)
+data MessageTo a = Csound a | OSC a | Aillen a deriving (Show, Eq, Typeable, Data)
 
 getPort :: MessageTo String -> String
 getPort (Csound x) = x
 getPort (OSC x) = x
+getPort (Aillen x) = x
 
 -- | instrument or effect ?
 data InstrType = Instrument | Effect deriving (Show, Eq)
@@ -755,6 +756,63 @@ oscInstr i_n osc_port pfields = do
         itype = Instrument
       }
 
+-------------- Create Aillen Instrument ---------
+aillenInstr :: InstrumentID -> String -> [(PfId, Pfield)] -> IO Instr
+aillenInstr i_n aillen_port pfields = do
+  pfieldss <- newTVarIO $ pfFromList pfields
+  emptyPat <- newTVarIO M.empty
+  return $
+    I
+      { insN = i_n,
+        pf = pfieldss,
+        toPlay = Nothing,
+        status = Inactive,
+        timeF = "",
+        pats = emptyPat,
+        kind = Aillen aillen_port,
+        itype = Instrument
+      }
+
+aillenTwoOp :: InstrumentID -> IO Instr
+aillenTwoOp i_n = aillenInstr i_n "8000"
+  [ (newPfId 3 "dur", Pd 1),
+    (newPfId 4 "vol", Pd 0.5),
+    (newPfId 29 "pitch", Pd 60)
+  ]
+
+aillenSampler :: InstrumentID -> String -> IO Instr
+aillenSampler i_n path = aillenInstr i_n "8000"
+  [ (newPfId 3 "dur", Pd 1),
+    (newPfId 4 "vol", Pd 0.5),
+    (newPfId 29 "sample", Ps path),
+    (newPfId 30 "cps", Pd 0)
+  ]
+
+aillen303 :: IO Instr
+aillen303 = aillenInstr 6 "8000"
+  [ (newPfId 3 "dur", Pd 1),
+    (newPfId 4 "vol", Pd 0.5),
+    (newPfId 29 "pitch", Pd 60)
+  ]
+
+aillenHubass :: IO Instr
+aillenHubass = aillenInstr 7 "8000"
+  [ (newPfId 3 "dur", Pd 1),
+    (newPfId 4 "vol", Pd 0.5),
+    (newPfId 29 "pitch", Pd 60)
+  ]
+
+aillenStutter :: InstrumentID -> String -> IO Instr
+aillenStutter i_n path = aillenInstr i_n "8000"
+  [ (newPfId 3 "dur", Pd 1),
+    (newPfId 4 "vol", Pd 0.5),
+    (newPfId 29 "sample", Ps path),
+    (newPfId 30 "cps", Pd 0),
+    (newPfId 31 "divs", Pd 4),
+    (newPfId 32 "pick", Pd 0),
+    (newPfId 33 "stuts", Pd 0)
+  ]
+
 ---------------------------------------------
 -- default Orchestra
 
@@ -800,6 +858,28 @@ defaultOrc = do
           ("mc", cycles1)
         ]
     )
+
+-- Aillen Orchestra
+aillenOrc :: IO Orchestra
+aillenOrc = do
+  fm1 <- aillenTwoOp 0
+  fm2 <- aillenTwoOp 4
+  s1 <- aillenSampler 1 ""
+  s2 <- aillenSampler 2 ""
+  s3 <- aillenSampler 3 ""
+  s5 <- aillenSampler 5 ""
+  a303 <- aillen303
+  hubass <- aillenHubass
+  newTVarIO $ M.fromList
+    [ ("fm1", fm1),
+      ("fm2", fm2),
+      ("s1", s1),
+      ("s2", s2),
+      ("s3", s3),
+      ("s5", s5),
+      ("303", a303),
+      ("hubass", hubass)
+    ]
 
 -- returns a map of all instruments that are not effects
 notEffectOrc :: M.Map [Char] Instr -> M.Map [Char] Instr

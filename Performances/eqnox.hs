@@ -34,6 +34,7 @@ cPat "eightN" "hoco"
 
 
 cPat "fourFloor" "er1k3"
+
 cPat "upFour" "chxtan"
 cPat "jgs" "sj1"
 
@@ -59,14 +60,20 @@ pitch "303" (withScale 41 dorian) $ runMarkovCSV csvAcid
 
 let mainKit = newKit [ (1, Ps "er1k3"), (2, Ps "er1k2"), (3, Ps "K909"), (4, Ps "sj1"), (5, Ps "cp808d"), (6, Ps "er1r"), (7, Ps "glsn"), (8, Ps "chxtan"), (9, Ps "er1mhh"), (10, Ps "scs"), (11, Ps "ohLe"), (12, Ps "bongo3"), (13, Ps "bongo4"), (14, Ps "bongo5"), (15, Ps "ri707"), (16, Ps "er1cr1"), (17, Ps "hit4") ]
 
+let bongos = newKit [(1, Ps "bongo1"),(2, Ps "bongo2"),(3, Ps "bongo3"),(3, Ps "bongo3"),(4, Ps "bongo4"),(5, Ps "bongo5")]
+
 -- Instantiate missing instruments
 
 addI "sub" $ fmSub
 addI "stabs" $ superSaw
 addI "kit" $ sampler ""
+addI "bgs" $ sampler ""
 addI "glitch" $ stutter ""
 addI "hov" $ hoover
 addI "strings" $ stringPad
+
+
+
 
 -- Scale Definition (D Dorian)
 -- D3 = 50, D2 = 38
@@ -87,9 +94,11 @@ let kitI = runKitMarkov "MarkovTables/IDM.csv" mainKit
 -- Bass 
 
 pitch "303" [38] k
+
 addC "303" "offbeat" $ toTP [0.5, 1.5, 2.5, 3.5]
 
 pitch "303" [38, 38, 41, 38] nv
+
 cPat "sixteenN" "303"
 
 pitch "303" [38] k 
@@ -97,22 +106,23 @@ addC "303" "drone" [0]
 
 -- Hoover: Subs & Low End Beds
 
-pitch "hov" [26, 38] rnd >> cf "hov" [400] k >> res "hov" [10] k >> adRatio "hov" [0.8] k
-addC "hov" "sub_bed" [0]
+pitch "hov" [41, 38] rnd >> durTS "hov" [2] k>> cf "hov" [2000] k >> res "hov" [10] k >> adRatio "hov" [0.8] k
 
-pitch "hov" [38, 41, 43] nv >> cf "hov" [800] k >> vol "hov" [0.6] k
+addC "hov" "sub_bed" [TP 0.5]
+
+pitch "hov" [38, 41, 43] nv >> cf "hov" [1800] k >> vol "hov" [0.6] k >> durTS "hov" [2,1.7] rnd
 addC "hov" "low_roll" $ euclid (5, 16) 0 32
 
 -- Leads
 
-pitch "sSaw" [57, 60, 57] nv >> addC "sSaw" "qa" [0, 4.5, 7]
+pitch "sSaw" [57, 60, 57] nv >> addC "sSaw" "qa" (toTP [0, 4.5, 7])
 
 pitch "sSaw" [50, 53, 57, 53] nv >> cPat "sixteenN" "sSaw"
 
 -- Kit 1: 4-Floor Drive
 
 sample "kit" (toPfs [1..17]) kitT 
-addC "kit" "t_kit" $ toTP [0..3]
+addC "kit" "t_kit" $ euclid (13, 16) 2 8
 
 -- Kit 2: Syncopated
 
@@ -121,7 +131,7 @@ addC "kit" "t_sync" $ euclid (9, 16) 0 32
 
 -- =============================================================================
 
--- Bass Two-Note Roll (configured)
+-- Bass Two-Note Roll
 
 pitch "sub" [38, 45, 38] nv 
 addC "sub" "roll" $ toTP [0, 0.75, 1]
@@ -138,20 +148,21 @@ addC "sub" "boom" $ toTP [0, 4]
 
 -- Stabs: Reggae Skank (configured)
 
-pitch "stabs" [50, 53, 57, 60] k 
-addC "stabs" "skank" $ toTP [1, 3]
+pitch "sSaw" [50, 53, 57, 60] k 
+
+addC "sSaw" "skank" $ toTP [1, 3]
 
 -- Kit 1: Amen-ish Markov
 
 sample "kit" (toPfs [1..17]) kitJ 
-addC "kit" "amen" $ textToTP 16 "x-x"
+addC "kit" "amen" $ euclid (3, 15) 0 8
 
 -- =============================================================================
 
 -- Strings: Ambience & Pads
 
 pitch "strings" [62, 65, 69] rnd >> vol "strings" [0.4] k >> rev "strings" [0.8] k
-addC "strings" "ambience" [0, 4]
+addC "strings" "ambience" $ toTP [0, 4]
 
 -- Strings: Soft Arps
 
@@ -159,19 +170,32 @@ pitch "strings" (withScale 62 dorian) nv >> dur "strings" [0.2] k
 addC "strings" "soft_arp" $ euclid (11, 32) 0 32
 
 -- Bass 1: Two-Step Sub
-pitch "sub" [38, 36] nv >> addC "sub" "2step" [0, 2]
+
+
+pitch "303" [38, 36] nv 
+addC "303" "2step" (toTP [0, 2])
 
 -- Bass: Rolling 8th 
-pitch "sub" [38, 38, 41, 43, 41, 38, 38] nv >> cPat "eightN" "sub"
+
+pitch "303" [38, 38, 41, 43, 41, 38, 38] nv >> cPat "eightN" "303"
 
 -- Lead: Arp (Rising)
-pitch "sSaw" [62, 65, 69, 72] nv >> cPat "sixteenN" "sSaw"
 
--- Lead 2: Chopped Vocal Hook
-pitch "sSaw" [57, 57, 55, 53] nv >> addC "sSaw" "vocal" [0, 0.5, 2, 2.5]
+pitch "sSaw" [62, 65, 69, 72] nv >> cPat "qa" "sSaw"
+
+-- Lead 2: 
+
+pitch "sSaw" [57, 57, 55, 53] nv 
+addC "sSaw" "vocal" $ toTP [0, 0.5, 2, 2.5]
  
 sample "glitch" (toPfs [1..17]) kitI 
-addC "glitch" "idm" $ textToTP 8 "adhejf" 
+addC "glitch" "id" $ textToTP 8 "adhejf" 
 
 prms "glitch" [(stuts, rnd, [1, 2, 8, 16]), (durTS, k, [0.0625])]  
 addC "glitch" "micro" $ euclid (13, 32) 4 32 
+
+pitch "303" [0..7] (withS (withScale 41 aeolian) (rMkvCSV csvAcid))
+
+sample "kit" [1..17] (withK' mainKit (rMkvCSV csvKitJ))
+
+sample "bongos [1..4] (withK' mainKit () 
