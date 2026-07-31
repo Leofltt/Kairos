@@ -140,8 +140,8 @@ isIntAddr addr =
   "/stutter" `isSuffixOf` addr ||
   "/density" `isSuffixOf` addr ||
   "/pingpong" `isSuffixOf` addr ||
-  "/unison" `isSuffixOf` addr ||
-  "/sub" `isSuffixOf` addr
+  "/stretch" `isSuffixOf` addr ||
+  "/overlap" `isSuffixOf` addr
 
 wordToDatum :: String -> Int -> String -> OSCDatum
 wordToDatum addr idx word =
