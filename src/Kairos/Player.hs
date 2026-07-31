@@ -29,7 +29,7 @@ import Kairos.Instrument
     getPort,
     notEffectOrc,
   )
-import Kairos.Network (UDPPort, sendAillenParam, sendAillenSamplerLoad, sendAillenSamplerNote, sendAillenSamplerSelect, sendAillenSynthNote, sendEvent, sendOSC, setChan)
+import Kairos.Network (UDPPort, sendAillenParam, sendAillenSamplerLoad, sendAillenSamplerNote, sendAillenSynthNote, sendEvent, sendOSC, setChan)
 import Kairos.Performance (Performance (clock, orc, timePs))
 import Kairos.PfPat (PfPat (pfId, updater))
 import Kairos.Pfield (PfId, PfMap, Pfield (..), idString, pfToString)
@@ -138,14 +138,20 @@ playAillen instr = do
         -- Sampler track
         when (not (null samplePath)) $
           sendAillenSamplerLoad port trackId samplePath
-        forM_ (lookupByName "divs") $ \v -> case v of
-          Pd d | d > 1.0 -> do
-            sendAillenParam port ("/track/" ++ show trackId ++ "/sample/slice/mode") (Pd 1.0)
-            sendAillenParam port ("/track/" ++ show trackId ++ "/sample/slice/count") v
-          _ -> do
-            sendAillenParam port ("/track/" ++ show trackId ++ "/sample/slice/mode") (Pd 0.0)
-        forM_ (lookupByName "pick") (sendAillenParam port ("/track/" ++ show trackId ++ "/sample/slice/select"))
-        forM_ (lookupByName "stuts") (sendAillenParam port ("/track/" ++ show trackId ++ "/sample/slice/stutter"))
+        let hasCustomCount = any (\k -> idString k == "/track/sample/slice/count" || idString k == "/track/sample/slice/mode") (M.keys pfields)
+        when (not hasCustomCount) $
+          forM_ (lookupByName "divs") $ \v -> case v of
+            Pd d | d > 1.0 -> do
+              sendAillenParam port ("/track/" ++ show trackId ++ "/sample/slice/mode") (Pd 1.0)
+              sendAillenParam port ("/track/" ++ show trackId ++ "/sample/slice/count") v
+            _ -> do
+              sendAillenParam port ("/track/" ++ show trackId ++ "/sample/slice/mode") (Pd 0.0)
+        let hasCustomSelect = any (\k -> idString k == "/track/sample/slice/select") (M.keys pfields)
+        when (not hasCustomSelect) $
+          forM_ (lookupByName "pick") (sendAillenParam port ("/track/" ++ show trackId ++ "/sample/slice/select"))
+        let hasCustomStutter = any (\k -> idString k == "/track/sample/slice/stutter") (M.keys pfields)
+        when (not hasCustomStutter) $
+          forM_ (lookupByName "stuts") (sendAillenParam port ("/track/" ++ show trackId ++ "/sample/slice/stutter"))
         forM_ (lookupByName "sample_pitch") (sendAillenParam port ("/track/" ++ show trackId ++ "/sample/pitch"))
         forM_ (lookupByName "speed") (sendAillenParam port ("/track/" ++ show trackId ++ "/sample/speed"))
         forM_ (lookupByName "loop") (sendAillenParam port ("/track/" ++ show trackId ++ "/sample/mode"))

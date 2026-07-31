@@ -164,6 +164,7 @@ aillenSliceMode i list fun = addPf i 100 "/track/sample/slice/mode" (toPfs list)
 aillenSliceCount i list fun = addPf i 101 "/track/sample/slice/count" (toPfs list) fun
 aillenSliceSelect i list fun = addPf i 102 "/track/sample/slice/select" (toPfs list) fun
 aillenSliceStutter i list fun = addPf i 103 "/track/sample/slice/stutter" (toPfs list) fun
+sampleSelect i list fun = addPf i 125 "/track/sample/select" (toPfs list) fun
 
 -- Aillen Synth303 specific parameters
 waveform303 i list fun = addPf i 104 "/track/6/303/waveform" (toPfs list) fun
