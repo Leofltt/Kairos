@@ -788,6 +788,24 @@ aillenSampler i_n path = aillenInstr i_n "8000"
     (newPfId 30 "cps", Pd 0)
   ]
 
+aillenSamplerV :: InstrumentID -> String -> IO Instr
+aillenSamplerV i_n path = aillenInstr i_n "8000"
+  [ (newPfId 3 "dur", Pd 1),
+    (newPfId 4 "vol", Pd 0.5),
+    (newPfId 29 "sample", Ps path),
+    (newPfId 30 "cps", Pd 0),
+    (newPfId 31 "divs", Pd 1),
+    (newPfId 32 "pick", Pd 0),
+    (newPfId 33 "stuts", Pd 1),
+    (newPfId 34 "loop", Pd 0),
+    (newPfId 35 "speed", Pd 1.0),
+    (newPfId 36 "sample_pitch", Pd 1.0),
+    (newPfId 37 "stretch", Pd 0),
+    (newPfId 38 "gsize", Pd 40.0),
+    (newPfId 39 "overlap", Pd 4),
+    (newPfId 40 "filter", Pd 0.0)
+  ]
+
 aillen303 :: IO Instr
 aillen303 = aillenInstr 6 "8000"
   [ (newPfId 3 "dur", Pd 1),

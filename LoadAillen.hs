@@ -8,11 +8,7 @@
 defPath s = "/Users/leofltt/Desktop/KairosSamples" ++ s
 markPath s = "/Users/leofltt/Desktop/Kairos/MarkovTables" ++ s
 aillenPort = "8000"
-
--- =========================================================================
--- TRACK 1: KICKS
--- =========================================================================
-k909 = defPath "/909/Kick-909.aif"
+k909 = defPath "/909/Kick-909.aif" -- TRACK 1: KICKS
 addI "K909" $ aillenSampler 1 k909
 kcj = defPath "/kicks/KickCymbJungle.wav"
 addI "kcj" $ aillenSampler 1 kcj
@@ -51,11 +47,7 @@ er1k3 = defPath "/ER1/kick14.wav"
 addI "er1k3" $ aillenSampler 1 er1k3
 er1kl = defPath "/ER1/kick08.wav"
 addI "er1kl" $ aillenSampler 1 er1kl
-
--- =========================================================================
--- TRACK 2: SNARES & CLAPS
--- =========================================================================
-cp909 = defPath "/909/Clap-909.aif"
+cp909 = defPath "/909/Clap-909.aif" -- TRACK 2: SNARES & CLAPS
 addI "CP909" $ aillenSampler 2 cp909
 snS = defPath "/snares/SNSandy.wav"
 addI "snS" $ aillenSampler 2 snS
@@ -105,12 +97,8 @@ snare34 = defPath "/snares/Snare34.wav"
 addI "snare34" $ aillenSampler 2 snare34
 snare41 = defPath "/snares/Snare41.wav"
 addI "snare41" $ aillenSampler 2 snare41
-
--- =========================================================================
--- TRACK 3: HATS, PERCUSSION, VOX & FX
--- =========================================================================
-sh = defPath "/ch/shortHat.wav"
-addI "sh" $ aillenSampler 3 sh
+sh = defPath "/ch/shortHat.wav" -- TRACK 3: HATS, PERCUSSION, VOX & FX
+addI "sh" $ aillenSampler 3 sh 
 r1 = defPath "/rim/HollowRim.wav"
 addI "r1" $ aillenSampler 3 r1
 rS = defPath "/rim/SmallRim.wav"
@@ -302,11 +290,7 @@ bongo4 = defPath "/bongo/Bongo4.wav"
 addI "bongo4" $ aillenSampler 3 bongo4
 bongo5 = defPath "/bongo/Bongo5.wav"
 addI "bongo5" $ aillenSampler 3 bongo5
-
--- =========================================================================
--- TRACK 5: BREAKS & STUTTERS
--- =========================================================================
-alzir = defPath "/breaks/Alzir.wav"
+alzir = defPath "/breaks/Alzir.wav" -- TRACK 5: BREAKS & STUTTERS
 addI "alzir" $ aillenStutter 5 alzir
 back = defPath "/breaks/Back.wav"
 addI "back" $ aillenStutter 5 back
@@ -395,11 +379,7 @@ addI "cmksyn" $ aillenStutter 5 cmksyn
 mpstut = defPath "/iclc/mp.wav"
 addI "mpstut" $ aillenStutter 5 mpstut
 dur "mpstut" [15] k
-
--- =========================================================================
--- MARKOV TABLES & SCRIPTS
--- =========================================================================
-csv1 = markPath "/Test.csv"
+csv1 = markPath "/Test.csv" -- MARKOV TABLES & SCRIPTS
 csv2 = markPath "/Test2.csv"
 csv3 = markPath "/Test3.csv"
 csvTechno = markPath "/Techno.csv"
@@ -417,6 +397,4 @@ csvStutsVsnare = markPath "/Stuts_Vsnare.csv"
 csvStutsAe = markPath "/Stuts_Ae.csv"
 csvKitT = markPath "/Kit_Techno.csv"
 csvKitJ = markPath "/Kit_Jungle.csv"
-
--- Clear terminal output
 :! clear
