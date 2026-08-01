@@ -171,10 +171,10 @@ addI "Oh" $ aillenSampler 3 $ defPath "/vox/voxPointOH.wav"
 addI "Ao" $ aillenSampler 3 $ defPath "/vox/voxStabAO.wav"
 shae = defPath "/ch/aeHAT.WAV"
 addI "shae" $ aillenSampler 3 shae
-808tml = defPath "/percIt/808_TomMidLow.wav"
-addI "808tml" $ aillenSampler 3 808tml
-808tl1 = defPath "/percIt/808_tomLow.wav"
-addI "808tl1" $ aillenSampler 3 808tl1
+t808tml = defPath "/percIt/808_TomMidLow.wav"
+addI "808tml" $ aillenSampler 3 t808tml
+t808tl1 = defPath "/percIt/808_tomLow.wav"
+addI "808tl1" $ aillenSampler 3 t808tl1
 shakecs = defPath "/shakeIt/shakercsk.aif"
 addI "shakecs" $ aillenSampler 3 shakecs
 shatcs = defPath "/shakeIt/shakeHatcsk.aif"
@@ -187,8 +187,8 @@ shtb = defPath "/shakeIt/LM-2_TAMB_1_TL.wav"
 addI "shtb" $ aillenSampler 3 shtb
 shnoi = defPath "/shakeIt/LM-2_SHAKER_1_TL.wav"
 addI "shnoi" $ aillenSampler 3 shnoi
-808tl2 = defPath "/808/808_tom_4_TL.wav"
-addI "808tl2" $ aillenSampler 3 808tl2
+t808tl2 = defPath "/808/808_tom_4_TL.wav"
+addI "808tl2" $ aillenSampler 3 t808tl2
 hh808sh = defPath "/808/808_hi_hat_13_TL.wav"
 addI "hh808sh" $ aillenSampler 3 hh808sh
 ride626 = defPath "/626/ride.wav"
