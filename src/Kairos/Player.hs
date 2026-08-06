@@ -114,6 +114,7 @@ playAillen instr = do
     sendParamIfPresent "vol" ("/track/" ++ show trackId ++ "/volume")
     sendParamIfPresent "pan" ("/track/" ++ show trackId ++ "/pan")
     sendParamIfPresent "del" ("/track/" ++ show trackId ++ "/send/delay")
+    sendParamIfPresent "rev" ("/track/" ++ show trackId ++ "/send/reverb")
 
   -- Send custom parameters starting with "/"
   mapM_ (\(k, v) -> when ("/" `isPrefixOf` idString k) (sendAillenParam port (rewriteTrackAddr trackId (idString k)) v)) (M.toList pfields)

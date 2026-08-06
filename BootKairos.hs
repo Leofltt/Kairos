@@ -32,6 +32,8 @@ d' i fun list = dur i (fromPfsD list) fun
 durTS i list fun = d' i fun  =<< withTimeSignature perf (toPfs list)  -- time signature dependent
 vol i list fun = addPf i 4 "vol" (toPfs list) fun     
 rev i list fun = addPf i 5 "rev" (toPfs list) fun
+sendDelay i list fun = addPf i 6 "del" (toPfs list) fun
+sendReverb i list fun = addPf i 7 "rev" (toPfs list) fun
 del i list fun = addPf i 6 "del" (toPfs list) fun
 pan i list fun = addPf i 7 "pan" (toPfs list) fun
 chorus i list fun = addPf i 8 "chorus" (toPfs list) fun
@@ -118,6 +120,10 @@ delayDensity i list fun = addPf i 60 "/mixer/return/delay/density" (toPfs list) 
 delaySpray i list fun = addPf i 61 "/mixer/return/delay/spray" (toPfs list) fun
 delayPitch i list fun = addPf i 62 "/mixer/return/delay/pitch" (toPfs list) fun
 
+-- Aillen Return Reverb Controls
+reverbTime i list fun = addPf i 60 "/mixer/return/reverb/decay" (toPfs list) fun
+reverbTone i list fun = addPf i 61 "/mixer/return/reverb/tone" (toPfs list) fun
+
 -- Aillen Track FX Chain Controls
 fxFilter i list fun = addPf i 63 "/track/fx/filter/position" (toPfs list) fun
 fxRingModMode i list fun = addPf i 64 "/track/fx/ring_mod/mode" (toPfs list) fun
@@ -133,6 +139,16 @@ fxCompAttack i list fun = addPf i 73 "/track/fx/compressor/attack" (toPfs list) 
 fxCompRelease i list fun = addPf i 74 "/track/fx/compressor/release" (toPfs list) fun
 fxCompMakeup i list fun = addPf i 75 "/track/fx/compressor/makeup" (toPfs list) fun
 fxCompSidechain i list fun = addPf i 76 "/track/fx/compressor/sidechain" (toPfs list) fun
+
+-- Aillen Track FX Chain additions
+fxWfDrive i list fun = addPf i 126 "/track/fx/wavefolder/drive" (toPfs list) fun
+fxWfFolds i list fun = addPf i 127 "/track/fx/wavefolder/folds" (toPfs list) fun
+fxWfSymmetry i list fun = addPf i 128 "/track/fx/wavefolder/symmetry" (toPfs list) fun
+fxBcBits i list fun = addPf i 129 "/track/fx/bitcrusher/bits" (toPfs list) fun
+fxBcDownsample i list fun = addPf i 130 "/track/fx/bitcrusher/downsample" (toPfs list) fun
+fxCombFreq i list fun = addPf i 131 "/track/fx/comb/freq" (toPfs list) fun
+fxCombFeedback i list fun = addPf i 132 "/track/fx/comb/feedback" (toPfs list) fun
+fxCombDamp i list fun = addPf i 133 "/track/fx/comb/damp" (toPfs list) fun
 
 -- Aillen TwoOp Synth specific parameters
 realtime i list fun = addPf i 77 "/track/realtime" (toPfs list) fun
