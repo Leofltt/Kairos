@@ -141,7 +141,8 @@ isIntAddr addr =
   "/density" `isSuffixOf` addr ||
   "/pingpong" `isSuffixOf` addr ||
   "/stretch" `isSuffixOf` addr ||
-  "/overlap" `isSuffixOf` addr
+  "/overlap" `isSuffixOf` addr ||
+  "/downsample" `isSuffixOf` addr
 
 wordToDatum :: String -> Int -> String -> OSCDatum
 wordToDatum addr idx word =

@@ -820,6 +820,13 @@ aillenHubass = aillenInstr 7 "8000"
     (newPfId 29 "pitch", Pd 60)
   ]
 
+aillenResonator :: IO Instr
+aillenResonator = aillenInstr 4 "8000"
+  [ (newPfId 3 "dur", Pd 1),
+    (newPfId 4 "vol", Pd 0.5),
+    (newPfId 29 "pitch", Pd 60)
+  ]
+
 aillenStutter :: InstrumentID -> String -> IO Instr
 aillenStutter i_n path = aillenInstr i_n "8000"
   [ (newPfId 3 "dur", Pd 1),
@@ -829,6 +836,37 @@ aillenStutter i_n path = aillenInstr i_n "8000"
     (newPfId 31 "divs", Pd 4),
     (newPfId 32 "pick", Pd 0),
     (newPfId 33 "stuts", Pd 0)
+  ]
+
+aillenEffect :: InstrumentID -> String -> [(PfId, Pfield)] -> IO Instr
+aillenEffect i_n aillen_port pfields = do
+  ins <- aillenInstr i_n aillen_port pfields
+  return ins { itype = Effect }
+
+aillenDelay :: IO Instr
+aillenDelay = aillenEffect 551 "8000"
+  [ (newPfId 56 "/mixer/return/delay/mode", Pd 0),
+    (newPfId 57 "/mixer/return/delay/pingpong", Pd 0),
+    (newPfId 58 "/mixer/return/delay/drive", Pd 0.2),
+    (newPfId 59 "/mixer/return/delay/grain_size", Pd 0.1),
+    (newPfId 60 "/mixer/return/delay/density", Pd 4),
+    (newPfId 61 "/mixer/return/delay/spray", Pd 0.02),
+    (newPfId 62 "/mixer/return/delay/pitch", Pd 1.0)
+  ]
+
+aillenReverb :: IO Instr
+aillenReverb = aillenEffect 550 "8000"
+  [ (newPfId 134 "/mixer/return/reverb/decay", Pd 0.5),
+    (newPfId 135 "/mixer/return/reverb/tone", Pd 0.0)
+  ]
+
+aillenMaster :: IO Instr
+aillenMaster = aillenEffect 999 "8000"
+  [ (newPfId 1 "/mixer/master/volume", Pd 0.8),
+    (newPfId 50 "/mixer/master/filter", Pd 0.0),
+    (newPfId 51 "/mixer/master/limiter/gain", Pd 1.0),
+    (newPfId 52 "/mixer/master/limiter/release", Pd 0.05),
+    (newPfId 53 "/mixer/master/limiter/ceiling", Pd 0.99)
   ]
 
 ---------------------------------------------
@@ -881,22 +919,28 @@ defaultOrc = do
 aillenOrc :: IO Orchestra
 aillenOrc = do
   fm1 <- aillenTwoOp 0
-  fm2 <- aillenTwoOp 4
   s1 <- aillenSampler 1 ""
   s2 <- aillenSampler 2 ""
   s3 <- aillenSampler 3 ""
+  kp <- aillenResonator
   s5 <- aillenSampler 5 ""
   a303 <- aillen303
   hubass <- aillenHubass
+  del <- aillenDelay
+  rev <- aillenReverb
+  mix <- aillenMaster
   newTVarIO $ M.fromList
     [ ("fm1", fm1),
-      ("fm2", fm2),
       ("s1", s1),
       ("s2", s2),
       ("s3", s3),
+      ("kp", kp),
       ("s5", s5),
       ("303", a303),
-      ("hubass", hubass)
+      ("hubass", hubass),
+      ("del", del),
+      ("rev", rev),
+      ("mix", mix)
     ]
 
 -- returns a map of all instruments that are not effects

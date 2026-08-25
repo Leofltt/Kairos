@@ -121,8 +121,8 @@ delaySpray i list fun = addPf i 61 "/mixer/return/delay/spray" (toPfs list) fun
 delayPitch i list fun = addPf i 62 "/mixer/return/delay/pitch" (toPfs list) fun
 
 -- Aillen Return Reverb Controls
-reverbTime i list fun = addPf i 60 "/mixer/return/reverb/decay" (toPfs list) fun
-reverbTone i list fun = addPf i 61 "/mixer/return/reverb/tone" (toPfs list) fun
+reverbTime i list fun = addPf i 134 "/mixer/return/reverb/decay" (toPfs list) fun
+reverbTone i list fun = addPf i 135 "/mixer/return/reverb/tone" (toPfs list) fun
 
 -- Aillen Track FX Chain Controls
 fxFilter i list fun = addPf i 63 "/track/fx/filter/position" (toPfs list) fun
@@ -167,6 +167,17 @@ twopWavefold i list fun = addPf i 89 "/track/wavefold" (toPfs list) fun
 twopNoise i list fun = addPf i 90 "/track/noise" (toPfs list) fun
 twopPitchSweep i list fun = addPf i 91 "/track/pitch/sweep" (toPfs list) fun
 twopLfo i list fun = addPf i 92 "/track/lfo" (toPfs list) fun
+
+-- Aillen SynthResonator specific parameters (Track 4)
+exciterAdsr i list fun = addPf i 136 "/track/exciter/adsr" (toPfs list) fun
+exciterCutoff i list fun = addPf i 137 "/track/exciter/cutoff" (toPfs list) fun
+resFeedback i list fun = addPf i 138 "/track/feedback" (toPfs list) fun
+resDampening i list fun = addPf i 139 "/track/dampening" (toPfs list) fun
+bendDrive i list fun = addPf i 140 "/track/bend/drive" (toPfs list) fun
+bendFolds i list fun = addPf i 141 "/track/bend/folds" (toPfs list) fun
+bendBits i list fun = addPf i 142 "/track/bend/bits" (toPfs list) fun
+modalRatio i list fun = addPf i 143 "/track/modal/ratio" (toPfs list) fun
+modalMix i list fun = addPf i 144 "/track/modal/mix" (toPfs list) fun
 
 -- Aillen Sampler specific parameters
 sampleMode i list fun = addPf i 93 "/track/sample/mode" (toPfs list) fun
@@ -233,12 +244,11 @@ delt i list fun =  addPf i 2 "/mixer/return/delay/time" (toPfs list) fun
 -- voldel = setChannel csd1 "voldel"
 -- delvol i list fun =  addPf i 1 "voldel" (toPfs list) fun -- delay volume
 
--- fbrev = setChannel csd1 "fbrev"
--- revfb i list fun =  addPf i 3 "fbrev" (toPfs list) fun -- rev fb
--- cfrev = setChannel csd1 "cfrev"
--- revcf i list fun =  addPf i 2 "cfrev" (toPfs list) fun -- rev cf
--- volrev = setChannel csd1 "volrev"
--- revvol i list fun =  addPf i 1 "volrev" (toPfs list) fun -- rev volume
+revDecay = sendAillenParam aillenPort "/mixer/return/reverb/decay"
+revdecay i list fun = addPf i 3 "/mixer/return/reverb/decay" (toPfs list) fun
+
+revTone = sendAillenParam aillenPort "/mixer/return/reverb/tone"
+revtone i list fun = addPf i 2 "/mixer/return/reverb/tone" (toPfs list) fun
 
 -- volchorus = setChannel csd1 "volchorus"
 -- chorvol i list fun =  addPf i 1 "volchorus" (toPfs list) fun -- chorus volume
