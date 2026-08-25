@@ -14,8 +14,8 @@ kcj = defPath "/kicks/KickCymbJungle.wav"
 addI "kcj" $ aillenSampler 1 kcj
 kWd = defPath "/kicks/KickWoody.wav"
 addI "kWd" $ aillenSampler 1 kWd
-kp = defPath "/kicks/OrphansSonKick.wav"
-addI "kp" $ aillenSampler 1 kp
+kphat = defPath "/kicks/OrphansSonKick.wav"
+addI "kphat" $ aillenSampler 1 kphat
 kN = defPath "/kicks/EkaliKick.wav"
 addI "kN" $ aillenSampler 1 kN
 kbaSh = defPath "/kicks/basskickShallow.wav"
