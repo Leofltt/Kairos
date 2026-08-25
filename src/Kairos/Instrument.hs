@@ -997,21 +997,6 @@ aillenOrc = do
   del <- aillenDelay
   rev <- aillenReverb
   mix <- aillenMaster
-<<<<<<< HEAD
-  newTVarIO $ M.fromList
-    [ ("fm1", fm1),
-      ("s1", s1),
-      ("s2", s2),
-      ("s3", s3),
-      ("kp", kp),
-      ("s5", s5),
-      ("303", a303),
-      ("hubass", hubass),
-      ("del", del),
-      ("rev", rev),
-      ("mix", mix)
-    ]
-=======
   newTVarIO $
     M.fromList
       [ ("fm1", fm1),
@@ -1026,7 +1011,6 @@ aillenOrc = do
         ("rev", rev),
         ("mix", mix)
       ]
->>>>>>> 5ee136b (updated instr)
 
 -- returns a map of all instruments that are not effects
 notEffectOrc :: M.Map [Char] Instr -> M.Map [Char] Instr
