@@ -845,13 +845,6 @@ aillenResonator =
       (newPfId 29 "pitch", Pd 60)
     ]
 
-aillenResonator :: IO Instr
-aillenResonator = aillenInstr 4 "8000"
-  [ (newPfId 3 "dur", Pd 1),
-    (newPfId 4 "vol", Pd 0.5),
-    (newPfId 29 "pitch", Pd 60)
-  ]
-
 aillenStutter :: InstrumentID -> String -> IO Instr
 aillenStutter i_n path =
   aillenInstr
@@ -906,36 +899,6 @@ aillenMaster =
       (newPfId 53 "/mixer/master/limiter/ceiling", Pd 0.99)
     ]
 
-aillenEffect :: InstrumentID -> String -> [(PfId, Pfield)] -> IO Instr
-aillenEffect i_n aillen_port pfields = do
-  ins <- aillenInstr i_n aillen_port pfields
-  return ins { itype = Effect }
-
-aillenDelay :: IO Instr
-aillenDelay = aillenEffect 551 "8000"
-  [ (newPfId 56 "/mixer/return/delay/mode", Pd 0),
-    (newPfId 57 "/mixer/return/delay/pingpong", Pd 0),
-    (newPfId 58 "/mixer/return/delay/drive", Pd 0.2),
-    (newPfId 59 "/mixer/return/delay/grain_size", Pd 0.1),
-    (newPfId 60 "/mixer/return/delay/density", Pd 4),
-    (newPfId 61 "/mixer/return/delay/spray", Pd 0.02),
-    (newPfId 62 "/mixer/return/delay/pitch", Pd 1.0)
-  ]
-
-aillenReverb :: IO Instr
-aillenReverb = aillenEffect 550 "8000"
-  [ (newPfId 134 "/mixer/return/reverb/decay", Pd 0.5),
-    (newPfId 135 "/mixer/return/reverb/tone", Pd 0.0)
-  ]
-
-aillenMaster :: IO Instr
-aillenMaster = aillenEffect 999 "8000"
-  [ (newPfId 1 "/mixer/master/volume", Pd 0.8),
-    (newPfId 50 "/mixer/master/filter", Pd 0.0),
-    (newPfId 51 "/mixer/master/limiter/gain", Pd 1.0),
-    (newPfId 52 "/mixer/master/limiter/release", Pd 0.05),
-    (newPfId 53 "/mixer/master/limiter/ceiling", Pd 0.99)
-  ]
 
 ---------------------------------------------
 -- default Orchestra
