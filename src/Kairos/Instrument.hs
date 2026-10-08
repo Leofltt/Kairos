@@ -835,6 +835,16 @@ aillenHubass =
       (newPfId 29 "pitch", Pd 60)
     ]
 
+aillenSwave :: IO Instr
+aillenSwave =
+  aillenInstr
+    8
+    "8000"
+    [ (newPfId 3 "dur", Pd 1),
+      (newPfId 4 "vol", Pd 0.5),
+      (newPfId 29 "pitch", Pd 60)
+    ]
+
 aillenResonator :: IO Instr
 aillenResonator =
   aillenInstr
@@ -957,6 +967,7 @@ aillenOrc = do
   s5 <- aillenSampler 5 ""
   a303 <- aillen303
   hubass <- aillenHubass
+  swave <- aillenSwave
   del <- aillenDelay
   rev <- aillenReverb
   mix <- aillenMaster
@@ -970,6 +981,7 @@ aillenOrc = do
         ("s5", s5),
         ("303", a303),
         ("hubass", hubass),
+        ("swave", swave),
         ("del", del),
         ("rev", rev),
         ("mix", mix)

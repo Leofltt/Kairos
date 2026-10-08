@@ -90,6 +90,7 @@ Make sure you have the following installed:
 ### Basic Controls
 
 - **Display Instruments**: `displayIns`
+- **Display Aillen Tree**: `displayAillenIns` (displays instruments grouped by Aillen track in a tree view)
 
 - **Change Tempo**: `cT 128` (sets BPM to 128)
 - **Start Instrument**: `p "instName"`

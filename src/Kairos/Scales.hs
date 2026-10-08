@@ -1,42 +1,65 @@
 module Kairos.Scales where
 
-import Kairos.Utilities ( offset )
+import Kairos.Utilities (offset)
 
 type Scale = [Double]
 
--- | create a list of values given a scale starting from a given root note 
+-- | create a list of values given a scale starting from a given root note
 withScale :: Double -> Scale -> Scale
 root `withScale` scale = offset root scale
 
 -- scales source : https://en.wikipedia.org/wiki/List_of_musical_scales_and_modes
 
 ionian :: Scale
-ionian = [0,2,4,5,7,9,11]
+ionian = [0, 2, 4, 5, 7, 9, 11]
+
 dorian :: Scale
-dorian = [0,2,3,5,7,9,10]
+dorian = [0, 2, 3, 5, 7, 9, 10]
+
 phrygian :: Scale
-phrygian = [0,1,3,5,7,8,10]
+phrygian = [0, 1, 3, 5, 7, 8, 10]
+
 lydian :: Scale
-lydian = [0,2,4,6,7,9,11]
+lydian = [0, 2, 4, 6, 7, 9, 11]
+
 aeolian :: Scale
-aeolian =  [0,2,3,5,7,8,10]
+aeolian = [0, 2, 3, 5, 7, 8, 10]
+
 mixo :: Scale
-mixo = [0,2,4,5,7,9,10]
+mixo = [0, 2, 4, 5, 7, 9, 10]
+
 locrian :: Scale
-locrian =  [0,1,3,5,7,8,10]
+locrian = [0, 1, 3, 5, 7, 8, 10]
+
 blues :: Scale
-blues = [0,1,3,5,6,7,10]
+blues = [0, 1, 3, 5, 6, 7, 10]
+
 flamenco :: Scale
-flamenco = [0,1,5,6,8,10,11]
+flamenco = [0, 1, 5, 6, 8, 10, 11]
+
 harmMin :: Scale
-harmMin = [0,2,3,5,7,8,11]
+harmMin = [0, 2, 3, 5, 7, 8, 11]
+
 persian :: Scale
-persian = [0,1,4,5,6,8,11]
+persian = [0, 1, 4, 5, 6, 8, 11]
+
 prometheus :: Scale
-prometheus = [0,2,4,6,9,10]
+prometheus = [0, 2, 4, 6, 9, 10]
+
 wholeTone :: Scale
-wholeTone = [0,2,4,6,8,10]
+wholeTone = [0, 2, 4, 6, 8, 10]
+
 triTone :: Scale
-triTone = [0,1,4,6,7,10]
+triTone = [0, 1, 4, 6, 7, 10]
+
 phryDom :: Scale
-phryDom = [0,1,4,5,7,8,10,11]
+phryDom = [0, 1, 4, 5, 7, 8, 10, 11]
+
+minorPentatonic :: Scale
+minorPentatonic = [0, 3, 5, 7, 10]
+
+majorPentatonic :: Scale
+majorPentatonic = [0, 2, 4, 7, 9]
+
+melodicMinor :: Scale
+melodicMinor = [0, 2, 3, 5, 7, 9, 11]

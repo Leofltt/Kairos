@@ -69,6 +69,9 @@ catTP measure a b = a ++ sumdb where sumdb = map (+ TP measure) b
 seqTP :: [TimePoint] -> [TimePoint] -> [TimePoint]
 seqTP a = catTP (maximum (fromTP a) + 1) a
 
+dilate :: Double -> [TimePoint] -> [TimePoint]
+dilate mult = map (fmap (* mult))
+
 -- | functions to create TimePoint patterns -------------------------------
 
 -- | from Star.Rhythm mininotation

@@ -3,6 +3,7 @@
 module Kairos.Performance where
 
 import Control.Concurrent.STM (TVar, newTVarIO, readTVarIO)
+import Data.List (sortOn)
 import Data.Map.Strict qualified as M
 import Data.Maybe (fromJust, isNothing)
 import Kairos.Clock
@@ -11,7 +12,7 @@ import Kairos.Clock
     currentTS,
     defaultClock,
   )
-import Kairos.Instrument (Instr (..), Orchestra, aillenOrc)
+import Kairos.Instrument (Instr (..), MessageTo (..), Orchestra, aillenOrc)
 import Kairos.PfPat
 import Kairos.Pfield
 import Kairos.TimePoint (TimePoint, defaultTPMap, notEmpty)
@@ -73,6 +74,76 @@ displayInstruments :: Performance -> IO String
 displayInstruments perf = do
   ins <- readTVarIO (orc perf)
   return $ unwords $ M.keys ins
+
+-- | Helper to extract sample path info from an instrument
+getSampleInfo :: Instr -> IO String
+getSampleInfo i = do
+  pfields <- readTVarIO (pf i)
+  case M.lookup (newPfId 29 "sample") pfields of
+    Just (Ps path) | not (null path) -> do
+      let filename = reverse $ takeWhile (/= '/') $ reverse path
+      return $ if null filename then "" else " [" ++ filename ++ "]"
+    _ -> return ""
+
+-- | Human-readable track labels for Aillen tracks
+aillenTrackLabel :: Int -> String
+aillenTrackLabel 0 = "Track 0 (TwoOp Synth)"
+aillenTrackLabel 1 = "Track 1 (Sampler: Kicks)"
+aillenTrackLabel 2 = "Track 2 (Sampler: Snares & Claps)"
+aillenTrackLabel 3 = "Track 3 (Sampler: Hats, Perc, Vox & FX)"
+aillenTrackLabel 4 = "Track 4 (Resonator / Karplus-Strong)"
+aillenTrackLabel 5 = "Track 5 (Sampler: Breaks & Stutters)"
+aillenTrackLabel 6 = "Track 6 (Synth303: Acid Bass)"
+aillenTrackLabel 7 = "Track 7 (SynthHubass: Hyper-Bass)"
+aillenTrackLabel 8 = "Track 8 (SWAVE Synth: SuperWave)"
+aillenTrackLabel 550 = "Track 550 (Return Reverb)"
+aillenTrackLabel 551 = "Track 551 (Return Delay)"
+aillenTrackLabel 999 = "Track 999 (Master Mixer)"
+aillenTrackLabel n = "Track " ++ show n
+
+-- | Render grouped tracks and instruments into a tree
+renderAillenTree :: [(Int, [(String, String)])] -> [String]
+renderAillenTree [] = ["Aillen Orchestra: (no Aillen instruments found)"]
+renderAillenTree tracks = "Aillen Orchestra" : concatMap renderTrack (withLast tracks)
+  where
+    withLast [] = []
+    withLast [x] = [(x, True)]
+    withLast (x : xs) = (x, False) : withLast xs
+
+    renderTrack ((trNum, items), isLastTrack) =
+      let (tPrefix, cPrefix) =
+            if isLastTrack
+              then ("└── ", "    ")
+              else ("├── ", "│   ")
+          tHeader = tPrefix ++ aillenTrackLabel trNum
+          itemLines = map (renderItem cPrefix) (withLast items)
+       in tHeader : itemLines
+
+    renderItem cPrefix ((name, info), isLastItem) =
+      let iPrefix = if isLastItem then "└── " else "├── "
+       in cPrefix ++ iPrefix ++ name ++ info
+
+-- | Return a string representing the Aillen instruments organized in a track tree
+displayAillenInstrumentsStr :: Performance -> IO String
+displayAillenInstrumentsStr perf = do
+  orch <- readTVarIO (orc perf)
+  let aillenOnly = M.filter (\i -> case kind i of Aillen _ -> True; _ -> False) orch
+  pairsWithInfo <-
+    mapM
+      ( \(n, i) -> do
+          sInfo <- getSampleInfo i
+          return (insN i, (n, sInfo))
+      )
+      (M.toList aillenOnly)
+  let trackMap = M.fromListWith (++) [(trNum, [item]) | (trNum, item) <- pairsWithInfo]
+  let sortedTracks = [(trNum, sortOn fst items) | (trNum, items) <- M.toAscList trackMap]
+  return $ unlines $ renderAillenTree sortedTracks
+
+-- | Display Aillen instruments organised by track in a tree view
+displayAillenInstruments :: Performance -> IO ()
+displayAillenInstruments perf = do
+  s <- displayAillenInstrumentsStr perf
+  putStr s
 
 withTimeSignature :: Performance -> [Pfield] -> IO [Pfield]
 withTimeSignature perf l = do

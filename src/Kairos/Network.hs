@@ -120,6 +120,14 @@ pfieldToOSCDatumForAddrIndexed addr idx (Pd x) =
     ("/track/7/hubass/filter/mode", 0) -> OSC_I $ round x
     ("/track/7/hubass/lfo/1", 0) -> OSC_I $ round x
     ("/track/6/303/pwm/params", _) -> OSC_F $ doubleToFloat x
+    (a, 0) | "/swave/sub" `isSuffixOf` a -> OSC_I $ round x
+    (a, 1) | "/swave/sub" `isSuffixOf` a -> OSC_I $ round x
+    (a, 0) | "/swave/drive" `isSuffixOf` a -> OSC_I $ round x
+    (a, 0) | "/ratio/quantize" `isSuffixOf` a -> OSC_I $ round x
+    (a, 1) | "/ratio/quantize" `isSuffixOf` a -> OSC_I $ round x
+    (a, 0) | "/filter/basewidth" `isSuffixOf` a -> OSC_I $ round x
+    (a, 2) | "/filter/params" `isSuffixOf` a -> OSC_I $ round x
+    (a, 0) | "/lfo" `isSuffixOf` a -> OSC_I $ round x
     _ -> if isIntAddr addr
            then OSC_I $ round x
            else OSC_F $ doubleToFloat x
@@ -155,6 +163,14 @@ wordToDatum addr idx word =
     ("/track/7/hubass/filter/mode", 0) -> OSC_I $ parseI word
     ("/track/7/hubass/lfo/1", 0) -> OSC_I $ parseI word
     ("/track/6/303/pwm/params", _) -> OSC_F $ parseF word
+    (a, 0) | "/swave/sub" `isSuffixOf` a -> OSC_I $ parseI word
+    (a, 1) | "/swave/sub" `isSuffixOf` a -> OSC_I $ parseI word
+    (a, 0) | "/swave/drive" `isSuffixOf` a -> OSC_I $ parseI word
+    (a, 0) | "/ratio/quantize" `isSuffixOf` a -> OSC_I $ parseI word
+    (a, 1) | "/ratio/quantize" `isSuffixOf` a -> OSC_I $ parseI word
+    (a, 0) | "/filter/basewidth" `isSuffixOf` a -> OSC_I $ parseI word
+    (a, 2) | "/filter/params" `isSuffixOf` a -> OSC_I $ parseI word
+    (a, 0) | "/lfo" `isSuffixOf` a -> OSC_I $ parseI word
     _ -> if isIntAddr addr || (not (null word) && all (`elem` ("0123456789-" :: String)) word)
            then OSC_I $ parseI word
            else OSC_F $ parseF word

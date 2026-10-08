@@ -8,6 +8,8 @@ aillenPort = "8000"
 :set -w 
 perf <- defaultPerformance
 displayIns = displayInstruments perf
+displayAillenIns = displayAillenInstruments perf
+displayInsAillen = displayAillenInstruments perf
 displayP = displayParams perf
 displayTP = displayTPat perf
 p = play perf
@@ -163,6 +165,9 @@ twopFilterAdsr i list fun = addPf i 85 "/track/filter/adsr" (toPfs list) fun
 twopFilterParams i list fun = addPf i 86 "/track/filter/params" (toPfs list) fun
 twopFilterMod i list fun = addPf i 87 "/track/filter/mod" (toPfs list) fun
 twopFeedback i list fun = addPf i 88 "/track/feedback" (toPfs list) fun
+twopFeedback1 i list fun = addPf i 145 "/track/feedback1" (toPfs list) fun
+twopRatioQuantize i list fun = addPf i 146 "/track/ratio/quantize" (toPfs list) fun
+twopFilterBaseWidth i list fun = addPf i 147 "/track/filter/basewidth" (toPfs list) fun
 twopWavefold i list fun = addPf i 89 "/track/wavefold" (toPfs list) fun
 twopNoise i list fun = addPf i 90 "/track/noise" (toPfs list) fun
 twopPitchSweep i list fun = addPf i 91 "/track/pitch/sweep" (toPfs list) fun
@@ -217,6 +222,17 @@ hubassLfo1 i list fun = addPf i 121 "/track/7/hubass/lfo/1" (toPfs list) fun
 chorusHubass i list fun = addPf i 122 "/track/7/hubass/chorus/params" (toPfs list) fun
 legatoHubass i list fun = addPf i 123 "/track/7/hubass/legato" (toPfs list) fun
 gainHubass i list fun = addPf i 124 "/track/7/hubass/gain" (toPfs list) fun
+
+-- Aillen SWAVE Synth specific parameters (Track 8)
+swaveMode i list fun = addPf i 148 "/track/swave/mode" (toPfs list) fun
+swaveWaveform i list fun = addPf i 149 "/track/swave/waveform" (toPfs list) fun
+swaveUnison i list fun = addPf i 150 "/track/swave/unison" (toPfs list) fun
+swaveEnsemble i list fun = addPf i 151 "/track/swave/ensemble" (toPfs list) fun
+swaveSub i list fun = addPf i 152 "/track/swave/sub" (toPfs list) fun
+swaveFilter i list fun = addPf i 153 "/track/swave/filter" (toPfs list) fun
+swaveAmpAdsr i list fun = addPf i 154 "/track/swave/amp/adsr" (toPfs list) fun
+swaveFilterAdsr i list fun = addPf i 155 "/track/swave/filter/adsr" (toPfs list) fun
+swaveDrive i list fun = addPf i 156 "/track/swave/drive" (toPfs list) fun
 
 -- mc_pitch i list fun = addPf i 11 "pitch" (toPfs list) fun -- model:cycles
 -- decay i list fun = addPf i 12 "decay" (toPfs list) fun    -- model:cycles
