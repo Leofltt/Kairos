@@ -1,10 +1,3 @@
-{--
- -
- - Currently Playing:
- - @leofltt
- -
- -
-
 Updaters & Sequence Helpers:
 - nv / k / keep (no update)
 - np Int (next pattern)
@@ -61,6 +54,13 @@ Markov Tables (CSV):
 - Ratchets: csvStutsDnB, csvStutsVsnare, csvStutsAe
 - Kits: csvKitT, csvKitJ
 
+Chords (Kairos.Chords):
+- Triads: maj, min', sus2, sus4, dim, aug
+- 7ths: min7, maj7, dom7, dim7, halfDim7, minMaj7, aug7, augMaj7
+- 6ths & 9ths: min6, maj6, min9no5, maj9no5, dom9no5, add9, minAdd9
+- Altered & Voicings: dom7b5, dom7sharp5, dom7b9, dom7sharp9, openMin7, openMaj7, fifthOct, octaves
+- Helpers: withChord root chord, withGain gain chord, swaveEnsemble "swave" [min7] keep
+
 Performance Utils:
 - displayP "instr" (Show all current p-fields)
 - prms "instr" [(updater, param, [values])]
@@ -108,4 +108,3 @@ uzuvol / uzuwd / uzuoff / uzudp / uzusp / uzubl / uzumx / uzuhz / uzubs / uzuspr
 mixvol
 wlvol / wldrop / wlmax
 
---}
