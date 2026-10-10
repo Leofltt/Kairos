@@ -10,6 +10,7 @@ import Kairos.Instrument as K
 import Kairos.Player as K
 import Kairos.Utilities as K
 import Kairos.Scales as K
+import Kairos.Chords as K
 import Kairos.Markov as K
     ( runMarkov,
       runMarkovCSV,

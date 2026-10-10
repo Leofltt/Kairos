@@ -227,7 +227,10 @@ gainHubass i list fun = addPf i 124 "/track/7/hubass/gain" (toPfs list) fun
 swaveMode i list fun = addPf i 148 "/track/swave/mode" (toPfs list) fun
 swaveWaveform i list fun = addPf i 149 "/track/swave/waveform" (toPfs list) fun
 swaveUnison i list fun = addPf i 150 "/track/swave/unison" (toPfs list) fun
-swaveEnsemble i list fun = addPf i 151 "/track/swave/ensemble" (toPfs list) fun
+swaveEnsemble i list fun = addPf i 151 "/track/swave/ensemble" (toPfs (map normalizeEnsemble list)) fun
+  where
+    normalizeEnsemble [s2, s3, s4] = [s2, s3, s4, 0.8]
+    normalizeEnsemble other = other
 swaveSub i list fun = addPf i 152 "/track/swave/sub" (toPfs list) fun
 swaveFilter i list fun = addPf i 153 "/track/swave/filter" (toPfs list) fun
 swaveAmpAdsr i list fun = addPf i 154 "/track/swave/amp/adsr" (toPfs list) fun

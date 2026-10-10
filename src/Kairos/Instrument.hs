@@ -780,19 +780,13 @@ aillenTwoOp i_n =
     "8000"
     [ (newPfId 3 "dur", Pd 1),
       (newPfId 4 "vol", Pd 0.5),
-      (newPfId 29 "pitch", Pd 60)
+      (newPfId 29 "pitch", Pd 60),
+      (newPfId 55 "/track/sidechain/source", Pd (-1)),
+      (newPfId 76 "/track/fx/compressor/sidechain", Pd 0)
     ]
 
 aillenSampler :: InstrumentID -> String -> IO Instr
-aillenSampler i_n path =
-  aillenInstr
-    i_n
-    "8000"
-    [ (newPfId 3 "dur", Pd 1),
-      (newPfId 4 "vol", Pd 0.5),
-      (newPfId 29 "sample", Ps path),
-      (newPfId 30 "cps", Pd 0)
-    ]
+aillenSampler = aillenSamplerV
 
 aillenSamplerV :: InstrumentID -> String -> IO Instr
 aillenSamplerV i_n path =
@@ -812,7 +806,9 @@ aillenSamplerV i_n path =
       (newPfId 37 "stretch", Pd 0),
       (newPfId 38 "gsize", Pd 40.0),
       (newPfId 39 "overlap", Pd 4),
-      (newPfId 40 "filter", Pd 0.0)
+      (newPfId 40 "filter", Pd 0.0),
+      (newPfId 55 "/track/sidechain/source", Pd (-1)),
+      (newPfId 76 "/track/fx/compressor/sidechain", Pd 0)
     ]
 
 aillen303 :: IO Instr
@@ -822,7 +818,9 @@ aillen303 =
     "8000"
     [ (newPfId 3 "dur", Pd 1),
       (newPfId 4 "vol", Pd 0.5),
-      (newPfId 29 "pitch", Pd 60)
+      (newPfId 29 "pitch", Pd 60),
+      (newPfId 55 "/track/sidechain/source", Pd 1),
+      (newPfId 76 "/track/fx/compressor/sidechain", Pd 1)
     ]
 
 aillenHubass :: IO Instr
@@ -832,7 +830,9 @@ aillenHubass =
     "8000"
     [ (newPfId 3 "dur", Pd 1),
       (newPfId 4 "vol", Pd 0.5),
-      (newPfId 29 "pitch", Pd 60)
+      (newPfId 29 "pitch", Pd 60),
+      (newPfId 55 "/track/sidechain/source", Pd 1),
+      (newPfId 76 "/track/fx/compressor/sidechain", Pd 1)
     ]
 
 aillenSwave :: IO Instr
@@ -842,7 +842,9 @@ aillenSwave =
     "8000"
     [ (newPfId 3 "dur", Pd 1),
       (newPfId 4 "vol", Pd 0.5),
-      (newPfId 29 "pitch", Pd 60)
+      (newPfId 29 "pitch", Pd 60),
+      (newPfId 55 "/track/sidechain/source", Pd (-1)),
+      (newPfId 76 "/track/fx/compressor/sidechain", Pd 0)
     ]
 
 aillenResonator :: IO Instr
@@ -852,7 +854,9 @@ aillenResonator =
     "8000"
     [ (newPfId 3 "dur", Pd 1),
       (newPfId 4 "vol", Pd 0.5),
-      (newPfId 29 "pitch", Pd 60)
+      (newPfId 29 "pitch", Pd 60),
+      (newPfId 55 "/track/sidechain/source", Pd (-1)),
+      (newPfId 76 "/track/fx/compressor/sidechain", Pd 0)
     ]
 
 aillenStutter :: InstrumentID -> String -> IO Instr
@@ -866,7 +870,16 @@ aillenStutter i_n path =
       (newPfId 30 "cps", Pd 0),
       (newPfId 31 "divs", Pd 4),
       (newPfId 32 "pick", Pd 0),
-      (newPfId 33 "stuts", Pd 0)
+      (newPfId 33 "stuts", Pd 0),
+      (newPfId 34 "loop", Pd 0),
+      (newPfId 35 "speed", Pd 1.0),
+      (newPfId 36 "sample_pitch", Pd 1.0),
+      (newPfId 37 "stretch", Pd 0),
+      (newPfId 38 "gsize", Pd 40.0),
+      (newPfId 39 "overlap", Pd 4),
+      (newPfId 40 "filter", Pd 0.0),
+      (newPfId 55 "/track/sidechain/source", Pd (-1)),
+      (newPfId 76 "/track/fx/compressor/sidechain", Pd 0)
     ]
 
 aillenEffect :: InstrumentID -> String -> [(PfId, Pfield)] -> IO Instr
@@ -959,12 +972,12 @@ defaultOrc = do
 -- Aillen Orchestra
 aillenOrc :: IO Orchestra
 aillenOrc = do
-  fm1 <- aillenTwoOp 0
-  s1 <- aillenSampler 1 ""
-  s2 <- aillenSampler 2 ""
-  s3 <- aillenSampler 3 ""
+  twop <- aillenTwoOp 0
+  s1 <- aillenSamplerV 1 ""
+  s2 <- aillenSamplerV 2 ""
+  s3 <- aillenSamplerV 3 ""
   kp <- aillenResonator
-  s5 <- aillenSampler 5 ""
+  s5 <- aillenSamplerV 5 ""
   a303 <- aillen303
   hubass <- aillenHubass
   swave <- aillenSwave
@@ -973,7 +986,7 @@ aillenOrc = do
   mix <- aillenMaster
   newTVarIO $
     M.fromList
-      [ ("fm1", fm1),
+      [ ("twop", twop),
         ("s1", s1),
         ("s2", s2),
         ("s3", s3),

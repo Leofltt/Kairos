@@ -98,7 +98,7 @@ addI "snare34" $ aillenSampler 2 snare34
 snare41 = defPath "/snares/Snare41.wav"
 addI "snare41" $ aillenSampler 2 snare41
 sh = defPath "/ch/shortHat.wav" -- TRACK 3: HATS, PERCUSSION, VOX & FX
-addI "sh" $ aillenSampler 3 sh 
+addI "sh" $ aillenSampler 3 sh
 r1 = defPath "/rim/HollowRim.wav"
 addI "r1" $ aillenSampler 3 r1
 rS = defPath "/rim/SmallRim.wav"
@@ -238,13 +238,13 @@ dur "ez" [1.5] k
 ec = defPath "/iclc/nic.wav"
 addI "tril" $ aillenSampler 3 ec
 dur "tril" [1] k
-hhakubra = defPath "/ch/akubra.wav"
+hhakubra = defPath "/ch/Akubra.wav"
 addI "hhakubra" $ aillenSampler 3 hhakubra
-hat2 = defPath "/ch/hat2.wav"
+hat2 = defPath "/ch/hat02.wav"
 addI "hat2" $ aillenSampler 3 hat2
-hhbowler = defPath "/ch/bowler.wav"
+hhbowler = defPath "/ch/Bowler.wav"
 addI "hhbowler" $ aillenSampler 3 hhbowler
-hhdurag = defPath "/ch/durag.wav"
+hhdurag = defPath "/ch/Durag.wav"
 addI "hhdurag" $ aillenSampler 3 hhdurag
 spaceperc1 = defPath "/spaceperc/spaceperc1.wav"
 addI "spaceperc1" $ aillenSampler 3 spaceperc1
@@ -382,19 +382,19 @@ dur "mpstut" [15] k
 csv1 = markPath "/Test.csv" -- MARKOV TABLES & SCRIPTS
 csv2 = markPath "/Test2.csv"
 csv3 = markPath "/Test3.csv"
-csvTechno = markPath "/Techno.csv"
-csvAcid = markPath "/Acid.csv"
-csvElectro = markPath "/Electro.csv"
-csvJungle = markPath "/Jungle.csv"
-csvIDM = markPath "/IDM.csv"
-csvTrance = markPath "/Trance.csv"
-csvBreakDnB = markPath "/Break_DnB.csv"
-csvBreakJungle = markPath "/Break_Jungle.csv"
-csvBreakVsnare = markPath "/Break_Vsnare.csv"
-csvBreakAe = markPath "/Break_Ae.csv"
-csvStutsDnB = markPath "/Stuts_DnB.csv"
-csvStutsVsnare = markPath "/Stuts_Vsnare.csv"
-csvStutsAe = markPath "/Stuts_Ae.csv"
-csvKitT = markPath "/Kit_Techno.csv"
-csvKitJ = markPath "/Kit_Jungle.csv"
-:! clear
+csvTechno = markPath "/Techno.csv" -- melodic
+csvAcid = markPath "/Acid.csv" -- melodic
+csvElectro = markPath "/Electro.csv" -- melodic
+csvJungle = markPath "/Jungle.csv" -- melodic
+csvIDM = markPath "/IDM.csv" -- melodic
+csvTrance = markPath "/Trance.csv" -- melodic
+csvBreakDnB = markPath "/Break_DnB.csv" -- breaks
+csvBreakJungle = markPath "/Break_Jungle.csv" -- breaks
+csvBreakVsnare = markPath "/Break_Vsnare.csv" -- breaks
+csvBreakAe = markPath "/Break_Autechre.csv" -- breaks
+csvStutsDnB = markPath "/Stuts_DnB.csv" -- stutters
+csvStutsVsnare = markPath "/Stuts_Vsnare.csv" -- stutters
+csvStutsAe = markPath "/Stuts_Ae.csv" -- stutters
+csvKitT = markPath "/Kit_Techno.csv" -- drumkits
+csvKitJ = markPath "/Kit_Jungle.csv" -- drumkits
+-- :! clear
