@@ -137,6 +137,7 @@ pfieldToOSCDatumForAddrIndexed _ _ (Pl _) = error "Nested lists in OSC parameter
 isIntAddr :: String -> Bool
 isIntAddr addr =
   "/mode" `isSuffixOf` addr ||
+  "/shape" `isSuffixOf` addr ||
   "/waveform" `isSuffixOf` addr ||
   "/mute" `isSuffixOf` addr ||
   "/source" `isSuffixOf` addr ||

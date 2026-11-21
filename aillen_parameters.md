@@ -104,6 +104,11 @@ Each track owns an independent `FxChain` containing a sequential arrangement of 
                                  +---------+ +---------+
                                       |           |
                                       v           v
+                                 +---------+ +---------+
+                                 | Chopper | | Chopper | <--- Note Trigger / Dur
+                                 +---------+ +---------+
+                                      |           |
+                                      v           v
                                    L Output    R Output
 ```
 
@@ -178,7 +183,7 @@ These parameters control global master return effects tracks.
 
 ### 2.2 Master Return Reverb Controls
 
-An Elektron-style stereo Plate Reverb filtered through a dedicated 120 Hz Biquad High-Pass filter before return summing to prevent low-end mud.
+A stereo Plate Reverb filtered through a dedicated 120 Hz Biquad High-Pass filter before return summing to prevent low-end mud.
 
 | Haskell Function | OSC Address | Parameter Type / Range | Description |
 | :--- | :--- | :--- | :--- |
@@ -200,7 +205,7 @@ reverbTone s1 [-0.4] (step 1)
 
 ## 3. Track FX Chain Controls
 
-Every track features a sequential FX Chain: **Ring Modulator $\rightarrow$ Wavefolder $\rightarrow$ Distortion $\rightarrow$ Bitcrusher $\rightarrow$ Comb Filter $\rightarrow$ DJ Filter $\rightarrow$ Compressor**.
+Every track features a sequential FX Chain: **Ring Modulator $\rightarrow$ Wavefolder $\rightarrow$ Distortion $\rightarrow$ Bitcrusher $\rightarrow$ Comb Filter $\rightarrow$ DJ Filter $\rightarrow$ Compressor $\rightarrow$ Chopper**.
 
 ### 3.1 Ring Modulator & Wavefolder
 
@@ -245,6 +250,30 @@ Every track features a sequential FX Chain: **Ring Modulator $\rightarrow$ Wavef
 | `fxCompMakeup i` | `/track/fx/compressor/makeup` | `Double` (makeup gain in dB) | Makeup gain. |
 | `fxCompSidechain i`| `/track/fx/compressor/sidechain`| `Int` (0 = Self, 1 = External) | Enable sidechain compression. |
 
+### 3.4 Rhythmic Chopper (Amplitude Gate / Tremolo)
+
+A stereo-linked, unipolar LFO amplitude modulator at the end of each track's `FxChain` for rhythmic break/synth gating without retriggering samples.
+
+| Haskell Function | OSC Address | Parameter Type / Range | Description |
+| :--- | :--- | :--- | :--- |
+| `fxChopRate i list` | `/track/fx/chopper/rate` | `Double` (0.0+) | Divisions per note/sample length (modes `0`/`1`) or Hz (mode `2`). `0.0` = bypass (default). |
+| `fxChopShape i list`| `/track/fx/chopper/shape` | `Int` (0 to 4) | Window/waveform shape (default `0`). See shapes below. |
+| `fxChopDepth i list`| `/track/fx/chopper/depth` | `Double` (0.0 to 1.0) | Modulation depth (`0.0` = dry, `1.0` = full gating, default `1.0`). |
+| `fxChopDuty i list` | `/track/fx/chopper/duty` | `Double` (0.05 to 1.0) | Active window duty cycle / pulse width per cycle (default `0.5`). |
+| `fxChopMode i list` | `/track/fx/chopper/mode` | `Int` (0 to 2) | Timing sync mode (default `0`). See modes below. |
+
+#### Chopper Shapes (`fxChopShape`)
+- `0` = **Square**: Soft-edged rectangular gate (`duty` controls on-time vs silence) with 1.5 ms anti-click smoothstep edges.
+- `1` = **Hann**: Smooth rounded bell curve within the `duty` window (`0` at edges, `1` at center).
+- `2` = **RampDown**: Percussive downward saw/ramp decay within the `duty` window (1.5 ms fade-in at start).
+- `3` = **RampUp**: Reverse swell rising linearly across the `duty` window (1.5 ms fade-out at end).
+- `4` = **Cosine**: Smooth peak-start tremolo centered on phase `0.0` so initial note transients hit at full gain (`1.0`).
+
+#### Chopper Sync Modes (`fxChopMode`)
+- `0` = **NoteDur**: `rate` divides the scheduled note duration (`dur` / `durTS`); phase resets on each note trigger (falls back to sample/slice duration on raw `/note/on`).
+- `1` = **SampleLength**: `rate` divides the active sample or slice length on Sampler tracks (falls back to note duration on synth tracks); phase resets on each note trigger.
+- `2` = **FreeHz**: `rate` directly sets a free-running LFO frequency in Hz (phase does not reset on note triggers).
+
 ### Examples
 ```haskell
 -- Wavefold a drum track for glassy saturation
@@ -254,6 +283,22 @@ fxWfDrive OH808 [2.0] (step 1)
 -- Tuned metallic/physical comb filter sweep
 fxCombFeedback s1 [0.85] (step 1)
 fxCombFreq s1 [220, 330, 440, 660] (step 4)
+
+-- Rhythmic break chopping synced to Kairos note duration (0 = bypass on off-steps)
+durTS "beb" [(1/4)] keep
+fxChopMode "beb" [0] keep
+fxChopShape "beb" [0] keep
+fxChopDuty "beb" [0.5] keep
+fxChopRate "beb" [0, 0, 2, 4] (step 4)
+
+-- Percussive RampDown chop synced to sample/slice length, or Cosine tremolo on a synth
+fxChopMode "beb" [1] keep
+fxChopShape "beb" [2] keep
+fxChopRate "beb" [4] keep
+
+fxChopShape "swave" [4] keep
+fxChopDepth "swave" [0.75] keep
+fxChopRate "swave" [3, 6] (step 2)
 ```
 
 ---
@@ -448,13 +493,13 @@ twopFilterBaseWidth "fm1" [[1, 200.0, 4000.0, 1.2]] keep
 
 ## 6. SynthResonator (Karplus-Strong & Modal Resonator) Specific Parameters (Track 4 - `kp`)
 
-A physical modeling string and modal synthesizer with a noise exciter, fractional delay line, parallel modal resonator, and internal distortion inside the feedback loop.
+A physical modeling string and stereo modal synthesizer driven by a velocity-sensitive noise exciter feeding a Karplus-Strong fractional delay line in parallel with a 6-mode coupled-form resonant modal bank, followed by an equal-power crossfade and post-mix per-voice stereo wavefolding/bitcrushing.
 
 ### SynthResonator Architecture
 
 ```
   +-------------------------------------------------------+
-  | Noise Generator PRNG                                  |
+  | Noise Generator PRNG (scaled by velocity)             |
   +-------------------------------------------------------+
                              |
                              v
@@ -467,69 +512,63 @@ A physical modeling string and modal synthesizer with a noise exciter, fractiona
                              |
                    Exciter Impulse Burst
                              |
-                             v
-           +-----------------+-----------------------+
-           |                                         |
-           v                                         |
-  +-----------------------------+                    |
-  | Karplus-Strong Delay Line   | <--- Pitch Hz      |
-  | (Fractional Linear Interp)  |                    |
-  +-----------------------------+                    |
-                 |                                   |
-                 v                                   |
-  +-----------------------------+                    |
-  | Wavefolder (bend_drive/fold)|                    |
-  +-----------------------------+                    |
-                 |                                   |
-                 v                                   |
-  +-----------------------------+                    |
-  | Bitcrusher (bend_bits)      |                    |
-  +-----------------------------+                    |
-                 |                                   |
-                 v                                   |
-  +-----------------------------+                    |
-  | Loop Dampening LowPass      | <--- dampening (Hz)|
-  +-----------------------------+                    |
-                 |                                   |
-                 v                                   |
-        [x Feedback Gain]                            |
-                 |                                   |
-                 v                                   |
-            ( + Sum ) <------------------------------+
-                 |
-                 v
-        [Soft Clip Tanh()]
-                 |
-                 +-------------------+ (Loop Feedback to Delay Line)
-                 |
-                 +-----------------------------------+
-                 |                                   |
-                 v                                   v
-        (1.0 - modal_mix)                     [modal_mix]
-                 |                                   |
-                 |                                   v
-                 |                    +-------------------------------+
-                 |                    | Parallel Modal Resonator      |
-                 |                    | (BPF at Pitch * modal_ratio)  |
-                 |                    +-------------------------------+
-                 |                                   |
-                 +-----------------+-----------------+
-                                   |
-                                   v
-                        Output -> Track FxChain
+                             +---------------------------------------------------+
+                             | (Branch A: String)                                | (Branch B: Parallel Modal Bank)
+                             v                                                   v
+                    +-----------------------------+             +-------------------------------------------+
+                    | Karplus-Strong Delay Line   | <-- Pitch   | 6-Mode High-Q Modal Resonator Bank        |
+                    | (Fractional Linear Interp)  |             |  - Mode 0: f0 (center-panned fundamental) |
+                    +-----------------------------+             |  - Modes 1..5: f0 * (k+1)^log2(ratio)     |
+                             |                                  |  - RMS-normalized gain (matched loudness) |
+                             v                                  |  - Decay tracks `feedback`, HF `dampening`|
+                    +-----------------------------+             |  - Odd/Even L/R pan (`modal_width`)       |
+                    | Loop Dampening LPF + DC Blk | <-- damp    +-------------------------------------------+
+                    +-----------------------------+                               | (L / R)
+                             |                                                    v
+                             v                                               [ Tanh() ]
+                    [x Feedback Gain]                                             |
+                             |                                                    |
+                             v                                                    |
+                    (+ Exciter) -> [Tanh()] ---> (Loop Feedback)                  |
+                             | (Center L/R)                                       | (Stereo L/R)
+                             v                                                    v
+                      [cos(mix * pi/2)]                                    [sin(mix * pi/2)]
+                             |                                                    |
+                             +-------------------------+--------------------------+
+                                                       | (Stereo L/R)
+                                                       v
+                                          +-------------------------+
+                                          | Stereo Wavefolder (L/R) | <--- bend_drive, bend_folds
+                                          +-------------------------+
+                                                       |
+                                                       v
+                                          +-------------------------+
+                                          | Stereo Bitcrusher (L/R) | <--- bend_bits
+                                          +-------------------------+
+                                                       |
+                                                Polyphonic Sum
+                                                       |
+                                                       v
+                                          +-------------------------+
+                                          | Headroom Gain Normalizer|
+                                          +-------------------------+
+                                                       |
+                                                       v
+                                           Stereo Output -> Track FxChain
 ```
 
 | Haskell Function | OSC Address | Parameter Type / Range | Description |
 | :--- | :--- | :--- | :--- |
 | `exciterAdsr i list` | `/track/exciter/adsr` | `[A, D, S, R]` (seconds, sustain 0..1) | Exciter noise burst ADSR parameters. A/D/R: `0.001` to `10.0`s. S: `0.0` to `1.0`. |
 | `exciterCutoff i list`| `/track/exciter/cutoff` | `Double` (20.0 to 20000.0 Hz) | Exciter noise burst lowpass cutoff frequency in Hz. |
-| `resFeedback i list` | `/track/feedback` | `Double` (0.0 to 0.999) | Delay line decay feedback ratio. |
-| `resDampening i list` | `/track/dampening` | `Double` (200.0 to 20000.0 Hz) | Feedback loop lowpass dampening cutoff frequency in Hz. |
-| `bendDrive i list` | `/track/bend/drive` | `Double` (1.0 to 10.0) | Wavefolder input drive multiplier inside feedback loop. |
-| `bendFolds i list` | `/track/bend/folds` | `Double` (0.0 to 5.0) | Wavefolder intensity inside feedback loop (0.0 is clean). |
-| `bendBits i list` | `/track/bend/bits` | `Double` (1.0 to 16.0) | Bitcrusher quantization bits inside feedback loop (16.0 is bypass). |
-| `modalRatio i list` | `/track/modal/ratio` | `Double` (0.5 to 8.0) | Detune ratio multiplier for parallel modal resonator filter. |
-| `modalMix i list` | `/track/modal/mix` | `Double` (0.0 to 1.0) | Resonator mix (0.0 is pure string, 1.0 is pure modal). |
+| `resFeedback i list` | `/track/feedback` | `Double` (0.0 to 0.999) | Decay time control for Karplus-Strong delay line and modal bank T60 decay. |
+| `resDampening i list` | `/track/dampening` | `Double` (200.0 to 20000.0 Hz) | Feedback loop lowpass dampening cutoff in Hz and high-partial modal decay rolloff. |
+| `bendDrive i list` | `/track/bend/drive` | `Double` (1.0 to 10.0) | Post-mix per-voice stereo wavefolder input drive multiplier. |
+| `bendFolds i list` | `/track/bend/folds` | `Double` (0.0 to 5.0) | Post-mix per-voice stereo wavefolder intensity (`0.0` is clean). |
+| `bendBits i list` | `/track/bend/bits` | `Double` (1.0 to 16.0) | Post-mix per-voice stereo bitcrusher quantization bits (`16.0` is bypass). |
+| `modalRatio i list` | `/track/modal/ratio` | `Double` (0.5 to 8.0) | Overtone stretch ratio (`f0` stays anchored; `f_k = f0 * (k+1)^log2(ratio)`). |
+| `modalMix i list` | `/track/modal/mix` | `Double` (0.0 to 1.0) | Equal-power crossfade between Karplus-Strong string (`0.0`) and 6-mode modal bank (`1.0`). |
+| `modalWidth i list` | `/track/modal/width` | `Double` (0.0 to 1.0) | Stereo spread for odd/even modal overtones (`0.0` = mono default, `1.0` = full L/R spread). |
 
 ---
 

@@ -152,6 +152,13 @@ fxCombFreq i list fun = addPf i 131 "/track/fx/comb/freq" (toPfs list) fun
 fxCombFeedback i list fun = addPf i 132 "/track/fx/comb/feedback" (toPfs list) fun
 fxCombDamp i list fun = addPf i 133 "/track/fx/comb/damp" (toPfs list) fun
 
+-- Aillen Track FX Chain Chopper (Amplitude Gate / Tremolo)
+fxChopRate i list fun = addPf i 157 "/track/fx/chopper/rate" (toPfs list) fun
+fxChopShape i list fun = addPf i 158 "/track/fx/chopper/shape" (toPfs list) fun
+fxChopDepth i list fun = addPf i 159 "/track/fx/chopper/depth" (toPfs list) fun
+fxChopDuty i list fun = addPf i 160 "/track/fx/chopper/duty" (toPfs list) fun
+fxChopMode i list fun = addPf i 161 "/track/fx/chopper/mode" (toPfs list) fun
+
 -- Aillen TwoOp Synth specific parameters
 realtime i list fun = addPf i 77 "/track/realtime" (toPfs list) fun
 legato i list fun = addPf i 78 "/track/legato" (toPfs list) fun
@@ -183,6 +190,7 @@ bendFolds i list fun = addPf i 141 "/track/bend/folds" (toPfs list) fun
 bendBits i list fun = addPf i 142 "/track/bend/bits" (toPfs list) fun
 modalRatio i list fun = addPf i 143 "/track/modal/ratio" (toPfs list) fun
 modalMix i list fun = addPf i 144 "/track/modal/mix" (toPfs list) fun
+modalWidth i list fun = addPf i 162 "/track/modal/width" (toPfs list) fun
 
 -- Aillen Sampler specific parameters
 sampleMode i list fun = addPf i 93 "/track/sample/mode" (toPfs list) fun

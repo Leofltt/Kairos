@@ -29,7 +29,7 @@ import Kairos.Instrument
     getPort,
     notEffectOrc,
   )
-import Kairos.Network (UDPPort, sendAillenParam, sendAillenSamplerLoad, sendAillenSamplerNote, sendAillenSynthNote, sendEvent, sendOSC, setChan)
+import Kairos.Network (UDPPort, sendAillenParam, sendAillenSamplerLoad, sendAillenSynthNote, sendEvent, sendOSC, setChan)
 import Kairos.Performance (Performance (clock, orc, timePs))
 import Kairos.PfPat (PfPat (pfId, updater))
 import Kairos.Pfield (PfId, PfMap, Pfield (..), idString, pfToString)
@@ -161,7 +161,7 @@ playAillen instr = do
         forM_ (lookupByName "overlap") (sendAillenParam port ("/track/" ++ show trackId ++ "/sample/overlap"))
         forM_ (lookupByName "filter") (sendAillenParam port ("/track/" ++ show trackId ++ "/filter"))
         let samplerFreq = if cpsVal > 0.0 then (if cpsVal <= 127.0 then midiToHz cpsVal else cpsVal) else 261.63
-        sendAillenSamplerNote port trackId samplerFreq vol
+        sendAillenSynthNote port trackId samplerFreq durMs vol
       else do
         -- Synth track
         sendAillenSynthNote port trackId freq durMs vol

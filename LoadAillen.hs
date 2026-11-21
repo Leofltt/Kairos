@@ -5,8 +5,8 @@
 -- Track 3: Hats, Percussion, Vox & FX
 -- Track 5: Breaks (Stutters)
 
-defPath s = "/Users/leofltt/Desktop/KairosSamples" ++ s
-markPath s = "/Users/leofltt/Desktop/Kairos/MarkovTables" ++ s
+defPath s = "/Users/leofltt/Desktop/live_coding/KairosSamples" ++ s
+markPath s = "/Users/leofltt/Desktop/live_coding/Kairos/MarkovTables" ++ s
 aillenPort = "8000"
 k909 = defPath "/909/Kick-909.aif" -- TRACK 1: KICKS
 addI "K909" $ aillenSampler 1 k909
