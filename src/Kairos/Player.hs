@@ -11,7 +11,8 @@ import Data.List (isPrefixOf)
 import Data.Map.Strict qualified as M
 import Data.Maybe (fromJust, isJust)
 import Kairos.Clock
-  ( TimeSignature (beatInMsr),
+  ( Beats,
+    TimeSignature (beatInMsr),
     beatInBar,
     currentBeat,
     currentTS,
@@ -137,9 +138,11 @@ playAillen instr = do
     if trackId `elem` [1, 2, 3, 5]
       then do
         -- Sampler track
-        when (not (null samplePath)) $
+        let hasCustomSub sub =
+              any (\k -> idString k == "/track/" ++ sub || idString k == "/track/" ++ show trackId ++ "/" ++ sub) (M.keys pfields)
+        when (not (null samplePath) && not (hasCustomSub "sample/select")) $
           sendAillenSamplerLoad port trackId samplePath
-        let hasCustomCount = any (\k -> idString k == "/track/sample/slice/count" || idString k == "/track/sample/slice/mode") (M.keys pfields)
+        let hasCustomCount = hasCustomSub "sample/slice/count" || hasCustomSub "sample/slice/mode"
         when (not hasCustomCount) $
           forM_ (lookupByName "divs") $ \v -> case v of
             Pd d | d > 1.0 -> do
@@ -147,19 +150,24 @@ playAillen instr = do
               sendAillenParam port ("/track/" ++ show trackId ++ "/sample/slice/count") v
             _ -> do
               sendAillenParam port ("/track/" ++ show trackId ++ "/sample/slice/mode") (Pd 0.0)
-        let hasCustomSelect = any (\k -> idString k == "/track/sample/slice/select") (M.keys pfields)
-        when (not hasCustomSelect) $
+        when (not (hasCustomSub "sample/slice/select")) $
           forM_ (lookupByName "pick") (sendAillenParam port ("/track/" ++ show trackId ++ "/sample/slice/select"))
-        let hasCustomStutter = any (\k -> idString k == "/track/sample/slice/stutter") (M.keys pfields)
-        when (not hasCustomStutter) $
+        when (not (hasCustomSub "sample/slice/stutter")) $
           forM_ (lookupByName "stuts") (sendAillenParam port ("/track/" ++ show trackId ++ "/sample/slice/stutter"))
-        forM_ (lookupByName "sample_pitch") (sendAillenParam port ("/track/" ++ show trackId ++ "/sample/pitch"))
-        forM_ (lookupByName "speed") (sendAillenParam port ("/track/" ++ show trackId ++ "/sample/speed"))
-        forM_ (lookupByName "loop") (sendAillenParam port ("/track/" ++ show trackId ++ "/sample/mode"))
-        forM_ (lookupByName "stretch") (sendAillenParam port ("/track/" ++ show trackId ++ "/sample/mode/stretch"))
-        forM_ (lookupByName "gsize") (sendAillenParam port ("/track/" ++ show trackId ++ "/sample/grain_size"))
-        forM_ (lookupByName "overlap") (sendAillenParam port ("/track/" ++ show trackId ++ "/sample/overlap"))
-        forM_ (lookupByName "filter") (sendAillenParam port ("/track/" ++ show trackId ++ "/filter"))
+        when (not (hasCustomSub "sample/pitch")) $
+          forM_ (lookupByName "sample_pitch") (sendAillenParam port ("/track/" ++ show trackId ++ "/sample/pitch"))
+        when (not (hasCustomSub "sample/speed")) $
+          forM_ (lookupByName "speed") (sendAillenParam port ("/track/" ++ show trackId ++ "/sample/speed"))
+        when (not (hasCustomSub "sample/mode")) $
+          forM_ (lookupByName "loop") (sendAillenParam port ("/track/" ++ show trackId ++ "/sample/mode"))
+        when (not (hasCustomSub "sample/mode/stretch")) $
+          forM_ (lookupByName "stretch") (sendAillenParam port ("/track/" ++ show trackId ++ "/sample/mode/stretch"))
+        when (not (hasCustomSub "sample/grain_size")) $
+          forM_ (lookupByName "gsize") (sendAillenParam port ("/track/" ++ show trackId ++ "/sample/grain_size"))
+        when (not (hasCustomSub "sample/overlap")) $
+          forM_ (lookupByName "overlap") (sendAillenParam port ("/track/" ++ show trackId ++ "/sample/overlap"))
+        when (not (hasCustomSub "filter")) $
+          forM_ (lookupByName "filter") (sendAillenParam port ("/track/" ++ show trackId ++ "/filter"))
         let samplerFreq = if cpsVal > 0.0 then (if cpsVal <= 127.0 then midiToHz cpsVal else cpsVal) else 261.63
         sendAillenSynthNote port trackId samplerFreq durMs vol
       else do
@@ -175,20 +183,63 @@ rewriteTrackAddr trackId addr =
       remainder -> "/track/" ++ show trackId ++ "/" ++ remainder
     else addr
 
-playOne :: Performance -> Instr -> TimePoint -> IO ()
-playOne perf i tp =
+-- | 0-based bar index of a TimePoint within its pattern.
+patternBar :: TimeSignature -> TimePoint -> Int
+patternBar ts tp = floor (whenTP tp / beatInMsr ts)
+
+-- | Compute the scheduled Beats position of the next TimePoint (`nb`)
+--   given the current TimePoint (`tp`) and its scheduled position (`currentTarget`).
+nextScheduledBeat :: TimeSignature -> Beats -> TimePoint -> TimePoint -> Beats
+nextScheduledBeat ts currentTarget tp nb
+  | whenTP nb > whenTP tp =
+      let barDelta = patternBar ts nb - patternBar ts tp
+       in thisBar currentTarget
+            + fromIntegral barDelta
+            + (whenTP (wrapBar ts nb) / beatInMsr ts)
+  | otherwise =
+      nextBar currentTarget + (whenTP nb / beatInMsr ts)
+
+-- | Resolve the scheduled Beats target for the current loop step `tp`.
+--   - On first entry (`Nothing`), anchor `tp` to the current bar of `cb`.
+--   - If `tp` matches the beat scheduled on the previous iteration, keep the
+--     exact carried target so early wakeups across a bar boundary never shift `thisBar`.
+--   - If `toPlay` was modified externally (e.g. via `changeTimeF`), re-anchor
+--     using `max cb prevTarget` so an early wakeup across a bar boundary still
+--     lands in the right bar.
+resolveScheduledBeat ::
+  TimeSignature ->
+  Beats ->
+  Maybe (TimePoint, Beats) ->
+  TimePoint ->
+  Beats
+resolveScheduledBeat ts cb Nothing tp =
+  thisBar cb + (whenTP tp / beatInMsr ts)
+resolveScheduledBeat ts cb (Just (prevTP, prevTarget)) tp
+  | tp == prevTP = prevTarget
+  | otherwise =
+      let refBeat = max cb prevTarget
+          barAdvance = max 0 (patternBar ts tp - patternBar ts prevTP)
+       in thisBar refBeat
+            + fromIntegral barAdvance
+            + (whenTP (wrapBar ts tp) / beatInMsr ts)
+
+playOneAt :: Performance -> Instr -> Beats -> IO ()
+playOneAt perf i toBePlayed =
   catch
     ( do
-        ts <- currentTS (clock perf)
         cb <- currentBeat (clock perf)
         now <- timeD (clock perf)
-        let toBePlayed = (whenTP tp / beatInMsr ts) + thisBar cb
         if toBePlayed > cb
           then do
             nextT <- timeAtBeat (clock perf) toBePlayed
-            let toWait = realToFrac (floor ((nextT - now) * 10000)) / 10000
-            waitT toWait
-            playOne perf i tp
+            let toWait = nextT - now
+            if toWait > 0.0001
+              then do
+                waitT toWait
+                playOneAt perf i toBePlayed
+              else do
+                updatePfields i
+                playInstr i
           else
             if cb - toBePlayed <= 0.020
               then do
@@ -196,6 +247,17 @@ playOne perf i tp =
                 playInstr i
               else do
                 return ()
+    )
+    (\e -> putStrLn $ "Error in playOne for instr " ++ show (insN i) ++ ": " ++ show (e :: SomeException))
+
+playOne :: Performance -> Instr -> TimePoint -> IO ()
+playOne perf i tp =
+  catch
+    ( do
+        ts <- currentTS (clock perf)
+        cb <- currentBeat (clock perf)
+        let toBePlayed = (whenTP tp / beatInMsr ts) + thisBar cb
+        playOneAt perf i toBePlayed
     )
     (\e -> putStrLn $ "Error in playOne for instr " ++ show (insN i) ++ ": " ++ show (e :: SomeException))
 
@@ -224,7 +286,10 @@ play perf pn =
 
 -- | play loop callBack
 playLoop :: Performance -> String -> Status -> IO ()
-playLoop perf pn Active =
+playLoop perf pn st = playLoopWith perf pn st Nothing
+
+playLoopWith :: Performance -> String -> Status -> Maybe (TimePoint, Beats) -> IO ()
+playLoopWith perf pn Active mScheduled =
   catch
     ( do
         mP <- lookupMap (orc perf) pn
@@ -239,48 +304,46 @@ playLoop perf pn Active =
                 changeStatus perf pn Stopping
                 mP' <- lookupMap (orc perf) pn
                 case mP' of
-                  Just p' -> playLoop perf pn $ status p'
+                  Just p' -> playLoopWith perf pn (status p') Nothing
                   Nothing -> return ()
               else do
                 case toPlay p of
                   Nothing -> do
                     putStrLn $ "Warning: toPlay is Nothing for " ++ pn ++ " in Active state. Resetting..."
                     changeStatus perf pn Init
-                    playLoop perf pn Init
+                    playLoopWith perf pn Init Nothing
                   Just tp -> do
                     mts <- lookupMap (timePs perf) (timeF p)
                     case mts of
                       Nothing -> do
                         putStrLn $ "Error: Time Pattern " ++ timeF p ++ " not found for " ++ pn
                         changeStatus perf pn Stopping
-                        playLoop perf pn Stopping
+                        playLoopWith perf pn Stopping Nothing
                       Just timeString -> do
                         if null timeString
                           then do
                             putStrLn $ "Error: Time Pattern " ++ timeF p ++ " is empty for " ++ pn
                             changeStatus perf pn Stopping
-                            playLoop perf pn Stopping
+                            playLoopWith perf pn Stopping Nothing
                           else do
-                            let nb = nextBeat tp timeString
-                            let nextToPlay
-                                  | whenTP nb > whenTP tp = (whenTP (wrapBar ts nb) / beatInMsr ts) + thisBar cb + (fromIntegral . floor $ whenTP nb / beatInMsr ts - whenTP tp / beatInMsr ts)
-                                  | whenTP nb <= whenTP tp = (whenTP nb / beatInMsr ts) + nextBar cb
-                                  | otherwise = error "This shouldn't be happening"
+                            let targetBeat = resolveScheduledBeat ts cb mScheduled tp
+                                nb = nextBeat tp timeString
+                                nextToPlay = nextScheduledBeat ts targetBeat tp nb
                             nextTime <- timeAtBeat (clock perf) nextToPlay
-                            _ <- forkIO $ playOne perf p (wrapBar ts tp)
+                            _ <- forkIO $ playOneAt perf p targetBeat
                             updateToPlay perf pn (Just nb)
-                            let toWait = realToFrac (floor ((nextTime - now) * 10000)) / 10000
+                            let toWait = nextTime - now
                             waitT toWait
                             mP'' <- lookupMap (orc perf) pn
                             case mP'' of
-                              Just p'' -> playLoop perf pn $ status p''
+                              Just p'' -> playLoopWith perf pn (status p'') (Just (nb, nextToPlay))
                               Nothing -> return ()
     )
     (\e -> putStrLn $ "Error in playLoop for " ++ pn ++ ": " ++ show (e :: SomeException))
-playLoop perf p Inactive = do
+playLoopWith perf p Inactive _ = do
   changeStatus perf p Init
-  playLoop perf p Init
-playLoop perf i Init =
+  playLoopWith perf p Init Nothing
+playLoopWith perf i Init _ =
   catch
     ( do
         mP <- lookupMap (orc perf) i
@@ -292,7 +355,7 @@ playLoop perf i Init =
                 changeStatus perf i Stopping
                 mP' <- lookupMap (orc perf) i
                 case mP' of
-                  Just p' -> playLoop perf i $ status p'
+                  Just p' -> playLoopWith perf i (status p') Nothing
                   Nothing -> return ()
               else do
                 mts <- lookupMap (timePs perf) (timeF p)
@@ -300,24 +363,24 @@ playLoop perf i Init =
                   Nothing -> do
                     putStrLn $ "Error in Init: Time Pattern " ++ timeF p ++ " not found for " ++ i
                     changeStatus perf i Stopping
-                    playLoop perf i Stopping
+                    playLoopWith perf i Stopping Nothing
                   Just timeString -> do
                     if null timeString
                       then do
                         putStrLn $ "Error in Init: Time Pattern " ++ timeF p ++ " is empty for " ++ i
                         changeStatus perf i Stopping
-                        playLoop perf i Stopping
+                        playLoopWith perf i Stopping Nothing
                       else do
                         let nb = head timeString
                         updateToPlay perf i (Just nb)
                         changeStatus perf i Active
                         mP'' <- lookupMap (orc perf) i
                         case mP'' of
-                          Just p'' -> playLoop perf i $ status p''
+                          Just p'' -> playLoopWith perf i (status p'') Nothing
                           Nothing -> return ()
     )
     (\e -> putStrLn $ "Error in playLoop (Init) for " ++ i ++ ": " ++ show (e :: SomeException))
-playLoop perf p Stopping = do
+playLoopWith perf p Stopping _ = do
   changeStatus perf p Inactive
   putStrLn $ "instrument " ++ p ++ " is now Inactive."
   return ()

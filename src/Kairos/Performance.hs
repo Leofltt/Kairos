@@ -15,7 +15,7 @@ import Kairos.Clock
 import Kairos.Instrument (Instr (..), MessageTo (..), Orchestra, aillenOrc)
 import Kairos.PfPat
 import Kairos.Pfield
-import Kairos.TimePoint (TimePoint, defaultTPMap, notEmpty)
+import Kairos.TimePoint (TimePoint, catBar, catBars, defaultTPMap, notEmpty)
 import Kairos.Utilities (addToMap, lookupMap, stringToDouble)
 
 -- | the Performance is the scope of the composition
@@ -172,6 +172,18 @@ maybeAddTPf e n ts
   | otherwise = addTPf e n $ fromJust mts
   where
     mts = notEmpty ts
+
+-- | Concatenate two patterns starting `b` on the next bar boundary of the clock's active time signature.
+catTPTS :: Performance -> [TimePoint] -> [TimePoint] -> IO [TimePoint]
+catTPTS perf a b = do
+  ts <- currentTS (clock perf)
+  return $ catBar (beatInMsr ts) a b
+
+-- | Chain a list of patterns on bar boundaries of the clock's active time signature.
+catTPsTS :: Performance -> [[TimePoint]] -> IO [TimePoint]
+catTPsTS perf ps = do
+  ts <- currentTS (clock perf)
+  return $ catBars (beatInMsr ts) ps
 
 -- | resolve instrument name to its sample path (p29)
 resolvePfield :: Performance -> Pfield -> IO Pfield

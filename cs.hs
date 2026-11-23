@@ -27,8 +27,11 @@ sample "kit" [0..3] (withK' mainKit (rMkvCSV csvKitT))
 
 TP stuff:
 - displayTP / displayIns
-- catTP bars tp1 tp2
-- seqTP tp1 tp2
+- catTP beats tp1 tp2 (concat at explicit beat offset)
+- catBar barLen tp1 tp2 (concat starting on next bar of length barLen)
+- catBars barLen [tp1, tp2, ...] (chain patterns on bar boundaries; [] = silent bar)
+- catTP' tp1 tp2 (4/4 shorthand for catBar 4)
+- catB tp1 tp2 / catBs [tp1, ...] (IO, uses active clock time signature: addC "K909" "p" =<< catB [0,2] [0,1])
 - tupleForBar bars Intbeats
 - euclid (hit,total) rotation bars
 - patternWithDensity bars beatsTotal %Int

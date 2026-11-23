@@ -241,7 +241,8 @@ Every track features a sequential FX Chain: **Ring Modulator $\rightarrow$ Wavef
 | :--- | :--- | :--- | :--- |
 | `fxCombFreq i list` | `/track/fx/comb/freq` | `Double` (20.0 to 10000.0) | Tuned comb filter frequency in Hz. |
 | `fxCombFeedback` | `/track/fx/comb/feedback` | `Double` (-0.99 to 0.99) | Feedback intensity / resonance decay. |
-| `fxCombDamp i list` | `/track/fx/comb/damp` | `Double` (cutoff Hz) | Loop lowpass dampening cutoff frequency. |
+| `fxCombDamp i list` | `/track/fx/comb/damp` | `Double` (20.0 to Nyquist Hz) | Loop lowpass dampening cutoff frequency. |
+| `fxCombMix i list` | `/track/fx/comb/mix` | `Double` (0.0 to 1.0) | Dry/wet comb mix (`0.0` = dry/bypass default, `0.5` = classic 50/50 comb, `1.0` = 100% wet). |
 | `fxFilter i list` | `/track/fx/filter/position` | `Double` (-1.0 to 1.0) | DJ filter (`-1.0` = LP, `0.0` = bypass, `1.0` = HP). |
 | `fxCompRatio i list` | `/track/fx/compressor/ratio` | `Double` (1.0 to 20.0) | Compressor ratio. |
 | `fxCompThreshold i`| `/track/fx/compressor/threshold`| `Double` (-60.0 to 0.0 dB) | Threshold level. |
@@ -281,6 +282,7 @@ fxWfFolds OH808 [0.6] (step 1)
 fxWfDrive OH808 [2.0] (step 1)
 
 -- Tuned metallic/physical comb filter sweep
+fxCombMix s1 [0.5] (step 1)
 fxCombFeedback s1 [0.85] (step 1)
 fxCombFreq s1 [220, 330, 440, 660] (step 4)
 
@@ -350,7 +352,7 @@ These control playback, granular time-stretch, and slice options for the Sampler
 | `sampleGrainSize i` | `/track/sample/grain_size` | `Double` (10.0 to 150.0 ms) | Grain duration for time-stretching. |
 | `sampleOverlap i` | `/track/sample/overlap` | `Int` (2 to 8) | Grain overlap count. |
 | `sampleFilter i list`| `/track/filter` | `Double` (-1.0 to 1.0) | Sampler internal DJ filter. |
-| `aillenSliceMode i` | `/track/sample/slice/mode` | `Int` (0 = Off, 1 = On) | Enable slice mode playback. |
+| `aillenSliceMode i` | `/track/sample/slice/mode` | `Int` (0 = Off, 1 = On) | Enable slice mode playback (`1` smoothly chokes previous slices on that track; `0` stays polyphonic). |
 | `aillenSliceCount i`| `/track/sample/slice/count`| `Int` (2 to 64) | Divide sample into equal slice count. |
 | `aillenSliceSelect i`| `/track/sample/slice/select`| `Int` (0 to count-1) | Playback targeted slice index. |
 | `aillenSliceStutter` | `/track/sample/slice/stutter`| `Int` (1 to 16) | Repeat slice count times (stutter effect). |

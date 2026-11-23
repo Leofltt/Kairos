@@ -37,5 +37,23 @@ timePointTest = hspec $ do
       shine 4 "~*~*" `shouldBe` toTP [1, 3]
       shine 4 "~*~~~*~~" `shouldBe` toTP [0.5, 2.5]
       shine 4 "*~~~~~*~~*~~" `shouldBe` toTP [0, 2, 3]
+  describe "Concatenating and sequencing TP patterns" $ do
+    it "catBar rounds up to the next bar boundary for single and multi-bar patterns" $ do
+      catBar 4 (toTP [0, 2]) (toTP [0, 1]) `shouldBe` toTP [0, 2, 4, 5]
+      catBar 4 (toTP [0, 1, 2, 3]) (toTP [0, 1]) `shouldBe` toTP [0, 1, 2, 3, 4, 5]
+      catBar 4 (toTP [0, 2, 4, 5]) (toTP [0, 1]) `shouldBe` toTP [0, 2, 4, 5, 8, 9]
+      catBar 3 (toTP [0, 2]) (toTP [0, 1]) `shouldBe` toTP [0, 2, 3, 4]
+      catBar 4 [] (toTP [0, 1]) `shouldBe` toTP [4, 5]
+    it "catBars chains multiple patterns and preserves silent middle bars" $ do
+      catBars 4 [] `shouldBe` []
+      catBars 4 [toTP [0, 2]] `shouldBe` toTP [0, 2]
+      catBars 4 [toTP [0, 2], [], toTP [0, 1]] `shouldBe` toTP [0, 2, 8, 9]
+      catBars 4 [toTP [0, 1, 2, 3], toTP [0, 2], toTP [1, 3]] `shouldBe` toTP [0, 1, 2, 3, 4, 6, 9, 11]
+    it "catTP' defaults catBar to 4/4" $ do
+      catTP' (toTP [0, 2]) (toTP [0, 1]) `shouldBe` toTP [0, 2, 4, 5]
+    it "catBar 1 joins on the next whole beat without crashing on empty lists" $ do
+      catBar 1 (toTP [0, 2]) (toTP [0, 1]) `shouldBe` toTP [0, 2, 3, 4]
+      catBar 1 (toTP [0, 2.5]) (toTP [0, 1]) `shouldBe` toTP [0, 2.5, 3, 4]
+      catBar 1 [] (toTP [0, 1]) `shouldBe` toTP [1, 2]
 
 -- todo : implement tests for other functions

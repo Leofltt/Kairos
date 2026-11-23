@@ -122,6 +122,7 @@ test-suite Kairos-test
        Test.Clock, 
        Test.Kit, 
        Test.PfPat, 
+       Test.Player,
        Test.TimePoint,
        Test.Utilities
 

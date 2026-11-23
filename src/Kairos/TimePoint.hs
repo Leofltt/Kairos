@@ -66,8 +66,26 @@ nextBeat b xs
 catTP :: Double -> [TimePoint] -> [TimePoint] -> [TimePoint]
 catTP measure a b = a ++ sumdb where sumdb = map (+ TP measure) b
 
-seqTP :: [TimePoint] -> [TimePoint] -> [TimePoint]
-seqTP a = catTP (maximum (fromTP a) + 1) a
+-- | Concatenate two patterns, automatically starting `b` on the next bar
+--   boundary of length `barLen` after `a`. An empty `a` counts as one silent bar.
+catBar :: Double -> [TimePoint] -> [TimePoint] -> [TimePoint]
+catBar barLen a b
+  | barLen <= 0 = a ++ b
+  | null a = map (+ TP barLen) b
+  | otherwise =
+      let nextBarStart = fromIntegral (floor (maximum (fromTP a) / barLen) + 1 :: Int) * barLen
+       in catTP nextBarStart a b
+
+-- | Chain a list of patterns on bar boundaries of length `barLen`.
+--   Empty patterns `[]` in the middle act as silent bars.
+catBars :: Double -> [[TimePoint]] -> [TimePoint]
+catBars _ [] = []
+catBars _ [p] = p
+catBars barLen (p : ps) = catBar barLen p (catBars barLen ps)
+
+-- | 4/4 shorthand for `catBar 4`.
+catTP' :: [TimePoint] -> [TimePoint] -> [TimePoint]
+catTP' = catBar 4
 
 dilate :: Double -> [TimePoint] -> [TimePoint]
 dilate mult = map (fmap (* mult))

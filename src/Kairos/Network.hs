@@ -102,10 +102,13 @@ sendAillenParam :: UDPPort -> String -> Pfield -> IO ()
 sendAillenParam port addr (Pl val) = do
   let datums = zipWith (pfieldToOSCDatumForAddrIndexed addr) [0..] val
   sendMsgOSC port $ V.OSC (B.packChars addr) datums
-sendAillenParam port addr (Ps val) = do
-  let wordsList = words val
-      datums = zipWith (wordToDatum addr) [0..] wordsList
-  sendMsgOSC port $ V.OSC (B.packChars addr) datums
+sendAillenParam port addr (Ps val)
+  | "/sample/select" `isSuffixOf` addr || "/sample/load" `isSuffixOf` addr =
+      sendMsgOSC port $ V.OSC (B.packChars addr) [OSC_S $ B.packChars val]
+  | otherwise = do
+      let wordsList = words val
+          datums = zipWith (wordToDatum addr) [0..] wordsList
+      sendMsgOSC port $ V.OSC (B.packChars addr) datums
 sendAillenParam port addr (Pd val) =
   sendMsgOSC port $ V.OSC (B.packChars addr) [pfieldToOSCDatumForAddrIndexed addr 0 (Pd val)]
 

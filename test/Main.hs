@@ -3,6 +3,7 @@ import Test.Clock (clockTest)
 import Test.PfPat (pfPatTest)
 import Test.Kit (kitTest)
 import Test.Utilities (utilitiesTest)
+import Test.Player (playerTest)
 
 main :: IO ()
 main = do
@@ -22,4 +23,7 @@ main = do
     putStrLn "======================"
     putStrLn "Utilities tests:"
     utilitiesTest
+    putStrLn "======================"
+    putStrLn "Player tests:"
+    playerTest
     putStrLn "======================"

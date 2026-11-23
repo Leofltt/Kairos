@@ -23,6 +23,8 @@ addIns = addInstrument perf
 addI name ins = addIns name =<< ins
 addC i n s = maybeAddP n s >> cPat n i
 getTP = getTimePoint perf
+catB = catTPTS perf
+catBs = catTPsTS perf
 addPf' = addPfPath' perf
 addPf i pfnum pfname list fun = addPf' i pfnum =<< createPfPat pfnum pfname list fun
 
@@ -151,6 +153,7 @@ fxBcDownsample i list fun = addPf i 130 "/track/fx/bitcrusher/downsample" (toPfs
 fxCombFreq i list fun = addPf i 131 "/track/fx/comb/freq" (toPfs list) fun
 fxCombFeedback i list fun = addPf i 132 "/track/fx/comb/feedback" (toPfs list) fun
 fxCombDamp i list fun = addPf i 133 "/track/fx/comb/damp" (toPfs list) fun
+fxCombMix i list fun = addPf i 163 "/track/fx/comb/mix" (toPfs list) fun
 
 -- Aillen Track FX Chain Chopper (Amplitude Gate / Tremolo)
 fxChopRate i list fun = addPf i 157 "/track/fx/chopper/rate" (toPfs list) fun

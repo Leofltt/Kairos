@@ -368,6 +368,8 @@ ohbre = defPath "/breaks/OhBreak1A.wav"
 addI "ohbre" $ aillenStutter 5 ohbre
 pboi = defPath "/breaks/Playboy Break - 6B.wav"
 addI "pboi" $ aillenStutter 5 pboi
+tenb = defPath "/breaks/Ten Break 2 - 7A.wav"
+addI "tenb" $ aillenStutter 5 tenb
 beb = defPath "/breaks/Wheel Up 2 Bad.wav"
 addI "beb" $ aillenStutter 5 beb
 hoco = defPath "/breaks/horny_conga.wav"
