@@ -34,6 +34,8 @@ pub struct InstrumentState {
     pub tpat: Vec<f64>,
     #[allow(dead_code)]
     pub to_play: Option<f64>,
+    #[serde(default)]
+    pub cycle_origin_bar: Option<i64>,
     pub pfields: BTreeMap<String, serde_json::Value>,
     pub patterned_pfs: Vec<String>,
 }

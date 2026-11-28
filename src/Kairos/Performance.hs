@@ -2,7 +2,7 @@
 
 module Kairos.Performance where
 
-import Control.Concurrent.STM (TBQueue, TVar, atomically, isFullTBQueue, newTVarIO, readTVarIO, writeTBQueue)
+import Control.Concurrent.STM (TBQueue, TVar, atomically, isFullTBQueue, modifyTVar', newTVarIO, readTVarIO, writeTBQueue)
 import Control.Monad (unless)
 import Data.List (sortOn)
 import Data.Map.Strict qualified as M
@@ -31,7 +31,8 @@ data Performance = P
   { orc :: Orchestra,
     clock :: Clock,
     timePs :: TVar (M.Map [Char] [TimePoint]), -- a map of time patterns with their names
-    noteQueue :: TVar (Maybe (TBQueue NoteEvent))
+    noteQueue :: TVar (Maybe (TBQueue NoteEvent)),
+    cycleOrigins :: TVar (M.Map String Int)
     -- TODO: gotta add Musical Key in here
   }
 
@@ -42,13 +43,19 @@ defaultPerformance = do
   c <- defaultClock
   t <- defaultTPMap
   nq <- newTVarIO Nothing
+  co <- newTVarIO M.empty
   return $
     P
       { orc = o,
         clock = c,
         timePs = t,
-        noteQueue = nq
+        noteQueue = nq,
+        cycleOrigins = co
       }
+
+setCycleOrigin :: Performance -> String -> Int -> IO ()
+setCycleOrigin perf name originBar =
+  atomically $ modifyTVar' (cycleOrigins perf) (M.insert name originBar)
 
 emitNoteEvent :: Performance -> String -> Beats -> PfMap -> IO ()
 emitNoteEvent perf name beat pfs = do

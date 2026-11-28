@@ -367,7 +367,11 @@ fn draw_tpat_grid(frame: &mut Frame, app: &mut AppState, area: Rect, max_page_ba
 
             for b in page_start_bar..page_end_bar {
                 let is_looped = b >= ins_bars;
-                let pat_bar = b.rem_euclid(ins_bars);
+                let abs_bar = app.clock.bar - cur_global_bar + b;
+                let pat_bar = match ins.cycle_origin_bar {
+                    Some(origin) => (abs_bar - origin).rem_euclid(ins_bars),
+                    None => b.rem_euclid(ins_bars),
+                };
                 let bar_offset_on_page = (b - page_start_bar) as f64 * bpb;
 
                 for &tp in &ins.tpat {

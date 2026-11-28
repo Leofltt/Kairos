@@ -31,7 +31,7 @@ import Kairos.Instrument
     notEffectOrc,
   )
 import Kairos.Network (UDPPort, sendAillenParam, sendAillenSamplerLoad, sendAillenSynthNote, sendEvent, sendOSC, setChan)
-import Kairos.Performance (Performance (clock, orc, timePs), emitNoteEvent)
+import Kairos.Performance (Performance (clock, orc, timePs), emitNoteEvent, setCycleOrigin)
 import Kairos.PfPat (PfPat (pfId, updater))
 import Kairos.Pfield (PfId, PfMap, Pfield (..), idString, pfToString)
 import Kairos.TimePoint
@@ -339,6 +339,7 @@ playLoopWith perf pn Active mScheduled =
                             let targetBeat = resolveScheduledBeat ts cb mScheduled tp
                                 nb = nextBeat tp timeString
                                 nextToPlay = nextScheduledBeat ts targetBeat tp nb
+                            setCycleOrigin perf pn (floor targetBeat - patternBar ts tp)
                             nextTime <- timeAtBeat (clock perf) nextToPlay
                             _ <- forkIO $ playOneAtNamed perf pn p targetBeat
                             updateToPlay perf pn (Just nb)

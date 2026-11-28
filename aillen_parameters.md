@@ -94,6 +94,11 @@ Each track owns an independent `FxChain` containing a sequential arrangement of 
                                  +---------+ +---------+
                                       |           |
                                       v           v
+                                 +---------------------+
+                                 |   RingsResonator    | <--- 16-mode Stereo
+                                 +---------------------+
+                                      |           |
+                                      v           v
                                  +---------+ +---------+
                                  |DjFilter | |DjFilter |
                                  +---------+ +---------+
@@ -205,7 +210,7 @@ reverbTone s1 [-0.4] (step 1)
 
 ## 3. Track FX Chain Controls
 
-Every track features a sequential FX Chain: **Ring Modulator $\rightarrow$ Wavefolder $\rightarrow$ Distortion $\rightarrow$ Bitcrusher $\rightarrow$ Comb Filter $\rightarrow$ DJ Filter $\rightarrow$ Compressor $\rightarrow$ Chopper**.
+Every track features a sequential FX Chain: **Ring Modulator $\rightarrow$ Wavefolder $\rightarrow$ Distortion $\rightarrow$ Bitcrusher $\rightarrow$ Comb Filter $\rightarrow$ Rings Modal Resonator $\rightarrow$ DJ Filter $\rightarrow$ Compressor $\rightarrow$ Chopper**.
 
 ### 3.1 Ring Modulator & Wavefolder
 
@@ -275,6 +280,19 @@ A stereo-linked, unipolar LFO amplitude modulator at the end of each track's `Fx
 - `1` = **SampleLength**: `rate` divides the active sample or slice length on Sampler tracks (falls back to note duration on synth tracks); phase resets on each note trigger.
 - `2` = **FreeHz**: `rate` directly sets a free-running LFO frequency in Hz (phase does not reset on note triggers).
 
+### 3.5 Rings Modal Resonator
+
+A Mutable Instruments Rings-inspired 16-mode stereo modal resonator bank (odd/even stereo spread) placed after the Comb Filter.
+
+| Haskell Function | OSC Address | Parameter Type / Range | Description |
+| :--- | :--- | :--- | :--- |
+| `fxRingsFreq i list` | `/track/fx/rings/freq` | `Double` (MIDI 0–127 or Hz) | Fundamental frequency (values $\le 127$ auto-convert from MIDI note to Hz; default `220.0`). |
+| `fxRingsStructure i` | `/track/fx/rings/structure` | `Double` (0.0 to 1.0) | Mode spacing (`0.0` = harmonic, `0.5` = stiff string, `1.0` = metallic/bell; default `0.25`). |
+| `fxRingsBrightness i`| `/track/fx/rings/brightness`| `Double` (0.0 to 1.0) | High-partial energy & damping tilt (default `0.6`). |
+| `fxRingsDamping i` | `/track/fx/rings/damping` | `Double` (0.0 to 1.0) | Decay time / Q factor (`1.0` = longest ring; default `0.65`). |
+| `fxRingsPosition i` | `/track/fx/rings/position` | `Double` (0.0 to 1.0) | Virtual pluck/excitation position comb along the resonator (default `0.35`). |
+| `fxRingsMix i list` | `/track/fx/rings/mix` | `Double` (0.0 to 1.0) | Dry/wet blend (`0.0` = bypassed default). |
+
 ### Examples
 ```haskell
 -- Wavefold a drum track for glassy saturation
@@ -285,6 +303,12 @@ fxWfDrive OH808 [2.0] (step 1)
 fxCombMix s1 [0.5] (step 1)
 fxCombFeedback s1 [0.85] (step 1)
 fxCombFreq s1 [220, 330, 440, 660] (step 4)
+
+-- Rings modal resonator on a percussion track
+fxRingsMix "snS" [0.45] k
+fxRingsFreq "snS" [48, 55, 60] nv
+fxRingsStructure "snS" [0.65] k
+fxRingsDamping "snS" [0.75] k
 
 -- Rhythmic break chopping synced to Kairos note duration (0 = bypass on off-steps)
 durTS "beb" [(1/4)] keep

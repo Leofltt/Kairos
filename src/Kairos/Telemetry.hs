@@ -125,12 +125,13 @@ buildStateJson perf = do
   bib <- beatInBar clk
   orch <- readTVarIO (orc perf)
   tpats <- readTVarIO (timePs perf)
+  origins <- readTVarIO (cycleOrigins perf)
   let barNum = floor (thisBar cb) :: Int
       modeStr = case linkState clk of
         Nothing -> "Local"
         Just _ -> "Link"
       activeInstruments = M.filter (\i -> itype i == Instrument && status i /= Inactive) orch
-  instrBuilders <- mapM (encodeInstrument tpats) (M.toAscList activeInstruments)
+  instrBuilders <- mapM (encodeInstrument tpats origins) (M.toAscList activeInstruments)
   return . BL.toStrict . toLazyByteString $
     obj
       [ ("type", jStr "state"),
@@ -146,14 +147,17 @@ buildStateJson perf = do
         ("instruments", arr instrBuilders)
       ]
 
-encodeInstrument :: M.Map String [TimePoint] -> (String, Instr) -> IO Builder
-encodeInstrument tpats (name, instr) = do
+encodeInstrument :: M.Map String [TimePoint] -> M.Map String Int -> (String, Instr) -> IO Builder
+encodeInstrument tpats origins (name, instr) = do
   pfs <- readTVarIO (pf instr)
   patMap <- readTVarIO (pats instr)
   let tpatBeats = fromMaybe [] (fromTP <$> M.lookup (timeF instr) tpats)
       toPlayVal = case toPlay instr of
         Nothing -> char7 'n' <> stringUtf8 "ull"
         Just tp -> jDouble (whenTP tp)
+      originVal = case M.lookup name origins of
+        Nothing -> char7 'n' <> stringUtf8 "ull"
+        Just o -> intDec o
       patternedIds = map (pfIdLabel . pfId) (M.elems patMap)
   return $
     obj
@@ -163,6 +167,7 @@ encodeInstrument tpats (name, instr) = do
         ("time_f", jStr (timeF instr)),
         ("tpat", arr (map jDouble tpatBeats)),
         ("to_play", toPlayVal),
+        ("cycle_origin_bar", originVal),
         ("pfields", encodePfMap pfs),
         ("patterned_pfs", arr (map jStr patternedIds))
       ]
