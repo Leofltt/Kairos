@@ -2,12 +2,14 @@
 
 module Kairos.Performance where
 
-import Control.Concurrent.STM (TVar, newTVarIO, readTVarIO)
+import Control.Concurrent.STM (TBQueue, TVar, atomically, isFullTBQueue, newTVarIO, readTVarIO, writeTBQueue)
+import Control.Monad (unless)
 import Data.List (sortOn)
 import Data.Map.Strict qualified as M
 import Data.Maybe (fromJust, isNothing)
 import Kairos.Clock
-  ( Clock,
+  ( Beats,
+    Clock,
     TimeSignature (beatInMsr, bpm),
     currentTS,
     defaultClock,
@@ -18,11 +20,18 @@ import Kairos.Pfield
 import Kairos.TimePoint (TimePoint, catBar, catBars, defaultTPMap, notEmpty)
 import Kairos.Utilities (addToMap, lookupMap, stringToDouble)
 
+data NoteEvent = NoteEvent
+  { neInstr :: String,
+    neBeat :: Beats,
+    nePfields :: PfMap
+  }
+
 -- | the Performance is the scope of the composition
 data Performance = P
   { orc :: Orchestra,
     clock :: Clock,
-    timePs :: TVar (M.Map [Char] [TimePoint]) -- a map of time patterns with their names
+    timePs :: TVar (M.Map [Char] [TimePoint]), -- a map of time patterns with their names
+    noteQueue :: TVar (Maybe (TBQueue NoteEvent))
     -- TODO: gotta add Musical Key in here
   }
 
@@ -32,12 +41,23 @@ defaultPerformance = do
   o <- aillenOrc
   c <- defaultClock
   t <- defaultTPMap
+  nq <- newTVarIO Nothing
   return $
     P
       { orc = o,
         clock = c,
-        timePs = t
+        timePs = t,
+        noteQueue = nq
       }
+
+emitNoteEvent :: Performance -> String -> Beats -> PfMap -> IO ()
+emitNoteEvent perf name beat pfs = do
+  mq <- readTVarIO (noteQueue perf)
+  case mq of
+    Nothing -> return ()
+    Just q -> atomically $ do
+      full <- isFullTBQueue q
+      unless full $ writeTBQueue q (NoteEvent name beat pfs)
 
 -- | print the parameters of an instrument in a performance
 displayParams :: Performance -> String -> IO ()

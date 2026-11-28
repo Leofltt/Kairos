@@ -5,3 +5,7 @@ stack.yaml.lock
 Dev/
 dist-newstyle/
 *.ghc*
+
+# Rust (kairos-tui)
+tui/target/
+**/*.rs.bk

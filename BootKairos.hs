@@ -7,6 +7,8 @@ aillenPort = "8000"
 :set prompt "κ> "
 :set -w 
 perf <- defaultPerformance
+_ <- autoStartTelemetry perf
+startTui = startTelemetry perf 9001
 displayIns = displayInstruments perf
 displayAillenIns = displayAillenInstruments perf
 displayInsAillen = displayAillenInstruments perf

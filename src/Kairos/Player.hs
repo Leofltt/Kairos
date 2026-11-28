@@ -31,7 +31,7 @@ import Kairos.Instrument
     notEffectOrc,
   )
 import Kairos.Network (UDPPort, sendAillenParam, sendAillenSamplerLoad, sendAillenSynthNote, sendEvent, sendOSC, setChan)
-import Kairos.Performance (Performance (clock, orc, timePs))
+import Kairos.Performance (Performance (clock, orc, timePs), emitNoteEvent)
 import Kairos.PfPat (PfPat (pfId, updater))
 import Kairos.Pfield (PfId, PfMap, Pfield (..), idString, pfToString)
 import Kairos.TimePoint
@@ -224,7 +224,10 @@ resolveScheduledBeat ts cb (Just (prevTP, prevTarget)) tp
             + (whenTP (wrapBar ts tp) / beatInMsr ts)
 
 playOneAt :: Performance -> Instr -> Beats -> IO ()
-playOneAt perf i toBePlayed =
+playOneAt perf i toBePlayed = playOneAtNamed perf (show (insN i)) i toBePlayed
+
+playOneAtNamed :: Performance -> String -> Instr -> Beats -> IO ()
+playOneAtNamed perf name i toBePlayed =
   catch
     ( do
         cb <- currentBeat (clock perf)
@@ -236,28 +239,35 @@ playOneAt perf i toBePlayed =
             if toWait > 0.0001
               then do
                 waitT toWait
-                playOneAt perf i toBePlayed
+                playOneAtNamed perf name i toBePlayed
               else do
                 updatePfields i
                 playInstr i
+                pfs <- readTVarIO (pf i)
+                emitNoteEvent perf name toBePlayed pfs
           else
             if cb - toBePlayed <= 0.020
               then do
                 updatePfields i
                 playInstr i
+                pfs <- readTVarIO (pf i)
+                emitNoteEvent perf name toBePlayed pfs
               else do
                 return ()
     )
     (\e -> putStrLn $ "Error in playOne for instr " ++ show (insN i) ++ ": " ++ show (e :: SomeException))
 
 playOne :: Performance -> Instr -> TimePoint -> IO ()
-playOne perf i tp =
+playOne perf i tp = playOneNamed perf (show (insN i)) i tp
+
+playOneNamed :: Performance -> String -> Instr -> TimePoint -> IO ()
+playOneNamed perf name i tp =
   catch
     ( do
         ts <- currentTS (clock perf)
         cb <- currentBeat (clock perf)
         let toBePlayed = (whenTP tp / beatInMsr ts) + thisBar cb
-        playOneAt perf i toBePlayed
+        playOneAtNamed perf name i toBePlayed
     )
     (\e -> putStrLn $ "Error in playOne for instr " ++ show (insN i) ++ ": " ++ show (e :: SomeException))
 
@@ -267,7 +277,7 @@ playNow perf i = do
   tp <- beatInBar (clock perf)
   mIns <- lookupMap (orc perf) i
   case mIns of
-    Just p' -> playOne perf p' (pure tp)
+    Just p' -> playOneNamed perf i p' (pure tp)
     Nothing -> putStrLn $ "Error: Instrument " ++ i ++ " not found"
 
 -- | start the play loop of an instrument
@@ -330,7 +340,7 @@ playLoopWith perf pn Active mScheduled =
                                 nb = nextBeat tp timeString
                                 nextToPlay = nextScheduledBeat ts targetBeat tp nb
                             nextTime <- timeAtBeat (clock perf) nextToPlay
-                            _ <- forkIO $ playOneAt perf p targetBeat
+                            _ <- forkIO $ playOneAtNamed perf pn p targetBeat
                             updateToPlay perf pn (Just nb)
                             let toWait = nextTime - now
                             waitT toWait

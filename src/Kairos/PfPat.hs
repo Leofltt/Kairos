@@ -6,12 +6,12 @@ import Kairos.Utilities (checkPercentNext, randI, safeHead, safeTail)
 
 -- | pattern of pfields and related update function
 data PfPat = PfPat
-  { -- | id of the pfield
-    pfId :: PfId,
-    -- | the string of possible values (or only value, depends on what the updater needs)
-    pat :: TVar [Pfield],
-    -- | the function that decides which value to take
-    updater :: Updater
+  { pfId :: PfId
+  -- ^ id of the pfield
+  , pat :: TVar [Pfield]
+  -- ^ the string of possible values (or only value, depends on what the updater needs)
+  , updater :: Updater
+  -- ^ the function that decides which value to take
   }
 
 -- | PfPat Update runners
@@ -92,7 +92,7 @@ aup n = do
       nv n
 
 -- | Generate a list of values using any Updater (like runMarkovCSV)
-genU :: PfAble a => Int -> Updater -> [a] -> IO [Pfield]
+genU :: (PfAble a) => Int -> Updater -> [a] -> IO [Pfield]
 genU n upd initial = do
   p <- newTVarIO (toPfs initial)
   let patrn = PfPat (Either 0 "") p upd

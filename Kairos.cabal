@@ -82,7 +82,8 @@ library
       Kairos.Euclidean,
       Kairos.Parser.Rhythm.Spark,
       Kairos.Parser.Rhythm.L,
-      Kairos.Kit
+      Kairos.Kit,
+      Kairos.Telemetry
 
     -- Modules included in this library but not exported.
     other-modules: Paths_Kairos
