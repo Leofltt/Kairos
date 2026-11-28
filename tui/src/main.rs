@@ -59,7 +59,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let (cols, rows) = term_size()?;
     let init_rect = Rect::new(0, 0, cols, rows);
-    let (pty_rows, pty_cols) = pty_inner_size(init_rect);
+    let (pty_rows, pty_cols) = pty_inner_size(init_rect, false, Focus::Repl);
 
     let rx = spawn_udp_listener(args.port)?;
     let mut pty = PtySession::spawn(&program, &cmd_args, pty_rows, pty_cols, args.port)?;
@@ -107,7 +107,11 @@ fn run_loop(
         if event::poll(frame_dur)? {
             match event::read()? {
                 Event::Resize(cols, rows) => {
-                    let (pr, pc) = pty_inner_size(Rect::new(0, 0, cols, rows));
+                    let (pr, pc) = pty_inner_size(
+                        Rect::new(0, 0, cols, rows),
+                        app.bottom_tpat_open,
+                        app.focus,
+                    );
                     pty.resize(pr, pc);
                 }
                 Event::Paste(text) => {
@@ -126,11 +130,37 @@ fn run_loop(
                     }
                 }
                 Event::Key(key) if key.kind != KeyEventKind::Release => {
+                    if key.code == KeyCode::F(1) {
+                        app.bottom_tpat_open = !app.bottom_tpat_open;
+                        if !app.bottom_tpat_open && app.focus == Focus::Viz {
+                            app.focus = Focus::Repl;
+                        }
+                        if let Ok(sz) = terminal.size() {
+                            let (pr, pc) = pty_inner_size(
+                                Rect::new(0, 0, sz.width, sz.height),
+                                app.bottom_tpat_open,
+                                app.focus,
+                            );
+                            pty.resize(pr, pc);
+                        }
+                        continue;
+                    }
+
                     if key.code == KeyCode::F(2) {
                         app.focus = match app.focus {
                             Focus::Repl => Focus::Viz,
                             Focus::Viz => Focus::Repl,
                         };
+                        if app.bottom_tpat_open {
+                            if let Ok(sz) = terminal.size() {
+                                let (pr, pc) = pty_inner_size(
+                                    Rect::new(0, 0, sz.width, sz.height),
+                                    app.bottom_tpat_open,
+                                    app.focus,
+                                );
+                                pty.resize(pr, pc);
+                            }
+                        }
                         continue;
                     }
 
@@ -152,7 +182,19 @@ fn run_loop(
                             }
                         }
                         Focus::Viz => match key.code {
-                            KeyCode::Esc => app.focus = Focus::Repl,
+                            KeyCode::Esc => {
+                                app.focus = Focus::Repl;
+                                if app.bottom_tpat_open {
+                                    if let Ok(sz) = terminal.size() {
+                                        let (pr, pc) = pty_inner_size(
+                                            Rect::new(0, 0, sz.width, sz.height),
+                                            app.bottom_tpat_open,
+                                            app.focus,
+                                        );
+                                        pty.resize(pr, pc);
+                                    }
+                                }
+                            }
                             KeyCode::Char('j') | KeyCode::Down => app.select_next(),
                             KeyCode::Char('k') | KeyCode::Up => app.select_prev(),
                             KeyCode::Char('J') | KeyCode::PageDown => {
@@ -161,7 +203,6 @@ fn run_loop(
                             KeyCode::Char('K') | KeyCode::PageUp => {
                                 app.param_scroll = app.param_scroll.saturating_sub(1);
                             }
-                            KeyCode::Char('i') => app.show_inactive = !app.show_inactive,
                             _ => {}
                         },
                     }

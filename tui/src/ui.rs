@@ -39,7 +39,7 @@ pub struct AppState {
     pub selected_idx: usize,
     pub list_state: ListState,
     pub param_scroll: u16,
-    pub show_inactive: bool,
+    pub bottom_tpat_open: bool,
     pub focus: Focus,
     pub connected: bool,
     pub last_packet_at: Option<Instant>,
@@ -61,7 +61,7 @@ impl AppState {
             selected_idx: 0,
             list_state: ListState::default(),
             param_scroll: 0,
-            show_inactive: false,
+            bottom_tpat_open: false,
             focus: Focus::Repl,
             connected: false,
             last_packet_at: None,
@@ -105,7 +105,7 @@ impl AppState {
     pub fn visible_instruments(&self) -> Vec<&InstrumentState> {
         self.instruments
             .iter()
-            .filter(|i| self.show_inactive || i.status != "Inactive")
+            .filter(|i| i.status != "Inactive")
             .collect()
     }
 
@@ -143,8 +143,25 @@ pub fn split_areas(area: Rect) -> (Rect, Rect) {
     (chunks[0], chunks[1])
 }
 
-pub fn pty_inner_size(area: Rect) -> (u16, u16) {
-    let (_, pty_area) = split_areas(area);
+pub fn split_with_bottom(main_area: Rect, focus: Focus) -> (Rect, Rect) {
+    let constraints = match focus {
+        Focus::Repl => [Constraint::Percentage(70), Constraint::Percentage(30)],
+        Focus::Viz => [Constraint::Percentage(50), Constraint::Percentage(50)],
+    };
+    let chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints(constraints)
+        .split(main_area);
+    (chunks[0], chunks[1])
+}
+
+pub fn pty_inner_size(area: Rect, bottom_tpat_open: bool, focus: Focus) -> (u16, u16) {
+    let (_, main_area) = split_areas(area);
+    let pty_area = if bottom_tpat_open {
+        split_with_bottom(main_area, focus).0
+    } else {
+        main_area
+    };
     let rows = pty_area.height.saturating_sub(2).max(1);
     let cols = pty_area.width.saturating_sub(2).max(1);
     (rows, cols)
@@ -160,9 +177,18 @@ pub fn draw(
     let (top_area, main_area) = split_areas(frame.area());
 
     draw_separator(frame, app, top_area);
-    match app.focus {
-        Focus::Repl => draw_pty(frame, app, parser, history, scroll_offset, main_area),
-        Focus::Viz => draw_viz(frame, app, main_area),
+    if app.bottom_tpat_open {
+        let (pty_area, bottom_area) = split_with_bottom(main_area, app.focus);
+        draw_pty(frame, app, parser, history, scroll_offset, pty_area);
+        match app.focus {
+            Focus::Repl => draw_tpat_grid(frame, app, bottom_area),
+            Focus::Viz => draw_viz(frame, app, bottom_area),
+        }
+    } else {
+        match app.focus {
+            Focus::Repl => draw_pty(frame, app, parser, history, scroll_offset, main_area),
+            Focus::Viz => draw_viz(frame, app, main_area),
+        }
     }
 }
 
@@ -181,9 +207,11 @@ fn draw_separator(frame: &mut Frame, app: &AppState, area: Rect) {
     } else {
         "WAIT"
     };
-    let focus_tag = match app.focus {
-        Focus::Repl => "REPL (F2->Viz)",
-        Focus::Viz => "VIZ (j/k, J/K, F2->REPL)",
+    let focus_tag = match (app.bottom_tpat_open, app.focus) {
+        (false, Focus::Repl) => "REPL (F1:TPat, F2:Viz)",
+        (false, Focus::Viz) => "VIZ (j/k, J/K, F2:REPL)",
+        (true, Focus::Repl) => "REPL+TPat (F1:Hide, F2:Expand)",
+        (true, Focus::Viz) => "EXPANDED (j/k, J/K, F2:REPL)",
     };
 
     let text = format!(
@@ -239,16 +267,11 @@ fn draw_tpat_grid(frame: &mut Frame, app: &mut AppState, area: Rect) {
 
     let visible = app.visible_instruments();
     if visible.is_empty() {
-        let base_title = if app.show_inactive {
-            " Active & Inactive TPats "
-        } else {
-            " Active TPats "
-        };
         let block = Block::default()
             .borders(Borders::ALL)
             .border_style(border_style)
-            .title(base_title);
-        let msg = Paragraph::new("No active instruments. Run `p \"kick\"` in ghci (or press F2 + `i` to show inactive).")
+            .title(" Active TPats ");
+        let msg = Paragraph::new("No active instruments. Run `p \"kick\"` in ghci.")
             .style(Style::default().fg(MED_GRAY2))
             .block(block);
         frame.render_widget(msg, area);
@@ -279,11 +302,7 @@ fn draw_tpat_grid(frame: &mut Frame, app: &mut AppState, area: Rect) {
     } else {
         format!("bars {}-{}/{}", page_start_bar + 1, page_end_bar, global_bars)
     };
-    let title = if app.show_inactive {
-        format!(" Active & Inactive TPats [{}] ", bar_label)
-    } else {
-        format!(" Active TPats [{}] ", bar_label)
-    };
+    let title = format!(" Active TPats [{}] ", bar_label);
     let block = Block::default()
         .borders(Borders::ALL)
         .border_style(border_style)
