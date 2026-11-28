@@ -30,10 +30,6 @@ struct Args {
     #[arg(long, default_value_t = 9001)]
     port: u16,
 
-    /// Percentage of terminal height allocated to the visualization pane
-    #[arg(long, default_value_t = 45)]
-    split: u16,
-
     /// UI refresh rate (frames per second)
     #[arg(long, default_value_t = 30)]
     fps: u64,
@@ -63,7 +59,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let (cols, rows) = term_size()?;
     let init_rect = Rect::new(0, 0, cols, rows);
-    let (pty_rows, pty_cols) = pty_inner_size(init_rect, args.split);
+    let (pty_rows, pty_cols) = pty_inner_size(init_rect);
 
     let rx = spawn_udp_listener(args.port)?;
     let mut pty = PtySession::spawn(&program, &cmd_args, pty_rows, pty_cols, args.port)?;
@@ -94,7 +90,7 @@ fn run_loop(
     rx: &std::sync::mpsc::Receiver<telemetry::TelemetryPacket>,
     args: &Args,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    let mut app = AppState::new(args.split);
+    let mut app = AppState::new();
     let frame_dur = Duration::from_millis((1000 / args.fps.max(1)).max(8));
 
     loop {
@@ -102,7 +98,7 @@ fn run_loop(
             app.apply_packet(pkt);
         }
 
-        terminal.draw(|f| draw(f, &mut app, &pty.parser))?;
+        terminal.draw(|f| draw(f, &mut app, &pty.parser, &pty.history, pty.scroll_offset))?;
 
         if pty.exited.load(Ordering::SeqCst) {
             break;
@@ -111,22 +107,24 @@ fn run_loop(
         if event::poll(frame_dur)? {
             match event::read()? {
                 Event::Resize(cols, rows) => {
-                    let (pr, pc) = pty_inner_size(Rect::new(0, 0, cols, rows), app.viz_percent);
+                    let (pr, pc) = pty_inner_size(Rect::new(0, 0, cols, rows));
                     pty.resize(pr, pc);
                 }
                 Event::Paste(text) => {
+                    pty.reset_scrollback();
+                    let _ = pty.write_bytes(b"\x1b[200~");
+                    let _ = pty.write_bytes(text.as_bytes());
+                    let _ = pty.write_bytes(b"\x1b[201~");
+                }
+                Event::Mouse(m) => {
                     if app.focus == Focus::Repl {
-                        pty.reset_scrollback();
-                        let _ = pty.write_bytes(b"\x1b[200~");
-                        let _ = pty.write_bytes(text.as_bytes());
-                        let _ = pty.write_bytes(b"\x1b[201~");
+                        match m.kind {
+                            MouseEventKind::ScrollUp => pty.scroll_up(3),
+                            MouseEventKind::ScrollDown => pty.scroll_down(3),
+                            _ => {}
+                        }
                     }
                 }
-                Event::Mouse(m) => match m.kind {
-                    MouseEventKind::ScrollUp => pty.scroll_up(3),
-                    MouseEventKind::ScrollDown => pty.scroll_down(3),
-                    _ => {}
-                },
                 Event::Key(key) if key.kind != KeyEventKind::Release => {
                     if key.code == KeyCode::F(2) {
                         app.focus = match app.focus {

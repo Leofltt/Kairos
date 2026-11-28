@@ -41,13 +41,12 @@ pub struct AppState {
     pub param_scroll: u16,
     pub show_inactive: bool,
     pub focus: Focus,
-    pub viz_percent: u16,
     pub connected: bool,
     pub last_packet_at: Option<Instant>,
 }
 
 impl AppState {
-    pub fn new(viz_percent: u16) -> Self {
+    pub fn new() -> Self {
         Self {
             clock: ClockState {
                 bar: 0,
@@ -64,7 +63,6 @@ impl AppState {
             param_scroll: 0,
             show_inactive: false,
             focus: Focus::Repl,
-            viz_percent: viz_percent.clamp(15, 80),
             connected: false,
             last_packet_at: None,
         }
@@ -134,31 +132,38 @@ impl AppState {
     }
 }
 
-pub fn split_areas(area: Rect, viz_percent: u16) -> (Rect, Rect, Rect) {
+pub fn split_areas(area: Rect) -> (Rect, Rect) {
     let chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
-            Constraint::Percentage(viz_percent),
             Constraint::Length(1),
-            Constraint::Min(5),
+            Constraint::Min(3),
         ])
         .split(area);
-    (chunks[0], chunks[1], chunks[2])
+    (chunks[0], chunks[1])
 }
 
-pub fn pty_inner_size(area: Rect, viz_percent: u16) -> (u16, u16) {
-    let (_, _, pty_area) = split_areas(area, viz_percent);
+pub fn pty_inner_size(area: Rect) -> (u16, u16) {
+    let (_, pty_area) = split_areas(area);
     let rows = pty_area.height.saturating_sub(2).max(1);
     let cols = pty_area.width.saturating_sub(2).max(1);
     (rows, cols)
 }
 
-pub fn draw(frame: &mut Frame, app: &mut AppState, parser: &Arc<Mutex<vt100::Parser>>) {
-    let (viz_area, sep_area, pty_area) = split_areas(frame.area(), app.viz_percent);
+pub fn draw(
+    frame: &mut Frame,
+    app: &mut AppState,
+    parser: &Arc<Mutex<vt100::Parser>>,
+    history: &Arc<Mutex<VecDeque<String>>>,
+    scroll_offset: usize,
+) {
+    let (top_area, main_area) = split_areas(frame.area());
 
-    draw_viz(frame, app, viz_area);
-    draw_separator(frame, app, sep_area);
-    draw_pty(frame, app, parser, pty_area);
+    draw_separator(frame, app, top_area);
+    match app.focus {
+        Focus::Repl => draw_pty(frame, app, parser, history, scroll_offset, main_area),
+        Focus::Viz => draw_viz(frame, app, main_area),
+    }
 }
 
 fn draw_separator(frame: &mut Frame, app: &AppState, area: Rect) {
@@ -526,18 +531,21 @@ fn draw_param_inspector(frame: &mut Frame, app: &mut AppState, area: Rect) {
     );
 }
 
-fn draw_pty(frame: &mut Frame, app: &AppState, parser: &Arc<Mutex<vt100::Parser>>, area: Rect) {
-    let scrollback = parser
-        .lock()
-        .map(|p| p.screen().scrollback())
-        .unwrap_or(0);
+fn draw_pty(
+    frame: &mut Frame,
+    app: &AppState,
+    parser: &Arc<Mutex<vt100::Parser>>,
+    history: &Arc<Mutex<VecDeque<String>>>,
+    scroll_offset: usize,
+    area: Rect,
+) {
     let border_style = if app.focus == Focus::Repl {
         Style::default().fg(SMOKY_AMETHYST)
     } else {
         Style::default().fg(MED_GRAY1)
     };
-    let title = if scrollback > 0 {
-        format!(" ghci [SCROLL +{} | type or Shift+PgDn to return] ", scrollback)
+    let title = if scroll_offset > 0 {
+        format!(" ghci [SCROLL +{} | type or Shift+PgDn to return] ", scroll_offset)
     } else {
         " ghci ".to_string()
     };
@@ -548,11 +556,27 @@ fn draw_pty(frame: &mut Frame, app: &AppState, parser: &Arc<Mutex<vt100::Parser>
     let inner = block.inner(area);
     frame.render_widget(block, area);
 
+    if scroll_offset > 0 {
+        if let Ok(hist) = history.lock() {
+            let total = hist.len();
+            let view_h = inner.height as usize;
+            let end = total.saturating_sub(scroll_offset);
+            let start = end.saturating_sub(view_h);
+            let lines: Vec<Line> = hist
+                .range(start..end)
+                .map(|s| Line::from(Span::styled(s.as_str(), Style::default().fg(LIGHT_GRAY2))))
+                .collect();
+            frame.render_widget(Paragraph::new(lines), inner);
+        }
+        return;
+    }
+
     if let Ok(p) = parser.lock() {
         let screen = p.screen();
+        let (s_rows, s_cols) = screen.size();
         let buf = frame.buffer_mut();
-        for row in 0..inner.height {
-            for col in 0..inner.width {
+        for row in 0..inner.height.min(s_rows) {
+            for col in 0..inner.width.min(s_cols) {
                 if let Some(cell) = screen.cell(row, col) {
                     let x = inner.x + col;
                     let y = inner.y + row;
@@ -583,7 +607,7 @@ fn draw_pty(frame: &mut Frame, app: &AppState, parser: &Arc<Mutex<vt100::Parser>
                 }
             }
         }
-        if app.focus == Focus::Repl && scrollback == 0 && !screen.hide_cursor() {
+        if app.focus == Focus::Repl && !screen.hide_cursor() {
             let (cr, cc) = screen.cursor_position();
             let cx = inner.x + cc.min(inner.width.saturating_sub(1));
             let cy = inner.y + cr.min(inner.height.saturating_sub(1));
