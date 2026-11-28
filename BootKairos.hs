@@ -164,6 +164,14 @@ fxChopDepth i list fun = addPf i 159 "/track/fx/chopper/depth" (toPfs list) fun
 fxChopDuty i list fun = addPf i 160 "/track/fx/chopper/duty" (toPfs list) fun
 fxChopMode i list fun = addPf i 161 "/track/fx/chopper/mode" (toPfs list) fun
 
+-- Aillen Track FX Chain Rings Modal Resonator
+fxRingsFreq i list fun = addPf i 164 "/track/fx/rings/freq" (toPfs list) fun
+fxRingsStructure i list fun = addPf i 165 "/track/fx/rings/structure" (toPfs list) fun
+fxRingsBrightness i list fun = addPf i 166 "/track/fx/rings/brightness" (toPfs list) fun
+fxRingsDamping i list fun = addPf i 167 "/track/fx/rings/damping" (toPfs list) fun
+fxRingsPosition i list fun = addPf i 168 "/track/fx/rings/position" (toPfs list) fun
+fxRingsMix i list fun = addPf i 169 "/track/fx/rings/mix" (toPfs list) fun
+
 -- Aillen TwoOp Synth specific parameters
 realtime i list fun = addPf i 77 "/track/realtime" (toPfs list) fun
 legato i list fun = addPf i 78 "/track/legato" (toPfs list) fun
