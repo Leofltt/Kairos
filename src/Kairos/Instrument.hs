@@ -981,6 +981,8 @@ aillenOrc = do
   a303 <- aillen303
   hubass <- aillenHubass
   swave <- aillenSwave
+  s9 <- aillenSamplerV 9 ""
+  s10 <- aillenSamplerV 10 ""
   del <- aillenDelay
   rev <- aillenReverb
   mix <- aillenMaster
@@ -995,6 +997,8 @@ aillenOrc = do
         ("303", a303),
         ("hubass", hubass),
         ("swave", swave),
+        ("s9", s9),
+        ("s10", s10),
         ("del", del),
         ("rev", rev),
         ("mix", mix)

@@ -181,7 +181,7 @@ pub fn draw(
         let (pty_area, bottom_area) = split_with_bottom(main_area, app.focus);
         draw_pty(frame, app, parser, history, scroll_offset, pty_area);
         match app.focus {
-            Focus::Repl => draw_tpat_grid(frame, app, bottom_area),
+            Focus::Repl => draw_tpat_grid(frame, app, bottom_area, 4),
             Focus::Viz => draw_viz(frame, app, bottom_area),
         }
     } else {
@@ -231,7 +231,7 @@ fn draw_viz(frame: &mut Frame, app: &mut AppState, area: Rect) {
         .constraints([Constraint::Percentage(60), Constraint::Percentage(40)])
         .split(area);
 
-    draw_tpat_grid(frame, app, cols[0]);
+    draw_tpat_grid(frame, app, cols[0], 2);
     draw_param_inspector(frame, app, cols[1]);
 }
 
@@ -253,7 +253,7 @@ enum CellKind {
     Unused,
 }
 
-fn draw_tpat_grid(frame: &mut Frame, app: &mut AppState, area: Rect) {
+fn draw_tpat_grid(frame: &mut Frame, app: &mut AppState, area: Rect, max_page_bars: i64) {
     let border_style = if app.focus == Focus::Viz {
         Style::default().fg(SMOKY_AMETHYST)
     } else {
@@ -288,7 +288,13 @@ fn draw_tpat_grid(frame: &mut Frame, app: &mut AppState, area: Rect) {
         .max()
         .unwrap_or(1)
         .max(1);
-    let page_bars: i64 = if global_bars >= 2 && grid_width >= 24 { 2 } else { 1 };
+    let page_bars: i64 = if max_page_bars >= 4 && global_bars >= 3 && grid_width >= 48 {
+        4.min(global_bars)
+    } else if global_bars >= 2 && grid_width >= 24 {
+        2
+    } else {
+        1
+    };
     let cur_global_bar = app.clock.bar.rem_euclid(global_bars);
     let page_idx = cur_global_bar / page_bars;
     let page_start_bar = page_idx * page_bars;

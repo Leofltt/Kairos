@@ -305,7 +305,7 @@ fxChopRate "swave" [3, 6] (step 2)
 
 ---
 
-## 4. Sampler Specific Parameters (Tracks 1, 2, 3, 5)
+## 4. Sampler Specific Parameters (Tracks 1, 2, 3, 5, 9, 10)
 
 These control playback, granular time-stretch, and slice options for the Sampler engine.
 

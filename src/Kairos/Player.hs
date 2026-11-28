@@ -135,7 +135,7 @@ playAillen instr = do
         durMs = dur * 1000.0
         midiToHz m = 440.0 * (2.0 ** ((m - 69.0) / 12.0))
         freq = if pitchVal <= 127.0 then midiToHz pitchVal else pitchVal
-    if trackId `elem` [1, 2, 3, 5]
+    if trackId `elem` [1, 2, 3, 5, 9, 10]
       then do
         -- Sampler track
         let hasCustomSub sub =
